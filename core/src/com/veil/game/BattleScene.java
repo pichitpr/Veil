@@ -46,7 +46,7 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, "Lakitu"));
 		//permanentDynList.add(new ScriptedEntity(this, "ShellKoopa"));
 		//permanentDynList.add(new ScriptedEntity(this, "TomahawkMan"));
-		permanentDynList.add(new ScriptedEntity(this, "FlameMan"));
+		permanentDynList.add(new ScriptedEntity(this, "Batonton"));
 	}
 	
 	@Override

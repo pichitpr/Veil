@@ -14,7 +14,7 @@ public class DistanceTo implements IFunction{
 		DynamicEntity dyn = ((ItpData)itp.getAdditionalData()).thisAgent;
 		String axis = param[0].toString();
 		Position pos = Position.parse(param[1]);
-		if(axis.equals("y")){
+		if(axis.equalsIgnoreCase("Y")){
 			return dyn.getWorldCenteredPosition().y - pos.getY();
 		}else{
 			return dyn.getWorldCenteredPosition().x - pos.getX();

@@ -15,7 +15,7 @@ public class DistanceToPlayer implements IFunction{
 		DynamicEntity dyn = itpData.thisAgent;
 		LevelContainer level = itpData.level;
 		String axis = param[0].toString();
-		if(axis.equals("y")){
+		if(axis.equalsIgnoreCase("Y")){
 			return dyn.getWorldCenteredPosition().y - level.getPlayer().getWorldCenteredPosition().y;
 		}else{
 			return dyn.getWorldCenteredPosition().x - level.getPlayer().getWorldCenteredPosition().x;
