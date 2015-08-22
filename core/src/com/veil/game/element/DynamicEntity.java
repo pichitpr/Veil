@@ -49,7 +49,6 @@ public abstract class DynamicEntity extends Entity{
 		this.identifier = "^";
 		this.level = level;
 		lastPos = collider.getPosition(new Vector2());
-		//this.hierarchy = new EntityHierarchy(this);
 		this.parent = null;
 		this.children = new ArrayList<DynamicEntity>();
 		this.parentPart = false;
@@ -63,8 +62,6 @@ public abstract class DynamicEntity extends Entity{
 		this.identifier = "^";
 		this.level = level;
 		lastPos = collider.getPosition(new Vector2());
-		//this.hierarchy = parent.hierarchy;
-		//this.hierarchy.appendChildOf(parent, this);
 		this.parent = parent;
 		this.parent.children.add(this);
 		this.children = new ArrayList<DynamicEntity>();

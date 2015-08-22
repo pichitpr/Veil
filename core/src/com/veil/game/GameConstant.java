@@ -19,10 +19,10 @@ public class GameConstant {
 	/**
 	 * Specify downward force applied to every dynamic 
 	 */
-	public static final float gravity = 2f;
+	public static final float gravity = 1.5f;
 	
-	public static final float jumpSpeed = 3f;
-	public static final int jumpCounter = 5;
+	public static final float jumpSpeed = 2.7f;
+	public static final int jumpCounter = 7;
 	
 	/**
 	 * Auto despawning time (in frame) after the dynamic leaves the screen
