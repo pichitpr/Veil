@@ -1,0 +1,28 @@
+.Mantan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,16");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 1, false);
+		}
+		.seq1{
+			if(DistanceToPlayer("Y") > 32){
+				RunStraight("south", 1, Abs(DistanceToPlayer("Y")) <= 16);
+			}else{
+				if(DistanceToPlayer("Y") < -32){
+					RunStraight("north", 1, Abs(DistanceToPlayer("Y")) <= 16);
+				}
+			}
+		}
+	}
+}

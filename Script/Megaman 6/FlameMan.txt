@@ -1,0 +1,100 @@
+.FlameMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 60);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(Anchor("c(32,0)"), 180, 5, SurfaceInDir("south"));
+			}else{
+				Jump(Get("position", DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			}
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Goto(.flame);
+			}else{
+				Goto(.bullet);
+			}
+		}
+	}
+	.flame{
+		.seq0{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("h")));
+			Spawn(.FlameShield, Anchor("c(16,-80)"));
+			Wait(TimePass() >= 10);
+			Spawn(.FlameShield, Anchor("c(96,-80)"));
+			Wait(TimePass() >= 10);
+			Spawn(.FlameShield, Anchor("c(216,-80)"));
+			Wait(TimePass() >= 10);
+			Spawn(.FlameShield, Anchor("c(336,-80)"));
+			Wait(TimePass() >= 10);
+			Spawn(.FlameShield, Anchor("c(456,-80)"));
+			Wait(TimePass() >= 10);
+			Spawn(.FlameShield, Anchor("c(676,-80)"));
+			Wait(TimePass() >= 50);
+			Goto(.base);
+		}
+	}
+	.bullet{
+		.seq0{
+			Spawn(.FlameShot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("h")) );
+			Wait(TimePass() >= 50);
+			Spawn(.FlameShot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("h")) );
+			Wait(TimePass() >= 50);
+			Spawn(.FlameShot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("h")) );
+			Wait(TimePass() >= 50);
+			Goto(.base);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("h")));
+		}
+	}
+}
+
+.FlameShield{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "16,128");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("phasing", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight("north", 7, TravelDistance() >= 130);
+			RunStraight("south", 7, TravelDistance() >= 130);
+			Wait(TimePass() >= 10);
+			RunStraight("north", 7, TravelDistance() >= 130);
+			RunStraight("south", 7, TravelDistance() >= 130);
+			Despawn();
+		}
+	}
+}
+
+.FlameShot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+	}
+}

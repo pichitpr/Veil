@@ -1,0 +1,17 @@
+.Bullet_Player{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "10,10");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("group", DynamicFilter("this"), 0);
+		Set("direction", DynamicFilter("this"), Get("direction", DynamicFilter("player")));
+		Set("position", DynamicFilter("this"), Get("position", DynamicFilter("player")));
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 10, false);
+		}
+	}
+}

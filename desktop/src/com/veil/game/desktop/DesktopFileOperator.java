@@ -6,7 +6,7 @@ import com.veil.platforminterface.FileOperator;
 
 public class DesktopFileOperator implements FileOperator{
 
-	private final FileHandle root = Gdx.files.absolute("G:\\libgdx");
+	private final FileHandle root = Gdx.files.absolute("G:\\libgdx\\Veil");
 	
 	@Override
 	public FileHandle getStorageRoot() {

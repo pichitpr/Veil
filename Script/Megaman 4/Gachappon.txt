@@ -1,0 +1,63 @@
+.Gachappon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,128");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 12);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		}
+		.seq1{
+			Wait(TimePass() >= 120);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Spawn(.Gachappon_bullet, Anchor("c(32,-60)"), Get("direction", DynamicFilter("this")) );
+				Wait(TimePass() >= 80);
+				Spawn(.Gachappon_bullet, Anchor("c(32,-60)"), Get("direction", DynamicFilter("this")) );
+			}else{
+				Spawn(.Gachappon_projectile, Anchor("c(-28,60)"));
+				Wait(TimePass() >= 80);
+				Spawn(.Gachappon_projectile, Anchor("c(-28,60)"));
+				Wait(TimePass() >= 80);
+				Spawn(.Gachappon_projectile, Anchor("c(-28,60)"));
+			}
+		}
+	}
+}
+
+.Gachappon_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+	}
+}
+
+.Gachappon_projectile{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 200, 5, false);
+		}
+	}
+}

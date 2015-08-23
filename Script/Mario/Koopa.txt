@@ -1,0 +1,79 @@
+.ShellKoopa{
+	.init{
+		Set("texture", DynamicFilter("this"), 5);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor("c(120,0)"), 150, 5, SurfaceInDir("south"));
+		}
+		.seq1{
+			if(SurfaceInDir( DirectionComponent("x", Get("direction",DynamicFilter("this")) ) )){
+				FlipDirection("h");
+			}
+		}
+	}
+	.des{
+		Spawn(.Koopa, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+	}
+}
+
+.Koopa{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 2, SurfaceInDir(DirectionComponent("x", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+	}
+	.des{
+		Spawn(.KoopaShell, Get("position", DynamicFilter("this")) );
+	}
+}
+
+.KoopaShell{
+	.init{
+		Set("texture", DynamicFilter("this"), 2);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			if(Attacked()){
+				Set("group", DynamicFilter("this"), 2);
+				Goto(.state1);
+			}
+		}
+	}
+	.state1{
+		.seq0{
+			if(Attacked()){
+				Set("group", DynamicFilter("this"), 1);
+				Goto(.state0);
+			}
+		}
+		.seq1{
+			RunStraight(Get("direction",DynamicFilter("this")), 8, SurfaceInDir(DirectionComponent("x", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");			
+		}
+	}
+}

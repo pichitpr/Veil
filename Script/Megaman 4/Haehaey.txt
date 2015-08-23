@@ -1,0 +1,43 @@
+.Haehaey{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  "west");
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 7, SurfaceInDir(DirectionComponent("x", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+			VarInc(0);
+			if(VarGet(0) == 3){
+				Set("phasing", DynamicFilter("this"), true);
+			}
+		}
+		.seq1{
+			Wait(TimePass() >= Random(DecimalSet(30,100,10))$ );
+			Spawn(.Haehaey_bullet, Get("position",DynamicFilter("this")) );
+		}
+	}
+}
+
+.Haehaey_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight("south", 4, false);
+		}
+	}
+}

@@ -1,0 +1,40 @@
+.Gyotot{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.swim{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, 
+				SurfaceInDir(Get("direction", DynamicFilter("this")))
+				);
+			FlipDirection("H");
+		}
+		.seq1{
+			if(VarGet(0) == 0 && Abs(DistanceToPlayer("Y")) <= 96){
+				Goto(.jump);
+			}
+		}
+	}
+	.jump{
+		.seq0{
+			Set("phasing", DynamicFilter("this"),  true);
+			Set("gravityeff", DynamicFilter("this"),  1);
+			Jump(Anchor("c(128,0)"), 256, 5, 
+				Abs(DistanceTo("Y", Get("position", DynamicFilter("this"))$ )) <= 5
+				);
+			Set("phasing", DynamicFilter("this"),  false);
+			Set("gravityeff", DynamicFilter("this"),  0);
+			VarInc(0);
+			Goto(.swim);
+		}
+	}
+}

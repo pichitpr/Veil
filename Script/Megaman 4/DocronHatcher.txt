@@ -1,0 +1,47 @@
+.DocronHatcher{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,500)");
+		Set("collider", DynamicFilter("this"),  "32,16");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.drop{
+		.seq0{
+			Spawn(.Docron, Get("position", DynamicFilter("this")));
+			Wait(TimePass() >= 100);
+		}
+	}
+}
+
+.Docron{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.fall{
+		.seq0{
+			if(SurfaceInDir("south")){
+				Wait(TimePass() >= 20);
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+				Goto(.move);
+			}
+		}
+	}
+	.move{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 5, SurfaceInDir(
+				DirectionComponent("X", Get("direction", DynamicFilter("this")) )
+				));
+			FlipDirection("H");
+		}
+	}
+}

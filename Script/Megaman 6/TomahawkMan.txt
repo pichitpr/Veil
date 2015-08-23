@@ -1,0 +1,113 @@
+.TomahawkMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 60);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(Anchor("c(32,0)"), 32, 5, SurfaceInDir("south"));
+			}else{
+				Jump(Get("position", DynamicFilter("player")), 360, 5, SurfaceInDir("south"));
+			}
+			Wait(TimePass() >= 20);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Goto(.feather);
+			}else{
+				Goto(.tomahawk);
+			}
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("h")));			
+		}
+	}
+	.feather{
+		.seq0{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("h")) );
+			Spawn(.FeatherBullet1, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Spawn(.FeatherBullet2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Spawn(.FeatherBullet3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Goto(.base);
+		}
+	}
+	.tomahawk{
+		.seq0{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("h")) );
+			Spawn(.Tomahawk, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Goto(.base);
+		}
+	}
+}
+
+.FeatherBullet1{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "24,4");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 8, false);
+		}
+	}
+}
+
+.FeatherBullet2{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "24,4");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 5, false);
+		}
+	}
+}
+
+.FeatherBullet3{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "24,4");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 3, false);
+		}
+	}
+}
+
+.Tomahawk{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"),  "48,10");
+		Set("gravityeff", DynamicFilter("this"), -0.1);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 10, false);
+		}
+	}
+}

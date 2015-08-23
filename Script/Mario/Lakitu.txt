@@ -1,0 +1,62 @@
+.Lakitu{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  "east");
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 10);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 6, SurfaceInDir(DirectionComponent("x", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("x")) <= 5){
+				Spawn(.SpinyEgg, Get("position",DynamicFilter("this")) );
+				Wait(TimePass() >= 100);
+			}
+		}
+	}
+}
+
+.SpinyEgg{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "24,24");
+		Set("gravityeff", DynamicFilter("this"),  1);
+	}
+	.state0{
+		.seq0{
+			if(SurfaceInDir("south")){
+				Despawn();
+			}
+		}
+	}
+	.des{
+		Spawn(.Spiny, Rel("c(0,20)") );
+	}
+}
+
+.Spiny{
+	.init{
+		Set("texture", DynamicFilter("this"), 5);
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 2, SurfaceInDir(DirectionComponent("x", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+	}
+}

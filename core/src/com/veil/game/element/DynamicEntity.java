@@ -61,7 +61,7 @@ public abstract class DynamicEntity extends Entity{
 		super(collider, texture);
 		this.identifier = "^";
 		this.level = level;
-		lastPos = collider.getPosition(new Vector2()); 
+		lastPos = collider.getPosition(new Vector2());
 		this.parent = parent;
 		this.parent.children.add(this);
 		this.children = new ArrayList<DynamicEntity>();

@@ -1,0 +1,40 @@
+.Batonton{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 2);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			if(Abs(DistanceToPlayer("X")) <= 80){
+				Goto(.chase);
+			}
+		}
+	}
+	.chase{
+		.seq0{
+			Set("invul", DynamicFilter("this"), false);
+			RunStraight(TurnToPlayer(DirectionSetDivide(16)), 1, false);
+		}
+		.seq1{
+			if(Attack()){
+				Wait(TimePass() >= 10);
+				Goto(.back);
+			}
+		}
+	}
+	.back{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			RunStraight("north", 10, SurfaceInDir("north"));
+			Goto(.wait);
+		}
+	}
+}

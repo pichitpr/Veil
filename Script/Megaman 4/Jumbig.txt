@@ -1,0 +1,24 @@
+.Jumbig{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,128");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 14);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			Wait(TimePass() >= 50);
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")));
+			if(Abs(DistanceToPlayer("X")) <= 96){
+				Jump(Anchor("c(32,0)"), 96, 5, SurfaceInDir("south"));
+			}else{
+				Jump(Anchor("c(96,0)"), 190, 5, SurfaceInDir("south"));
+			}
+		}
+	}
+}

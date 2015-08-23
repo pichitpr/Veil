@@ -1,0 +1,38 @@
+.Garyoby{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0, 2);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), VarGet(0), SurfaceInDir(DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("Y")) <= 5){
+				VarSet(0,8);
+			}else{
+				VarSet(0,2);
+			}
+		}
+		.seq2{
+			if(Attacked()){
+				Goto(.state1);
+			}
+		}
+	}
+	.state1{
+		.seq0{
+			Wait(TimePass() >= 80);
+			Goto(.state0);
+		}
+	}
+}
