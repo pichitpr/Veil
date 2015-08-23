@@ -1,0 +1,20 @@
+.M422{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,300)");
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				RunStraight("south", 8, SurfaceInDir("south"));
+				RunStraight("north", 5, Abs(DistanceTo("Y", VarGet(0))) <= 5);
+			}
+		}
+	}
+}
