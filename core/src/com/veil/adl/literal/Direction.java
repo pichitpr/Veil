@@ -35,6 +35,7 @@ public class Direction {
 	
 	public void setDirectionDegree(float degree){
 		data = new Vector2(EAST.data).rotate(degree);
+		filterNoise();
 	}
 	
 	public float getX(){
@@ -50,6 +51,7 @@ public class Direction {
 	 */
 	public void rotate(float degree){
 		data = data.rotate(degree);
+		filterNoise();
 	}
 	
 	public float getDegree(){
@@ -70,6 +72,14 @@ public class Direction {
 		return deltaDeg;
 	}
 	
+	
+	private void filterNoise(){
+		data.set(
+				((int)(data.x*1000))/1000f,
+				((int)(data.y*1000))/1000f
+				);
+	}
+	
 	@Override
 	public String toString(){
 		return "Dir: "+data.x+","+data.y;
@@ -78,7 +88,7 @@ public class Direction {
 	@Override
 	public boolean equals(Object o){
 		if(o instanceof Direction)
-			return data.equals(((Direction)o).data);
+			return data.epsilonEquals(((Direction)o).data, 0.0001f);
 		return false;
 	}
 	
