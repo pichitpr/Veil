@@ -58,6 +58,7 @@ import com.veil.adl.function.RandomPositionInRadius;
 import com.veil.adl.function.RangeCap;
 import com.veil.adl.function.RangeCapCircular;
 import com.veil.adl.function.Rel;
+import com.veil.adl.function.RelDirection;
 import com.veil.adl.function.RelPlayer;
 import com.veil.adl.function.SurfaceInDir;
 import com.veil.adl.function.TimePass;
@@ -141,6 +142,9 @@ public class AgentDatabase {
 		Registry.registerFunction("TurnTo", new TurnTo());
 		Registry.registerFunction("TurnToPlayer", new TurnToPlayer());
 		Registry.registerFunction("VarGet", new VarGet());
+		
+		//=========== v4
+		Registry.registerFunction("RelDirection", new RelDirection());
 	}
 	
 	private static boolean parseScriptInDir(FileHandle dir){
