@@ -17,12 +17,19 @@ public class Anchor implements IFunction{
 		DynamicEntity dyn = ((ItpData)itp.getAdditionalData()).thisAgent;
 		Vector2 dynPos = dyn.getWorldCenteredPosition();
 		Direction dir = dyn.direction;
+		/*
 		if(dir.getX() >= 0){
 			return new Position(dynPos.x+anchorPos.getX(),dynPos.y+anchorPos.getY());
 		}else if(dir.getX() < 0){
 			return new Position(dynPos.x-anchorPos.getX(),dynPos.y+anchorPos.getY());
 		}
 		return null;
+		*/
+		if(dir.getX() >= 0){
+			return new Position(dynPos.x+anchorPos.getX(),dynPos.y+anchorPos.getY());
+		}else{
+			return new Position(dynPos.x-anchorPos.getX(),dynPos.y+anchorPos.getY());
+		}
 	}
 
 }
