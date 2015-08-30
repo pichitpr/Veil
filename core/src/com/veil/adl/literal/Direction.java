@@ -1,7 +1,6 @@
 package com.veil.adl.literal;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
@@ -18,11 +17,11 @@ public class Direction {
 	private Vector2 data; 
 	
 	public Direction(){
-		data = new Vector2(EAST.data);
+		data = new Vector2(EAST.data.cpy());
 	}
 	
 	public Direction(Direction d){
-		data = new Vector2(d.data);
+		data = new Vector2(d.data.cpy());
 	}
 	
 	public Direction(float x,float y){
@@ -82,7 +81,7 @@ public class Direction {
 	
 	@Override
 	public String toString(){
-		return "Dir: "+data.x+","+data.y;
+		return "Dir: "+data.x+","+data.y+" ("+getDegree()+")";
 	}
 	
 	@Override
@@ -128,32 +127,56 @@ public class Direction {
 	}
 	
 	/**
-	 * Return sorted index of Direction, 
-	 * the first index is the CW-most to the ref dir, 
-	 * the last index is the CCW-most to the ref dir
+	 * Return 2 directions from CCW-sorted no-repeated dSet, 
+	 * [0] being the nearest CCW, [1] for the nearest CW
+	 * If dir equals to one of direction in dSet, that direction is discarded from the set during calculation
+	 * If dSet has 1 direction, [0] and [1] return the same Direction obj
+	 * if dSet is empty, it returns dir for both CW and CCW 
 	 */
-	public static Integer[] getSortedDirectionList(final List<Direction> dSet, final Direction dir){
-		Integer[] sortedIdx = new Integer[dSet.size()+1];
-		for(int i=0; i<dSet.size()+1; i++){
-			sortedIdx[i] = i-1;
-		}
-		Arrays.sort(sortedIdx, new Comparator<Integer>(){
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				float  deg1,deg2;
-				if(o1 == -1)
-					deg1 = 0;
-				else
-					deg1 = dSet.get(o1).deltaDegree(dir);
-				if(o2 == -1)
-					deg2 = 0;
-				else
-					deg2 = dSet.get(o1).deltaDegree(dir);
-				if(deg1 < deg2) return -1;
-				else if(deg1 > deg2) return 1;
-				return 0;
+	public static Direction[] getTwoNearestFromSet(List<Direction> dSetOri, Direction dir){
+		List<Direction> dSet = new ArrayList<Direction>();
+		dSet.addAll(dSetOri);
+		Direction[] result = new Direction[2];
+		
+		//Discard duplicated direction
+		int skipping = -1;
+		for(int i=0; i<dSet.size(); i++){
+			if(Math.abs(dSet.get(i).deltaDegree(dir)) < 1f){
+				skipping = i;
+				break;
 			}
-		});
-		return sortedIdx;
+		}
+		if(dSet.size() == 0 || (dSet.size() == 1 && skipping > -1)){
+			result[0] = new Direction(dir);
+			result[1] = new Direction(dir);
+			return result;
+		}
+		if(skipping > -1) dSet.remove(skipping);
+		
+		int nearestIdx = -1;
+		float minDeg = 400;
+		float delta;
+		for(int i=0; i<dSet.size(); i++){
+			delta = Math.abs(dir.deltaDegree(dSet.get(i)));
+			if(delta < minDeg){
+				minDeg = delta;
+				nearestIdx = i;
+			}
+		}
+		if(dir.deltaDegree(dSet.get(nearestIdx)) > 0){
+			//dir on the left(CCW) of nearest
+			result[1] = dSet.get(nearestIdx);
+			nearestIdx++;
+			if(nearestIdx >= dSet.size()) nearestIdx = 0;
+			result[0] = dSet.get(nearestIdx);
+		}else{
+			//dir on the right
+			result[0] = dSet.get(nearestIdx);
+			nearestIdx--;
+			if(nearestIdx < 0) nearestIdx = dSet.size()-1;
+			result[1] = dSet.get(nearestIdx);
+		}
+		
+		return result;
 	}
 }
