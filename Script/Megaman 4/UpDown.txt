@@ -1,0 +1,35 @@
+.UpDown{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,-100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				Goto(.up);
+			}
+		}
+	}
+	.up{
+		.seq0{
+			RunStraight("north", 7, TravelDistance() >= 450);
+			Goto(.down);
+		}
+	}
+	.down{
+		.seq0{
+			RunStraight("south", 3, TravelDistance() >= 450);
+		}
+		.seq1{
+			RunHarmonic("east", 1, TravelDistance() % 20 == 0);
+		}
+	}
+}

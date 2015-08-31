@@ -1,0 +1,50 @@
+.MetallJump{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.hide{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			if(Abs(DistanceToPlayer("X")) <= 96){
+				Set("invul", DynamicFilter("this"), false);				
+				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
+				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
+				Wait(TimePass() >= 20);
+				Goto(.move);
+			}
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")));
+		}
+	}
+	.move{
+		.seq0{
+			Jump(Anchor("c(96,0)"), 96, 5, SurfaceInDir("south"));
+			Goto(.hide);
+		}
+	}
+}
+
+.MetallJump_Bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 4, false);
+		}
+	}
+}

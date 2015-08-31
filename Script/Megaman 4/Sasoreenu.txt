@@ -1,0 +1,47 @@
+.Sasoreenu{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.run{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			RunStraight(Get("direction", DynamicFilter("this")), 3, TravelDistance() >= 160);
+			Goto(.hide);
+		}
+		.seq1{
+			if(SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )){			
+				Goto(.hide);
+			}
+		}
+	}
+	.hide{
+		.seq0{
+				Set("gravityeff", DynamicFilter("this"), 0);
+				Set("phasing", DynamicFilter("this"), true);
+				Set("invul", DynamicFilter("this"), true);
+				FlipDirection("H");
+				RunStraight("south", 3, TravelDistance() > 48);
+				Goto(.ambush);
+		}
+	}
+	.ambush{
+		.seq0{
+				Wait(TimePass() >= 20);
+				if(Abs(DistanceToPlayer("X")) <= 128){
+					RunStraight("north", 3, TravelDistance() > 60);
+					Set("gravityeff", DynamicFilter("this"), 1);
+					Set("phasing", DynamicFilter("this"), false);
+					Set("invul", DynamicFilter("this"), false);
+					Goto(.run);
+				}
+		}
+	}
+}

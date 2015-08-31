@@ -1,0 +1,37 @@
+.Pakatto{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			Wait(TimePass() >= 120);
+			Set("invul", DynamicFilter("this"), false);
+			Spawn(.Pakatto_bullet, Anchor("c(16,0)"), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 60);
+		}
+	}
+}
+
+.Pakatto_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+	}
+}

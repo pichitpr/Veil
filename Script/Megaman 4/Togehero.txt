@@ -1,0 +1,22 @@
+.Togehero{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 2, false);
+		}
+		.seq1{
+			RunHarmonic("north", 2, TravelDistance() % 96 == 0);
+		}
+	}
+}

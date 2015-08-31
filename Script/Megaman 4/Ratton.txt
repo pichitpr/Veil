@@ -1,0 +1,26 @@
+.Ratton{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.move{
+		.seq0{
+			Wait(TimePass() >= 128);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(Anchor("c(72,0)"), 64, 5, SurfaceInDir("south"));
+			}else{
+				Jump(Anchor("c(72,0)"), 128, 5, SurfaceInDir("south"));
+			}
+			if(SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )){
+				FlipDirection("H");
+			}
+		}
+	}
+}

@@ -1,0 +1,49 @@
+.Seamine{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("invul", DynamicFilter("this"),  true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.float{
+		.seq0{
+			RunHarmonic("north", 1, TravelDistance() % 48 == 1);
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				Goto(.explode);
+			}
+		}
+	}
+	.explode{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.seamine_explosion, Get("position", DynamicFilter("this")));
+	}
+}
+
+.seamine_explosion{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "96,96");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			Despawn();
+		}
+	}
+}

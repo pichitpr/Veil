@@ -1,0 +1,62 @@
+.SkeletonJoe{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"), 1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.attack{
+		.seq0{
+			Wait(TimePass() >= 60);
+			Spawn(.skeljoe_bone, Anchor("c(10,10)"), Get("direction", DynamicFilter("this")) );
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq2{
+			if(Attacked()){
+				Goto(.collapse);
+			}
+		}
+	}
+	.collapse{
+		.seq0{
+			Set("attacker", DynamicFilter("this"), false);
+			Set("defender", DynamicFilter("this"), false);
+			Wait(TimePass() >= 100);
+			Set("attacker", DynamicFilter("this"), true);
+			Set("defender", DynamicFilter("this"), true);
+			Wait(TimePass() >= 40);
+			Goto(.attack);
+		}
+	}
+}
+
+.skeljoe_bone{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 32){
+				Jump(Anchor("c(0,0)"), 96, 5, false);
+			}else{
+				if(Abs(DistanceToPlayer("X")) <= 96){
+					Jump(Anchor("c(96,0)"), 96, 5, false);
+				}else{
+					Jump(Anchor("c(192,0)"), 96, 5, false);
+				}
+			}
+		}
+	}
+}

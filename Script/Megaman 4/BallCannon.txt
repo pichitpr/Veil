@@ -1,0 +1,47 @@
+.BallCannon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,64");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 4);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			Wait(TimePass() >= 120);
+			Spawn(.BallCannon_BounceBall, Anchor("c(0,24)"), RelDirection("45") );
+		}
+	}
+}
+
+.BallCannon_BounceBall{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 7, false);
+		}
+		.seq1{
+			if(SurfaceInDir("north") || SurfaceInDir("south")){
+				FlipDirection("V");
+				Wait(TimePass() >= 1);
+			}else{
+				if(SurfaceInDir("east") || SurfaceInDir("west")){
+					FlipDirection("H");
+					Wait(TimePass() >= 1);
+				}
+			}
+		}
+	}
+}

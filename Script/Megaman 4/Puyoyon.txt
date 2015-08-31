@@ -1,0 +1,57 @@
+.Puyoyon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.move{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 2, TravelDistance() >= 128);
+			if(Abs(DistanceToPlayer("X")) <= 96){
+				Goto(.float);
+			}
+		}
+		.seq1{
+			if(SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )){
+				FlipDirection("H");
+			}
+		}
+	}
+	.float{
+		.seq0{
+			Set("gravityeff", DynamicFilter("this"), -1);
+			if(SurfaceInDir("north")){
+				Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+				Goto(.move_ceil);
+			}
+		}
+	}
+	.move_ceil{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 2, TravelDistance() >= 128);
+			if(Abs(DistanceToPlayer("X")) <= 96){
+				Goto(.fall);
+			}
+		}
+		.seq1{
+			if(SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )){
+				FlipDirection("H");
+			}
+		}
+	}
+	.fall{
+		.seq0{
+			Set("gravityeff", DynamicFilter("this"), 1);
+			if(SurfaceInDir("south")){
+				Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+				Goto(.move);
+			}
+		}
+	}
+}
