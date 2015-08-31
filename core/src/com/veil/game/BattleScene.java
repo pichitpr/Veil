@@ -55,7 +55,25 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, "Haehaey"));
 		//permanentDynList.add(new ScriptedEntity(this, "Helipon"));
 		//permanentDynList.add(new ScriptedEntity(this, "Jumbig"));
-		permanentDynList.add(new ScriptedEntity(this, "Mantan"));
+		//permanentDynList.add(new ScriptedEntity(this, "Mantan"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetallRun"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetallJump"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetallSwim"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetallSpin"));
+		//permanentDynList.add(new ScriptedEntity(this, "Monoroader"));
+		//permanentDynList.add(new ScriptedEntity(this, "Mummira"));
+		//permanentDynList.add(new ScriptedEntity(this, "Pakatto"));
+		//permanentDynList.add(new ScriptedEntity(this, "Puyoyon"));
+		//permanentDynList.add(new ScriptedEntity(this, "Ratton"));
+		//permanentDynList.add(new ScriptedEntity(this, "Ringring"));
+		//permanentDynList.add(new ScriptedEntity(this, "Sasoreenu"));
+		//permanentDynList.add(new ScriptedEntity(this, "Seamine"));
+		//permanentDynList.add(new ScriptedEntity(this, "SkeletonJoe"));
+		//permanentDynList.add(new ScriptedEntity(this, "BallCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "Togehero"));
+		//permanentDynList.add(new ScriptedEntity(this, "TotemPolem"));
+		//permanentDynList.add(new ScriptedEntity(this, "UpDown"));
+		//permanentDynList.add(new ScriptedEntity(this, "WallBlaster"));
 	}
 	
 	@Override
@@ -64,19 +82,6 @@ public class BattleScene implements Screen, LevelContainer{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
-		
-		//Draw
-		game.batch.begin();
-		map.render(game.batch,game.region);
-		player.render(game.batch,game.region);
-		for(DynamicEntity dyn : permanentDynList){
-			dyn.render(game.batch,game.region);
-		}
-		/*for(DynamicEntity dyn : temporaryDynList){
-			dyn.render(game.batch,game.region);
-		}*/
-		game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
-		game.batch.end();
 		
 		//=================================================================
 		// Update
@@ -152,6 +157,25 @@ public class BattleScene implements Screen, LevelContainer{
 		/*for(DynamicEntity dyn : temporaryDynList){
 			dyn.handleCollisionEvent();
 		}*/
+		
+		//===========================================================
+		// Render
+		//===========================================================
+		game.batch.begin();
+		map.render(game.batch,game.region);
+		player.render(game.batch,game.region);
+		for(DynamicEntity dyn : permanentDynList){
+			dyn.render(game.batch,game.region);
+		}
+		/*for(DynamicEntity dyn : temporaryDynList){
+			dyn.render(game.batch,game.region);
+		}*/
+		game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
+		game.batch.end();
+		
+		//===========================================================
+		// Despawn
+		//===========================================================
 		
 		//Propagate despawning to children
 		for(int i=0; i<permanentDynList.size(); i++){
