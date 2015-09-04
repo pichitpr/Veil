@@ -17,17 +17,13 @@ public class DirectionSetRange implements IFunction {
 		float angStart = start.getDegree();
 		float angEnd = end.getDegree();
 		if(angEnd < angStart){
-			Direction temp = end;
-			end = start;
-			start = temp;
-			angStart = start.getDegree();
-			angEnd = end.getDegree();
+			angStart -= 360f;
 		}
 		float step = ((Number)param[2]).floatValue();
 		List<Direction> dSet = new ArrayList<Direction>();
-		while(start.getDegree() <= end.getDegree()){
-			dSet.add(new Direction(start));
-			start.rotate(step);
+		while(angStart <= angEnd){
+			dSet.add(Direction.parse(""+angStart));
+			angStart += step;
 		}
 		return dSet;
 	}
