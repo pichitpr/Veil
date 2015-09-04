@@ -3,6 +3,8 @@ package com.veil.game.element;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -15,6 +17,8 @@ import com.veil.game.level.LevelContainer;
 
 public abstract class DynamicEntity extends Entity{
 
+	public static final Sound sfxReflect = Gdx.audio.newSound(Gdx.files.internal("reflection.mp3"));
+	
 	public enum Group{
 		ALLY , ENEMY , HOSTILE
 	};

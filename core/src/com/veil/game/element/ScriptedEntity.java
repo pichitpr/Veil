@@ -65,6 +65,8 @@ public class ScriptedEntity extends DynamicEntity{
 							this.hp -= dyn.atk;
 							if(this.hp < 0)
 								this.hp = 0;
+						}else{
+							sfxReflect.play(1.f);
 						}
 						
 						if(dyn.projectile && !dyn.invul){
