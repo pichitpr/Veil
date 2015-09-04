@@ -3,6 +3,9 @@ package com.veil.game.element;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.veil.adl.EventFlag;
@@ -218,4 +221,19 @@ public abstract class DynamicEntity extends Entity{
 	public abstract void handleCollisionEvent();
 	//Called on being despawn (before removing from entity list)
 	public abstract void onDespawn(float delta);
+	
+	@Override
+	public void render(SpriteBatch batch,AtlasRegion[] atlas){
+		if(visible){
+			Color c = batch.getColor();
+			
+			if(!defender){
+				batch.setColor(c.r, c.g, c.b, 0.6f);
+			}
+			Rectangle collider = getWorldCollider();
+			batch.draw(atlas[texture],collider.x,collider.y,collider.width,collider.height);
+			
+			batch.setColor(c);
+		}
+	}
 }
