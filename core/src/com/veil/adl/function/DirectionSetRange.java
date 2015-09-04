@@ -21,7 +21,7 @@ public class DirectionSetRange implements IFunction {
 		}
 		float step = ((Number)param[2]).floatValue();
 		List<Direction> dSet = new ArrayList<Direction>();
-		while(angStart <= angEnd){
+		while(angStart-angEnd < 2){ //use epsilon
 			dSet.add(Direction.parse(""+angStart));
 			angStart += step;
 		}
