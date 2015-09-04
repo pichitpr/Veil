@@ -232,10 +232,15 @@ public abstract class DynamicEntity extends Entity{
 			Color c = batch.getColor();
 			
 			if(!defender){
-				batch.setColor(c.r, c.g, c.b, 0.6f);
+				batch.setColor(c.r, c.g, c.b, 0.7f);
 			}
 			Rectangle collider = getWorldCollider();
 			batch.draw(atlas[texture],collider.x,collider.y,collider.width,collider.height);
+			
+			if(!projectile && invul){
+				batch.setColor(c.r, c.g, c.b, 0.6f);
+				batch.draw(atlas[2],collider.x,collider.y,collider.width,collider.height);
+			}
 			
 			batch.setColor(c);
 		}
