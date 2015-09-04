@@ -1,0 +1,59 @@
+.ToadMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			if(ButtonPress("attack")){
+				Goto(.jump);
+			}
+		}
+		.seq1{
+			Wait(TimePass() >= 200);
+			Goto(.rainflush);
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 260, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+	.rainflush{
+		.seq0{
+			Spawn(.Toadman_rain, Get("position", DynamicFilter("this")) );
+			Wait(TimePass() >= 120);
+		}
+		.seq1{
+			if(Attacked()){
+				Goto(.base);				
+			}
+		}
+	}
+}
+
+.Toadman_rain{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "10000,10000");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 100);
+			Despawn();
+		}
+	}
+}

@@ -1,0 +1,90 @@
+.Moby{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(300,200)");
+		Set("direction", DynamicFilter("this"),  "west");
+		Set("collider", DynamicFilter("this"),  "320,250");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 24);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.missile{
+		.seq0{
+			VarSet(0, Random(DecimalSet(1,5,1)));
+			if(VarGet(0) >= 1){
+				Wait(TimePass() >= 120);
+				Spawn(.Moby_missile, Anchor("c(160,0)"), TurnToPlayer(DirectionSetDivide(16)) );
+			}
+			if(VarGet(0) >= 2){
+				Wait(TimePass() >= 120);
+				Spawn(.Moby_missile, Anchor("c(160,0)"), TurnToPlayer(DirectionSetDivide(16)) );
+			}
+			if(VarGet(0) >= 3){
+				Wait(TimePass() >= 120);
+				Spawn(.Moby_missile, Anchor("c(160,0)"), TurnToPlayer(DirectionSetDivide(16)) );
+			}
+			if(VarGet(0) >= 4){
+				Wait(TimePass() >= 120);
+				Spawn(.Moby_missile, Anchor("c(160,0)"), TurnToPlayer(DirectionSetDivide(16)) );
+			}
+			if(VarGet(0) >= 5){
+				Wait(TimePass() >= 120);
+				Spawn(.Moby_missile, Anchor("c(160,0)"), TurnToPlayer(DirectionSetDivide(16)) );
+			}
+			Goto(.mine);
+		}
+	}
+	.mine{
+		.seq0{
+			Wait(TimePass() >= 100);
+			Spawn(.Moby_mine, "c(100,650)");
+			Spawn(.Moby_mine, "c(200,650)");
+			Spawn(.Moby_mine, "c(300,650)");
+			Spawn(.Moby_mine, "c(400,650)");
+			Spawn(.Moby_mine, "c(500,650)");
+			Wait(TimePass() >= 100);
+			AddExtraVelocityToPlayer("east", 5, TimePass() >= 300);
+			Goto(.missile);
+		}
+	}
+}
+
+.Moby_missile{
+	.init{
+		Set("texture", DynamicFilter("this"), 3);
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+		}
+		.seq1{
+			ChangeDirectionToPlayerByStep(DirectionSetDivide(16), 8);
+		}
+	}
+}
+
+.Moby_mine{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight("south", 2, false);
+		}
+	}
+}

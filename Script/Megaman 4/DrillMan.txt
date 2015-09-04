@@ -1,0 +1,102 @@
+.DrillMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0, 0);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 60);
+			VarSet(0, Random(DecimalSet(1,3,1)) );
+			if(VarGet(0) == 1){
+				Goto(.jump);
+			}else{
+				if(VarGet(0) == 2){
+					Goto(.shoot);
+				}else{
+					Goto(.dig);
+				}
+			}
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+	.shoot{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			RunStraight( Get("direction", DynamicFilter("this")), 4, SurfaceInDir( Get("direction", DynamicFilter("this")) ) );
+			Goto(.base);
+		}
+		.seq1{
+			Wait(TimePass() >= 40);
+			Spawn(.Drillman_bomb, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+	.dig{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			Jump(Get("position", DynamicFilter("this")), 200, 5, SurfaceInDir("south"));
+			Set("gravityEff", DynamicFilter("this"), 0);
+			Set("phasing", DynamicFilter("this"), true);
+			Set("invul", DynamicFilter("this"), true);
+			RunStraight("south", 3, TravelDistance() >= 120);
+			Wait(TimePass() >= 100);
+			RunStraight(TurnToPlayer(DirectionSet("H")), 6, Abs(DistanceToPlayer("X")) <= 32);
+			Wait(TimePass() >= 10);
+			RunStraight("north", 16, TravelDistance() >= 250);
+			Set("gravityEff", DynamicFilter("this"), 1);
+			Set("phasing", DynamicFilter("this"), false);
+			Set("invul", DynamicFilter("this"), false);
+			Goto(.base);
+		}
+	}
+}
+
+.Drillman_bomb{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,16");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 6, SurfaceInDir( Get("direction", DynamicFilter("this")) ) );
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.Drillmanbomb_explosion, Get("position", DynamicFilter("this")));
+	}
+}
+
+.Drillmanbomb_explosion{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "96,96");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			Despawn();
+		}
+	}
+}

@@ -1,0 +1,47 @@
+.BrightMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 60);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(Get("position", DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			}else{
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+				Wait(TimePass() >= 40);
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+				Wait(TimePass() >= 40);
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+			}
+		}
+	}
+}
+
+.Brightman_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 9, false);
+		}
+	}
+}
