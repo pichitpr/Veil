@@ -2,7 +2,7 @@
 	.init{
 		Set("texture", DynamicFilter("this"), 4);
 		Set("position", DynamicFilter("this"), "c(400,500)");
-		Set("collider", DynamicFilter("this"),  "32,16");
+		Set("collider", DynamicFilter("this"),  "48,16");
 		Set("gravityeff", DynamicFilter("this"),  0);
 		Set("hp", DynamicFilter("this"), 4);
 		Set("attacker", DynamicFilter("this"), true);
@@ -28,7 +28,7 @@
 .BoulderSpawner_Boulder{
 	.init{
 		Set("texture", DynamicFilter("this"), 3);
-		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("collider", DynamicFilter("this"),  "48,48");
 		Set("gravityeff", DynamicFilter("this"),  1);
 		Set("hp", DynamicFilter("this"), 1);
 		Set("attacker", DynamicFilter("this"), true);

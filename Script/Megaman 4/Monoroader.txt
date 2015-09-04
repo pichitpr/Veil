@@ -12,7 +12,6 @@
 	}
 	.move{
 		.seq0{
-			Set("invul", DynamicFilter("this"), false);
 			RunStraight( Get("direction", DynamicFilter("this")), 2, SurfaceInDir(
 				DirectionComponent("X", Get("direction", DynamicFilter("this")) )
 				));
@@ -33,6 +32,8 @@
 			Wait(TimePass() >= 30);
 			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
 			RunStraight( Get("direction", DynamicFilter("this")), 5, TravelDistance() >= 128);
+			Set("invul", DynamicFilter("this"), false);
+			Wait(TimePass() >= 20);
 			Goto(.move);
 		}
 		.seq1{

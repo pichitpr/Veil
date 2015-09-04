@@ -24,7 +24,7 @@
 			Spawn(.Mummira_Head, Rel("c(0,16)"), TurnToPlayer(DirectionSetDivide(16)));
 			Wait(TimePass() >= 40);
 			Set("defender", DynamicFilter("this"), false);
-			Wait(TimePass() >= 20);
+			Wait(TimePass() >= 40);
 			Goto(.hide);
 		}
 	}

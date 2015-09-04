@@ -18,7 +18,7 @@ public class Player extends DynamicEntity{
 	private boolean pressShoot = false;
 	
 	public Player(LevelContainer level, int texture) {
-		super(level, new Rectangle(50,500,32,32), texture);
+		super(level, new Rectangle(50,500,32,48), texture);
 		group = Group.ALLY;
 		defender = true;
 		gravityEff = 1;

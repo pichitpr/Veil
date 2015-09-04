@@ -3,7 +3,7 @@
 		Set("texture", DynamicFilter("this"), 4);
 		Set("position", DynamicFilter("this"), "c(320,400)");
 		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
-		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("collider", DynamicFilter("this"),  "32,48");
 		Set("gravityeff", DynamicFilter("this"),  1);
 		Set("hp", DynamicFilter("this"), 100);
 		Set("attacker", DynamicFilter("this"), true);
