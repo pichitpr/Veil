@@ -47,5 +47,7 @@ public class EventFlag {
 		pendingMessage = tmp;
 		pendingMessage.clear();
 	}
+	
+	public boolean jumping = false;
 }
 

@@ -176,6 +176,7 @@ public abstract class DynamicEntity extends Entity{
 	@Override
 	public void update(float delta){
 		if(level.getGravity()*gravityEff == 0 || reachFloor){
+			flag.jumping = false;
 			gravityVy = 0;
 		}
 		

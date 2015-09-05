@@ -51,6 +51,7 @@ public class Jump implements IAction{
 			
 			dyn.setVx(vx);
 			dyn.addGravityVy(vy);
+			dyn.flag.jumping = true;
 			itp.getSpannedActionInfo().put("Jump",vx);
 			
 			return false;

@@ -82,10 +82,12 @@ public class ScriptedEntity extends DynamicEntity{
 			}
 		}
 		
-		if(gravityEff > 0){
-			if(lastVy > 0 && gravityVy+vy < 0) flag.reachJumpingPeak = true;
-		}else if(gravityEff < 0){
-			if(lastVy < 0 && gravityVy+vy > 0) flag.reachJumpingPeak = true;
+		if(flag.jumping){
+			if(gravityEff > 0){
+				if(lastVy >= 0 && gravityVy+vy < 0) flag.reachJumpingPeak = true;
+			}else if(gravityEff < 0){
+				if(lastVy <= 0 && gravityVy+vy > 0) flag.reachJumpingPeak = true;
+			}
 		}
 		if(lastHP < getBaseHP())
 			flag.damaged = true;
