@@ -32,6 +32,7 @@ import com.veil.adl.action.VarSet;
 import com.veil.adl.action.Wait;
 import com.veil.adl.function.Abs;
 import com.veil.adl.function.Anchor;
+import com.veil.adl.function.AnchorPlayer;
 import com.veil.adl.function.Attack;
 import com.veil.adl.function.Attacked;
 import com.veil.adl.function.ButtonPress;
@@ -109,6 +110,7 @@ public class AgentDatabase {
 	private static void registerFunction(){
 		Registry.registerFunction("Abs",new Abs());
 		Registry.registerFunction("Anchor",new Anchor());
+		Registry.registerFunction("AnchorPlayer",new AnchorPlayer());
 		Registry.registerFunction("Attack",new Attack());
 		Registry.registerFunction("Attacked",new Attacked());
 		Registry.registerFunction("ButtonPress",new ButtonPress());
