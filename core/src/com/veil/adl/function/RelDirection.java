@@ -14,7 +14,7 @@ public class RelDirection implements IFunction {
 		DynamicEntity dyn = ((ItpData)itp.getAdditionalData()).thisAgent;
 		Direction dir = Direction.parse(param[0]);
 		Direction result = new Direction(dyn.direction);
-		if(dir.getX() >= 0){
+		if(result.getX() >= 0){
 			result.rotate(dir.getDegree());
 		}else{
 			result.rotate(-dir.getDegree());
