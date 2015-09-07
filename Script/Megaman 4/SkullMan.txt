@@ -1,0 +1,76 @@
+.SkullMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0, 0);
+	}
+	.base{
+		.seq0{
+			if(ButtonPress("left") || ButtonPress("right")){
+				VarInc(0);
+				if(VarGet(0) == 3){
+					Goto(.jump);
+				}
+				Goto(.shoot);
+			}else{
+				if(ButtonPress("attack")){
+					Goto(.jump);
+				}
+			}
+		}
+	}
+	.shoot{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq1{			
+			Spawn(.Skullman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("0", "30", 15))) );
+			Wait(TimePass() >= 40);
+			Spawn(.Skullman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("0", "30", 15))) );
+			Wait(TimePass() >= 40);
+			Spawn(.Skullman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("0", "30", 15))) );
+			Goto(.base);
+		}
+	}
+	.jump{
+		.seq0{
+			VarSet(0, 0);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(AnchorPlayer("c(96,0)"), 300, 5, SurfaceInDir("south"));
+			}else{
+				Jump(AnchorPlayer("c(128,0)"), 300, 5, SurfaceInDir("south"));
+			}
+			Set("invul", DynamicFilter("this"), true);
+			Wait(TimePass() >= Random(DecimalSet(100,200,1))$ );
+			Set("invul", DynamicFilter("this"), false);
+			Wait(TimePass() >= 10);
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+			RunStraight( Get("direction", DynamicFilter("this")), 7, Abs(DistanceTo("X", Get("position", DynamicFilter("player"))$)) <= 16);
+			Goto(.base);
+		}
+	}
+}
+
+.Skullman_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 12, false);
+		}
+	}
+}

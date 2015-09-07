@@ -1,0 +1,86 @@
+.Roach02{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "128,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 50);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 
+				Random(DecimalSet(6,10,4))$, TimePass() >= 100);
+			Goto(.shoot);
+		}
+		.seq1{
+			if(SurfaceInDir("north")){
+				Set("direction", DynamicFilter("this"), "east");
+			}else{
+				if(SurfaceInDir("east")){
+					Set("direction", DynamicFilter("this"), "south");
+				}else{
+					if(SurfaceInDir("south")){
+						Set("direction", DynamicFilter("this"), "west");
+					}else{
+						if(SurfaceInDir("west")){
+							Set("direction", DynamicFilter("this"), "north");
+						}
+					}				
+				}
+			}
+		}
+	}
+	.shoot{
+		.seq0{
+			Wait(TimePass() >= 50);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Spawn(.Roach02_shot, Get("position", DynamicFilter("this")), "210");
+				Spawn(.Roach02_shot, Get("position", DynamicFilter("this")), "240");
+				Spawn(.Roach02_shot, Get("position", DynamicFilter("this")), "-30");
+				Spawn(.Roach02_shot, Get("position", DynamicFilter("this")), "-60");
+			}else{
+				Spawn(.Roach02_bigshot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(60)) );
+			}
+			Wait(TimePass() >= 50);
+			Goto(.base);
+		}
+	}
+}
+
+.Roach02_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 10, false);
+		}
+	}
+}
+
+.Roach02_bigshot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("gravityeff", DynamicFilter("this"), 0);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 10, false);
+		}
+	}
+}

@@ -1,0 +1,50 @@
+.MetallDaddy{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,300)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "160,160");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			Wait(TimePass() >= 100);
+			Set("invul", DynamicFilter("this"), false);
+			Wait(TimePass() >= 50);
+			Jump(Get("position", DynamicFilter("player")), 400, 5, SurfaceInDir("south"));
+			Spawn(.Metall_minion, "c(120,500)", "west");
+			Spawn(.Metall_minion, "c(240,500)", "west");
+			Spawn(.Metall_minion, "c(520,500)", "east");
+			Spawn(.Metall_minion, "c(400,500)", "east");
+			Wait(TimePass() >= 50);			
+		}
+	}
+}
+
+.Metall_minion{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);			
+			Wait(TimePass() >= 30);
+			Set("invul", DynamicFilter("this"), false);
+			RunStraight(Get("direction", DynamicFilter("this")), 5, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Despawn();
+		}
+	}
+}

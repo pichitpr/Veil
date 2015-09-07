@@ -13,7 +13,7 @@
 	}
 	.base{
 		.seq0{
-			Wait(TimePass() >= 60);
+			Wait(TimePass() >= 50);
 			VarSet(0, Random(DecimalSet(1,3,1)) );
 			if(VarGet(0) == 1){
 				Goto(.jump);

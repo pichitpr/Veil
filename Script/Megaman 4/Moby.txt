@@ -57,7 +57,7 @@
 	.init{
 		Set("texture", DynamicFilter("this"), 3);
 		Set("collider", DynamicFilter("this"),  "48,48");
-		Set("phasing", DynamicFilter("this"),  true);
+		Set("projectile", DynamicFilter("this"),  true);
 		Set("hp", DynamicFilter("this"), 1);
 		Set("attacker", DynamicFilter("this"), true);
 		Set("atk", DynamicFilter("this"), 10);
@@ -65,7 +65,7 @@
 	}
 	.state0{
 		.seq0{
-			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+			RunStraight(Get("direction", DynamicFilter("this")), 8, false);
 		}
 		.seq1{
 			ChangeDirectionToPlayerByStep(DirectionSetDivide(16), 8);

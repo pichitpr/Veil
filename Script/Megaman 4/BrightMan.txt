@@ -12,19 +12,31 @@
 	}
 	.base{
 		.seq0{
-			Wait(TimePass() >= 60);
+			Wait(TimePass() >= 50);
 			if(Random(DecimalSet(1,2,1)) == 1){
-				Jump(Get("position", DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+				Goto(.jump);
 			}else{
-				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
-				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
-				Wait(TimePass() >= 40);
-				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
-				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
-				Wait(TimePass() >= 40);
-				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
-				Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+				Goto(.shoot);
 			}
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+	.shoot{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("h")) );
+		}
+		.seq1{
+			Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+			Wait(TimePass() >= 40);
+			Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+			Wait(TimePass() >= 40);
+			Spawn( .Brightman_shot, Get("position", DynamicFilter("this")), RelDirection(Random(DirectionSetRange("-10", "10", 10))) );
+			Goto(.base);
 		}
 	}
 }

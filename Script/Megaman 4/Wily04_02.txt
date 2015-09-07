@@ -1,0 +1,56 @@
+.Wily04_02{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,150)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "200,100");
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			RunHarmonic("west", 3, TravelDistance() % 123 == 0);
+		}
+		.seq1{
+			Wait(TimePass() >= 20);
+			VarSet(0, Random(DecimalSet(1,4,1)) );
+			if(VarGet(0) == 1){
+				Spawn(.Wily04_02_shot, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			}else{
+				if(VarGet(0) == 2){
+					Spawn(.Wily04_02_shot, Get("position", DynamicFilter("this")), RelDirection("-30") );
+				}else{
+					if(VarGet(0) == 3){
+						Spawn(.Wily04_02_shot, Get("position", DynamicFilter("this")), RelDirection("-45") );
+					}else{
+						Spawn(.Wily04_02_shot, Get("position", DynamicFilter("this")), RelDirection("-60") );
+					}
+				}
+			}
+		}
+		.seq2{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+}
+
+.Wily04_02_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"),  true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 7, false);
+		}
+	}
+}

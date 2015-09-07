@@ -1,0 +1,101 @@
+.PharaohMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 50);
+			if(Abs(DistanceToPlayer("H")) <= 96){
+				VarSet(0, Random(DecimalSet(1,10,1)) );
+				if(VarGet(0) >= 9){
+					Goto(.attack);
+				}else{
+					if(VarGet(0) >= 6){
+						Goto(.charge);
+					}else{
+						Goto(.jump);
+					}
+				}
+			}else{
+				VarSet(0, Random(DecimalSet(1,3,1)) );
+				if(VarGet(0) == 1){
+					Goto(.attack);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.charge);
+					}else{
+						Goto(.jump);
+					}
+				}
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			if(Random(DecimalSet(1,5,1)) == 1){
+				Jump(Anchor("c(160,0)"), 240, 5, SurfaceInDir("south"));
+			}
+			Jump(Anchor("c(160,0)"), 240, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+		.seq1{
+			if(Peak()){
+				Spawn(.Pharaoh_shot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(60)) );
+			}
+		}
+	}
+	.charge{
+		.seq0{
+			Wait(TimePass() >= 60);
+			Spawn(.Pharaoh_chargeshot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+			Goto(.base);
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 240, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+}
+
+.Pharaoh_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, false);
+		}
+	}
+}
+
+.Pharaoh_chargeshot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}

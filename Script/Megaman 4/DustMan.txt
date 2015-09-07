@@ -1,0 +1,96 @@
+.DustMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 50);
+			VarSet(0, Random(DecimalSet(1,3,1)) );
+			if(VarGet(0) == 1){
+				Goto(.attack);
+			}else{
+				if(VarGet(0) == 2){
+					Goto(.absorb);
+				}else{
+					Goto(.jump);
+				}
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+			Spawn(.Dust_shot, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 10);
+			Goto(.base);
+		}
+	}
+	.absorb{
+		.seq0{
+			Set("invul", DynamicFilter("this"), true);
+			AddExtraVelocityToPlayer(RelDirection("180"), 10, TimePass() >= 200);
+			Set("invul", DynamicFilter("this"), false);
+			Goto(.base);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 240, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+}
+
+.Dust_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("X")) <= 32){
+				Despawn();
+			}
+		}
+	}
+	.des{
+		Spawn(.Dust_shot_debris, Get("position", DynamicFilter("this")), "45");
+		Spawn(.Dust_shot_debris, Get("position", DynamicFilter("this")), "135");
+		Spawn(.Dust_shot_debris, Get("position", DynamicFilter("this")), "-45");
+		Spawn(.Dust_shot_debris, Get("position", DynamicFilter("this")), "-135");
+	}
+}
+
+.Dust_shot_debris{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}
