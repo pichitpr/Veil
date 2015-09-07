@@ -59,6 +59,7 @@ import com.veil.adl.function.RandomPositionInRadius;
 import com.veil.adl.function.RangeCap;
 import com.veil.adl.function.RangeCapCircular;
 import com.veil.adl.function.Rel;
+import com.veil.adl.function.Rel2Direction;
 import com.veil.adl.function.RelDirection;
 import com.veil.adl.function.RelPlayer;
 import com.veil.adl.function.SurfaceInDir;
@@ -110,7 +111,6 @@ public class AgentDatabase {
 	private static void registerFunction(){
 		Registry.registerFunction("Abs",new Abs());
 		Registry.registerFunction("Anchor",new Anchor());
-		Registry.registerFunction("AnchorPlayer",new AnchorPlayer());
 		Registry.registerFunction("Attack",new Attack());
 		Registry.registerFunction("Attacked",new Attacked());
 		Registry.registerFunction("ButtonPress",new ButtonPress());
@@ -146,7 +146,9 @@ public class AgentDatabase {
 		Registry.registerFunction("VarGet", new VarGet());
 		
 		//=========== v4
+		Registry.registerFunction("AnchorPlayer",new AnchorPlayer());
 		Registry.registerFunction("RelDirection", new RelDirection());
+		Registry.registerFunction("Rel2Direction", new Rel2Direction());
 	}
 	
 	private static boolean parseScriptInDir(FileHandle dir){
