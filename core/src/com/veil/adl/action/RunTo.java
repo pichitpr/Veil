@@ -17,9 +17,23 @@ public class RunTo implements IAction{
 		float spd = ((Number)param[1]).floatValue();
 		DynamicEntity dyn = itpData.thisAgent;
 		
+		boolean shouldEndAction = false;
+		if(itp.getSpannedActionInfo().containsKey("RunTo")){
+			Vector2 previousPos = (Vector2)itp.getSpannedActionInfo().get("RunTo");
+			if(dyn.getWorldCenteredPosition().dst(previousPos) <= 2){
+				//If no movement between 2 update -- end action
+				shouldEndAction = true;
+			}
+			
+		}
+		itp.getSpannedActionInfo().put("RunTo", dyn.getWorldCenteredPosition());
+		
 		Vector2 vec = new Vector2(pos.getX()-dyn.getWorldCenteredPosition().x,
 				pos.getY()-dyn.getWorldCenteredPosition().y);
-		boolean shouldEndAction = vec.len() <= spd;
+		if(vec.len() <= spd){
+			//If getting close to target point -- end action
+			shouldEndAction = true;
+		}
 		if(!shouldEndAction)
 			vec = vec.nor().scl(spd);
 		dyn.addVx(vec.x);
