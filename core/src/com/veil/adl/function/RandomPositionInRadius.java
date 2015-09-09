@@ -15,7 +15,7 @@ public class RandomPositionInRadius implements IFunction{
 		
 		float randomX = (float)(pos.getX()-rad+MathUtils.random(rad*2));
 		float randomY = (float)Math.sqrt(rad*rad - (pos.getX()-randomX)*(pos.getX()-randomX));
-		randomY = (-1f+2*MathUtils.random(2))*randomY + pos.getY();
+		randomY = (-1f+2f*MathUtils.random(1f))*randomY + pos.getY();
 		
 		return new Position(randomX,randomY);
 	}
