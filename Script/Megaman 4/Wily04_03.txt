@@ -1,0 +1,45 @@
+.Wily04_03{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,150)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "96,96");
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Set("invul", DynamicFilter("this"),  true);
+			Set("attacker", DynamicFilter("this"), false);
+			Set("position", DynamicFilter("this"),  
+				RandomPositionInRadius( Get("position",DynamicFilter("player")), 300 ));
+			Wait(TimePass() >= 20);
+			Set("attacker", DynamicFilter("this"), true);
+			Wait(TimePass() >= 60);
+			Set("invul", DynamicFilter("this"),  false);
+			Wait(TimePass() >= 50);
+			Spawn(.Wily04_03_shot, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(120)) );
+			Wait(TimePass() >= 50);
+		}
+	}
+}
+
+.Wily04_03_shot{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"),  true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}
