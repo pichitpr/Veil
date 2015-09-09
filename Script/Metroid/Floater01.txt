@@ -1,0 +1,20 @@
+.Floater01{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,60)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,16");
+		Set("invul", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 2, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+	}
+}

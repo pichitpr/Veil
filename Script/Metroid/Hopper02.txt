@@ -1,0 +1,25 @@
+.Hopper02{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,64");
+		Set("gravityeff", DynamicFilter("this"),  -1);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.swoop{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			Jump( Anchor("c(128,0)"), 128, 5, SurfaceInDir("north"));
+			Wait(TimePass() >= 30);
+		}
+		.seq1{
+			if( SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) ){
+				FlipDirection("H");
+			}
+		}
+	}
+}

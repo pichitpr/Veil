@@ -1,0 +1,35 @@
+.Crawler03{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,50)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "24,24");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+		.seq1{
+			if(SurfaceInDir("north")){
+				Set("direction", DynamicFilter("this"), "east");
+			}else{
+				if(SurfaceInDir("east")){
+					Set("direction", DynamicFilter("this"), "south");
+				}else{
+					if(SurfaceInDir("south")){
+						Set("direction", DynamicFilter("this"), "west");
+					}else{
+						if(SurfaceInDir("west")){
+							Set("direction", DynamicFilter("this"), "north");
+						}
+					}				
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,43 @@
+.Flyer04Spawner{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,-100)");
+	}
+	.spawn{
+		.seq0{
+			Wait(TimePass() >= 50);
+			Spawn(.Flyer04, Get("position", DynamicFilter("this")) );
+		}
+	}
+}
+
+.Flyer04{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.up{
+		.seq0{
+			RunStraight("north", 3, TravelDistance() >= 450);
+			Goto(.rush);
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("Y")) <= 30){
+				Goto(.rush);
+			}
+		}
+	}
+	.rush{
+		.seq0{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+			RunStraight(Get("direction", DynamicFilter("this")), 8, false);
+		}
+	}
+}

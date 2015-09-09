@@ -1,0 +1,34 @@
+.RinkaSpawner{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"),  "500,-100");
+	}
+	.spawn{
+		.seq0{
+			Wait(TimePass() >= 50);
+			Spawn(.Rinka, RandomPositionInRadius(Get("position",DynamicFilter("player")), 400) );
+		}
+	}
+}
+
+.Rinka{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.run{
+		.seq0{
+			Set("attacker", DynamicFilter("this"), false);
+			Wait(TimePass() >= 20);
+			Set("attacker", DynamicFilter("this"), true);
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSetDivide(60)) );
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

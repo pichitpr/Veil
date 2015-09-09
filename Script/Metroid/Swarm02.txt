@@ -1,0 +1,27 @@
+.Swarm02{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,300)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 160){
+				Goto(.attack);
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			RunTo(Get("position", DynamicFilter("player"))$, 7);
+			RunStraight("135", 7, false);
+		}
+	}
+}

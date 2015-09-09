@@ -1,0 +1,28 @@
+.Squeept{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,-100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				Goto(.up);
+			}
+		}
+	}
+	.up{
+		.seq0{
+			RunStraight("north", 10, TravelDistance() >= 300);
+			RunStraight("south", 6, TravelDistance() >= 300);
+			Goto(.wait);
+		}
+	}
+}

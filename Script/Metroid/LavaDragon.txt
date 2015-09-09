@@ -1,0 +1,52 @@
+.LavaDragon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,-100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 200){
+				Goto(.up);
+			}
+		}
+	}
+	.up{
+		.seq0{
+			RunStraight("north", 6, TravelDistance() >= 100);
+			Wait(TimePass() >= 20);
+			Spawn(.LavaDragon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(60)) );
+			Wait(TimePass() >= 10);
+			Spawn(.LavaDragon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(60)) );
+			Wait(TimePass() >= 10);
+			Spawn(.LavaDragon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(60)) );
+			Wait(TimePass() >= 20);
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Goto(.wait);
+		}
+	}
+}
+
+.LavaDragon_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 8, false);
+		}
+	}
+}

@@ -1,0 +1,56 @@
+.Skree{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "48,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				Goto(.chase);
+			}
+		}
+	}
+	.chase{
+		.seq0{
+			RunStraight("south", 5, SurfaceInDir("south"));
+			Goto(.explode);
+		}
+		.seq1{
+			RunStraight(TurnToPlayer(DirectionSet("H")), 4, false);
+		}
+	}
+	.explode{
+		.seq0{
+			Wait(TimePass() >= 30);
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.Skree_bullet, Get("position", DynamicFilter("this")), "0");
+		Spawn(.Skree_bullet, Get("position", DynamicFilter("this")), "45");
+		Spawn(.Skree_bullet, Get("position", DynamicFilter("this")), "135");
+		Spawn(.Skree_bullet, Get("position", DynamicFilter("this")), "180");
+	}
+}
+
+.Skree_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+		}
+	}
+}

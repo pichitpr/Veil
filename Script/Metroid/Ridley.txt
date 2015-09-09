@@ -1,0 +1,46 @@
+.Ridley{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,80");
+		Set("gravityeff", DynamicFilter("this"),  0.5);
+		Set("hp", DynamicFilter("this"), 80);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 80);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			Jump(Anchor("c(0,200)"), 300, 5, SurfaceInDir("south"));
+		}
+		.seq1{
+			Wait(TimePass() >= 50);
+			Spawn(.Ridley_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+		}
+	}
+}
+
+.Ridley_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor("c(64,0)"), 200, 5, SurfaceInDir("south"));
+		}
+		.seq1{
+			if(SurfaceInDir("east") || SurfaceInDir("west")){
+				Despawn();
+			}
+		}
+	}
+}

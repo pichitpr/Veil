@@ -1,0 +1,19 @@
+.Metroid{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,200)");
+		Set("collider", DynamicFilter("this"),  "64,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("invul", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 10);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			Wait(TimePass() >= 30);
+			RunTo(Get("position", DynamicFilter("player"))$, 8);
+		}
+	}
+}
