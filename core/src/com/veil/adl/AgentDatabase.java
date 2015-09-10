@@ -56,6 +56,7 @@ import com.veil.adl.function.Peak;
 import com.veil.adl.function.Perpendicular;
 import com.veil.adl.function.Random;
 import com.veil.adl.function.RandomPositionInRadius;
+import com.veil.adl.function.RandomPositionInRange;
 import com.veil.adl.function.RangeCap;
 import com.veil.adl.function.RangeCapCircular;
 import com.veil.adl.function.Rel;
@@ -149,6 +150,7 @@ public class AgentDatabase {
 		Registry.registerFunction("AnchorPlayer",new AnchorPlayer());
 		Registry.registerFunction("RelDirection", new RelDirection());
 		Registry.registerFunction("Rel2Direction", new Rel2Direction());
+		Registry.registerFunction("RandomPositionInRange", new RandomPositionInRange());
 	}
 	
 	private static boolean parseScriptInDir(FileHandle dir){
