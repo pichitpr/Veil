@@ -15,8 +15,7 @@
 		.seq0{
 			Set("invul", DynamicFilter("this"),  true);
 			Set("attacker", DynamicFilter("this"), false);
-			Set("position", DynamicFilter("this"),  
-				RandomPositionInRadius( Get("position",DynamicFilter("player")), 300 ));
+			Set("position", DynamicFilter("this"),  RandomPositionInRange("c(0,0)","c(640,480)"));
 			Wait(TimePass() >= 20);
 			Set("attacker", DynamicFilter("this"), true);
 			Wait(TimePass() >= 60);

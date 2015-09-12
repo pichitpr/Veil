@@ -5,8 +5,8 @@
 	}
 	.spawn{
 		.seq0{
-			Wait(TimePass() >= 50);
-			Spawn(.Rinka, RandomPositionInRadius(Get("position",DynamicFilter("player")), 400) );
+			Wait(TimePass() >= 70);
+			Spawn(.Rinka, RandomPositionInRange("c(0,0)","c(640,480)") );
 		}
 	}
 }
