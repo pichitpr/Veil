@@ -1,0 +1,114 @@
+.RedFalcon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(350,300)");
+		Set("collider", DynamicFilter("this"),  "256,256");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.shoot{
+		.seq0{
+			Wait(TimePass() >= 70);
+			Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+			Wait(TimePass() >= 4);
+			VarSet(0, Random(DecimalSet(3,7,1)));
+			if(VarGet(0) >= 4){
+				Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(0) >= 5){
+				Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(0) >= 6){
+				Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(0) >= 7){
+				Spawn(.RedFalcon_spike, Rel("c(0,128)"), "225");
+				Wait(TimePass() >= 4);
+			}
+		}
+		.seq1{
+			Wait(TimePass() >= 100);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+			Wait(TimePass() >= 4);
+			VarSet(1, Random(DecimalSet(6,10,1)) );
+			if(VarGet(1) >= 7){
+				Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(1) >= 8){
+				Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(1) >= 9){
+				Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+				Wait(TimePass() >= 4);
+			}
+			if(VarGet(1) >= 10){
+				Spawn(.RedFalcon_fallingspike, Rel("c(0,-128)"), TurnToPlayer(DirectionSet("H")));
+				Wait(TimePass() >= 4);
+			}
+		}
+	}
+}
+
+.RedFalcon_spike{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 7, false);
+		}
+	}
+}
+
+.RedFalcon_fallingspike{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0.5);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(800,0)")), 500, 5, Peak() );
+			Set("gravityeff", DynamicFilter("this"),  0);
+			Goto(.fall);
+		}
+	}
+	.fall{
+		.seq0{
+			RunStraight("south", 3, false);
+		}
+	}
+}

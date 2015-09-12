@@ -1,0 +1,61 @@
+.BombThrower{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq1{
+			Wait(TimePass() >= 80);
+			Spawn(.BombThrower_bomb, Anchor("c(10,0)"), TurnToPlayer(DirectionSet("H")) );
+			Wait(TimePass() >= 20);
+			Spawn(.BombThrower_bomb, Anchor("c(10,0)"), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+}
+
+.BombThrower_bomb{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityeff", DynamicFilter("this"), 0.5);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor("c(160,0)"), 160, 5, SurfaceInDir("south"));
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.BombThrower_bomb_explosion, Get("position", DynamicFilter("this")));
+	}
+}
+
+.BombThrower_bomb_explosion{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			Despawn();
+		}
+	}
+}

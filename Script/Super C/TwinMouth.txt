@@ -1,0 +1,45 @@
+.TwinMouth{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,96");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"),  20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			if(Attacked()){
+				RunStraight(Get("direction", DynamicFilter("this")), 1, TravelDistance() >= 10);
+			}
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		}
+		.seq2{
+			Wait(TimePass() >= 10);
+			Spawn(.TwinMouth_bullet, Anchor("c(30,30)"), Get("direction", DynamicFilter("this")) );
+		}
+	}
+}
+
+.TwinMouth_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityeff", DynamicFilter("this"), 1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(32,0)","c(96,0)")), 
+				64, 5, SurfaceInDir("south") );
+			Despawn();
+		}
+	}
+}

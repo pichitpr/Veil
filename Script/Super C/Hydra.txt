@@ -1,0 +1,101 @@
+.Hydra{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "400,48");
+		Set("position", DynamicFilter("this"),  "c(320,550)");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 50);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}	
+	.state{
+		.seq0{
+			Wait(TimePass() >= 100);
+			Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+				TurnToPlayer(DirectionSetDivide(16)) );
+			Wait(TimePass() >= 10);
+			Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+				TurnToPlayer(DirectionSetDivide(16)) );
+			Wait(TimePass() >= 10);
+			Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+				TurnToPlayer(DirectionSetDivide(16)) );
+			Wait(TimePass() >= 10);
+			VarSet(0, Random(DecimalSet(3,9,1)));
+			if(VarGet(0) >= 4){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+			if(VarGet(0) >= 5){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+			if(VarGet(0) >= 6){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+			if(VarGet(0) >= 7){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+			if(VarGet(0) >= 8){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+			if(VarGet(0) >= 9){
+				Spawn(.Hydra_bullet, Get("position", DynamicFilter("this")), 
+					TurnToPlayer(DirectionSetDivide(16)) );
+				Wait(TimePass() >= 10);
+			}
+		}
+		.seq1{
+			Wait(TimePass() >= 100);
+			Spawn(.Hydra_BigSpiky, "c(0,480)");
+			Spawn(.Hydra_BigSpiky, "c(640,480)");
+		}
+	}
+}
+
+.Hydra_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+		}
+	}
+}
+
+.Hydra_BigSpiky{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSetDivide(16)));
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 2, false);
+		}
+		.seq1{
+			ChangeDirectionToPlayerByStep(DirectionSetDivide(16), 10);
+		}
+	}
+}

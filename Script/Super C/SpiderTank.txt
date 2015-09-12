@@ -1,0 +1,94 @@
+.SpiderTank{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,60)");
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  40);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.walk{
+		.seq0{
+			if(DistanceToPlayer("Y") < 0){
+				VarSet(0,3);
+			}else{
+				VarSet(0,2);
+			}
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			RunStraight(Get("direction",DynamicFilter("this")), VarGet(1), TravelDistance() >= 160);
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			RunStraight(Get("direction",DynamicFilter("this")), VarGet(1), TravelDistance() >= 160);
+			Wait(TimePass() >= 20);
+			if(VarGet(0) >= 3){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+				RunStraight(Get("direction",DynamicFilter("this")), 5, TravelDistance() >= 160);
+				Wait(TimePass() >= 20);
+			}
+			Goto(.attack);
+		}
+		.seq1{
+			if( SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) ){
+				FlipDirection("H");
+			}
+		}
+		.seq2{
+			if(DistanceToPlayer("Y") < 0){
+				VarSet(1,6);
+			}else{
+				VarSet(1,3);
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			Wait(TimePass() >= 40);
+			Spawn(.SpiderTank_bullet, Rel("c(-60,20)"), "135");
+			Spawn(.SpiderTank_bullet, Rel("c(-60,20)"), "225");
+			Spawn(.SpiderTank_bullet, Rel("c(60,20)"), "45");
+			Spawn(.SpiderTank_bullet, Rel("c(60,20)"), "-45");
+			Spawn(.SpiderTank_wavebullet, Rel("c(-60,20)"), "east");
+			Spawn(.SpiderTank_wavebullet, Rel("c(60,20)"), "west");
+			Wait(TimePass() >= 40);
+			Goto(.walk);
+		}
+	}
+}
+
+.SpiderTank_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 9, false);
+		}
+	}
+}
+
+.SpiderTank_wavebullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 6, false);
+		}
+		.seq1{
+			RunHarmonic("north", 6, TravelDistance() % 96 == 0);
+		}
+	}
+}

@@ -1,0 +1,44 @@
+.HiddenDomeCannon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("collider", DynamicFilter("this"),  "64,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), false);
+	}
+	.hide{
+		.seq0{
+			Set("defender", DynamicFilter("this"), false);
+			if(Abs(DistanceToPlayer("X")) <= 200 && Abs(DistanceToPlayer("Y")) <= 200){
+				Set("defender", DynamicFilter("this"), true);
+				Goto(.attack);
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			Wait(TimePass() >= 70);
+			Spawn(.HiddenDomeCannon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+			Wait(TimePass() >= 10);
+			Spawn(.HiddenDomeCannon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+		}
+	}
+}
+
+.HiddenDomeCannon_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

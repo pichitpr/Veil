@@ -1,0 +1,52 @@
+.FlyingSniper{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,-100)");
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.firstflight{
+		.seq0{
+			RunStraight("north", 4, TravelDistance() >= 500);
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSetDivide(16)));
+			RunStraight(Get("direction", DynamicFilter("this")), 4, TravelDistance() >= 500);
+			Goto(.secondflight);
+		}
+		.seq1{
+			Wait(TimePass() >= 30);
+			Spawn(.FlyingSniper_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+		}
+	}
+	.secondflight{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSetRange("0","180",45)) );
+			Wait(TimePass() >= 30);
+		}
+		.seq2{
+			Wait(TimePass() >= 30);
+			Spawn(.FlyingSniper_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+		}
+	}
+}
+
+.FlyingSniper_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 5, false);
+		}
+	}
+}

@@ -1,0 +1,57 @@
+.AlienEggSpawner{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"),  "c(300,400)");
+	}
+	.spawn{
+		.seq0{
+			Wait(TimePass() >= 150);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+			Wait(TimePass() >= 5);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+			Wait(TimePass() >= 5);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+			Wait(TimePass() >= 5);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+			Wait(TimePass() >= 5);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+			Wait(TimePass() >= 5);
+			Spawn(.AlienEgg, Get("position", DynamicFilter("this")), Random(DirectionSetRange("-135","45",1)) );
+		}
+	}
+}
+
+.AlienEgg{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launched{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), Random(DecimalSet(4,8,1))$, TimePass() >= 50);
+			Set("direction", DynamicFilter("this"), Random(DirectionSetDivide(16)));
+			Goto(.floating);
+		}
+	}
+	.floating{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")), 3, false);
+		}
+		.seq1{
+			if(SurfaceInDir("north") || SurfaceInDir("south")){
+				FlipDirection("V");
+				Wait(TimePass() >= 1);
+			}else{
+				if(SurfaceInDir("east") || SurfaceInDir("west")){
+					FlipDirection("H");
+					Wait(TimePass() >= 1);
+				}
+			}
+		}
+	}
+}

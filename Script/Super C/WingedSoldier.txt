@@ -1,0 +1,31 @@
+.WingedSoldier{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.run{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 3, SurfaceInDir(DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("X")) <= 64){
+				Goto(.jump);
+			}
+		}
+	}
+	.jump{
+		.seq0{
+			Set("phasing", DynamicFilter("this"), true);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+			Jump(Anchor("c(32,0)"), 100, 5, false);
+		}
+	}
+}

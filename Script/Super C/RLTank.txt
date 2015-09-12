@@ -1,0 +1,54 @@
+.RLTank{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,300)");
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 60);
+			Spawn(.RLTank_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+		}
+		.seq1{
+			Wait(TimePass() >= 40);
+			Spawn(.RLTank_bigbullet, Rel("c(-20,20)"), "240");
+			Spawn(.RLTank_bigbullet, Rel("c(0,20)"), "270");
+			Spawn(.RLTank_bigbullet, Rel("c(20,20)"), "300");
+		}
+	}
+}
+
+.RLTank_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}
+
+.RLTank_bigbullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 7, false);
+		}
+	}
+}

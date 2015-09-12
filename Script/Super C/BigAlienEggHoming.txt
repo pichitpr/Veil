@@ -1,0 +1,19 @@
+.BigAlienEggHoming{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("position", DynamicFilter("this"),  "c(300,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSetDivide(16)) );
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("phasing", DynamicFilter("this"),  true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state{
+		.seq0{
+			RunStraight(TurnToPlayer(DirectionSetDivide(16)), 3, false);
+		}
+	}
+}

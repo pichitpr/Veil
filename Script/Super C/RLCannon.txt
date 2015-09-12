@@ -1,0 +1,37 @@
+.RLCannon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,300)");
+		Set("collider", DynamicFilter("this"),  "96,96");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 70);
+			Spawn(.RLCannon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+			Wait(TimePass() >= 10);
+			Spawn(.RLCannon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+			Wait(TimePass() >= 10);
+			Spawn(.RLCannon_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+		}
+	}
+}
+
+.RLCannon_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

@@ -1,0 +1,39 @@
+.ShootingMouth{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "48,48");
+		Set("position", DynamicFilter("this"),  "c(400,200)");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.spawn{
+		.seq0{
+			Wait(TimePass() >= 150);
+			Spawn(.ShootingMouth_spike, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")));
+		}
+	}
+}
+
+.ShootingMouth_spike{
+	.init{
+		Set("texture", DynamicFilter("this"), 5);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.chase{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSetDivide(16)) );
+			Wait(TimePass() >= 10);
+		}
+	}
+}

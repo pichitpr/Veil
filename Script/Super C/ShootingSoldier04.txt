@@ -1,0 +1,38 @@
+.ShootingSoldier04{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 3, SurfaceInDir(DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+		.seq1{
+			Wait(TimePass() >= 60);
+			Spawn(.ShootingSoldier04_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+}
+
+.ShootingSoldier04_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

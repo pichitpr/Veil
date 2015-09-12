@@ -1,0 +1,44 @@
+.AlienMinionSpawner{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("position", DynamicFilter("this"),  "c(400,100)");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.spawn{
+		.seq0{
+			Wait(TimePass() >= 150);
+			Spawn(.AlienMinion, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")));
+		}
+	}
+}
+
+.AlienMinion{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"),  "32,32");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(32,0)","c(128,0)")), 
+				128, 5, SurfaceInDir("south"));
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Goto(.run);
+		}
+	}
+	.run{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 8, SurfaceInDir(DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) );
+			FlipDirection("H");
+		}
+	}
+}

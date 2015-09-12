@@ -1,0 +1,41 @@
+.HiddenCannon02{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(450,-200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "96,96");
+		Set("phasing", DynamicFilter("this"), true);
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 20);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.wait{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 256){
+				RunStraight("north", 10, TravelDistance() >= 200);
+				Goto(.shoot);
+			}
+		}
+	}
+	.shoot{
+		.seq0{
+			Wait(TimePass() >= 50);
+			Spawn(.HiddenCannon02_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+		}
+	}
+}
+
+.HiddenCannon02_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

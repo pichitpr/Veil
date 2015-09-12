@@ -1,0 +1,88 @@
+.SkullUFO{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,300)");
+		Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "64,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  60);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight("east", 5, SurfaceInDir("east"));
+			RunStraight("west", 5, SurfaceInDir("west"));
+		}
+		.seq1{
+			RunStraight("north", 3, SurfaceInDir("north"));
+			RunStraight("south", 3, SurfaceInDir("south"));
+		}
+		.seq2{
+			Wait(TimePass() >= 150);
+			Spawn(.SkullUFO_skull, Rel("c(30,0)"), "east");
+			Spawn(.SkullUFO_skull, Rel("c(-30,0)"), "west");
+		}
+		.seq3{
+			Wait(TimePass() >= 200);
+			Spawn(.SkullUFO_spike, Rel("c(30,0)"));
+			Spawn(.SkullUFO_spike, Rel("c(0,0)"));
+			Spawn(.SkullUFO_spike, Rel("c(-30,0)"));
+		}
+	}
+}
+
+.SkullUFO_skull{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityeff", DynamicFilter("this"),  0.5);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launch{
+		.seq0{
+			Jump(Anchor("c(32,0)"), 64, 5, SurfaceInDir("south"));
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+			Goto(.chase);
+		}
+	}
+	.chase{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))))
+				);
+			Despawn();
+		}
+	}
+}
+
+.SkullUFO_spike{
+	.init{
+		Set("texture", DynamicFilter("this"), 5);
+		Set("collider", DynamicFilter("this"), "24,24");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launch{
+		.seq0{
+			RunStraight("south", 3, TravelDistance() >= 64);
+			Goto(.chase);
+		}
+	}
+	.chase{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 3, false);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSetDivide(16)) );
+			Wait(TimePass() >= 50);
+		}
+	}
+}

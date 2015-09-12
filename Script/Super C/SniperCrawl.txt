@@ -1,0 +1,35 @@
+.SniperCrawl{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("collider", DynamicFilter("this"),  "48,16");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"),  5);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 70);
+			Spawn(.SniperCrawl_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+			Wait(TimePass() >= 10);
+			Spawn(.SniperCrawl_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+}
+
+.SniperCrawl_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

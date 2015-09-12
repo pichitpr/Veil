@@ -1,0 +1,44 @@
+.HiddenSniper{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), false);
+	}
+	.hide{
+		.seq0{
+			Wait(TimePass() >= 60);
+			Goto(.attack);
+		}
+	}
+	.attack{
+		.seq0{
+			Set("defender", DynamicFilter("this"), true);
+			Spawn(.HiddenSniper_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+			Wait(TimePass() >= 10);
+			Spawn(.HiddenSniper_bullet, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(16)));
+			Wait(TimePass() >= 20);
+			Set("defender", DynamicFilter("this"), false);
+			Goto(.hide);
+		}
+	}
+}
+
+.HiddenSniper_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

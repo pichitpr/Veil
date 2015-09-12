@@ -1,0 +1,36 @@
+.AlienCannon{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(400,100)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		Set("collider", DynamicFilter("this"),  "96,96");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 20);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.shoot{
+		.seq0{
+			Wait(TimePass() >= 70);
+			Spawn(.AlienCannon_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Spawn(.AlienCannon_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+		}
+	}
+}
+
+.AlienCannon_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 9, false);
+		}
+	}
+}
