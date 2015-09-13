@@ -1,0 +1,58 @@
+.CWU01P{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,240)");
+		Set("direction", DynamicFilter("this"),  Random(DirectionSetDivide(4)) );
+		Set("collider", DynamicFilter("this"),  "100,100");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+		}
+		.seq1{
+			if(SurfaceInDir("north")){
+				Set("direction", DynamicFilter("this"), "east");
+			}else{
+				if(SurfaceInDir("east")){
+					Set("direction", DynamicFilter("this"), "south");
+				}else{
+					if(SurfaceInDir("south")){
+						Set("direction", DynamicFilter("this"), "west");
+					}else{
+						if(SurfaceInDir("west")){
+							Set("direction", DynamicFilter("this"), "north");
+						}
+					}				
+				}
+			}
+		}
+		.seq2{
+			Wait(TimePass() >= 100);
+			Spawn(.CWU01P_bullet, Get("position",DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(120)) );
+			Wait(TimePass() >= 20);
+			Spawn(.CWU01P_bullet, Get("position",DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(120)) );
+			Wait(TimePass() >= 10);
+			Spawn(.CWU01P_bullet, Get("position",DynamicFilter("this")), TurnToPlayer(DirectionSetDivide(120)) );
+		}
+	}
+}
+
+.CWU01P_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), Random(DecimalSet(4,10,1))$, false);
+		}
+	}
+}

@@ -1,0 +1,81 @@
+.GutsMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Goto(.jump);
+			}else{
+				Goto(.attack);
+			}
+		}
+	}
+	.jump{
+		.seq0{
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Jump(Rel("c(128,0)"), 128, 5 , SurfaceInDir("south"));
+			}else{
+				Jump(Rel("c(-128,0)"), 128, 5 , SurfaceInDir("south"));
+			}
+			Wait(TimePass() >= 30);
+			Goto(.base);
+		}
+	}
+	.attack{
+		.seq0{
+			Jump(Rel("c(0,128)"), 128, 5, SurfaceInDir("south") );
+			Spawn(.Gutsman_rock, Rel("c(0,24)"), TurnToPlayer(DirectionSet("H")) );
+			Wait(TimePass() >= 30);
+			Goto(.base);
+		}
+	}
+}
+
+.Gutsman_rock{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			RunStraight(Get("direction", DynamicFilter("this")), 6, Abs(DistanceToPlayer("X")) <= 96);
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.Gutsman_debris, Anchor("c(-16,-16)"), Get("direction", DynamicFilter("this")));
+		Spawn(.Gutsman_debris, Anchor("c(16,-16)"), Get("direction", DynamicFilter("this")));
+		Spawn(.Gutsman_debris, Anchor("c(-16,16)"), RelDirection("45"));
+		Spawn(.Gutsman_debris, Anchor("c(16,16)"), RelDirection("30"));
+	}
+}
+
+.Gutsman_debris{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 6, false);
+		}
+	}
+}

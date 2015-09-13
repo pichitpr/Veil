@@ -1,0 +1,83 @@
+.FireMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.move{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) > 200){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+				RunStraight(Get("direction",DynamicFilter("this")), 4, Abs(DistanceToPlayer("X")) <= 200);
+			}else{
+				if(Abs(DistanceToPlayer("X")) < 180){
+					Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+					FlipDirection("H");
+					RunStraight(Get("direction",DynamicFilter("this")), 4, Abs(DistanceToPlayer("X")) >= 180);
+				}
+			}
+		}
+		.seq1{
+			if(SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this")) ) )){
+				FlipDirection("H");
+			}
+		}
+		.seq2{
+			Wait(TimePass() >= 30);
+			Goto(.fire);
+		}
+	}
+	.fire{
+		.seq0{
+			Spawn(.Fireman_storm, Get("position", DynamicFilter("this")), TurnToPlayer(DirectionSet("H")) );
+			Wait(TimePass() >= 10);
+			Goto(.move);
+		}
+	}
+}
+
+.Fireman_storm{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 8, false);
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("X")) <= 16){
+				Spawn(.Fireman_fire, Get("position",DynamicFilter("this")) );
+				Wait(TimePass() >= 100);
+			}
+		}
+	}
+}
+
+.Fireman_fire{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			if(SurfaceInDir("south")){
+				Wait(TimePass() >= 10);
+				Despawn();
+			}
+		}
+	}
+}

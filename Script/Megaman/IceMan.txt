@@ -1,0 +1,77 @@
+.IceMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.move{
+		.seq0{
+			if(VarGet(0) == 0){
+				VarInc(0);
+				RunTo("c(580,32)", 6);
+			}else{
+				if(VarGet(0) == 1){
+					VarInc(0);
+					RunTo("c(450,32)", 6);
+				}else{
+					if(VarGet(0) == 2){
+						VarInc(0);
+						RunTo("c(320,32)", 6);
+					}else{
+						VarSet(0,0);
+						RunTo("c(450,32)", 6);
+					}
+				}
+			}
+			Goto(.attack);
+		}
+	}
+	.attack{
+		.seq0{
+			Jump(Rel("c(0,200)"), 200, 5, Peak());
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Set("gravityeff", DynamicFilter("this"),  0);
+			RunStraight("south", 4, TravelDistance() >= 100);
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("south", 4, SurfaceInDir("south"));
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Wait(TimePass() >= 20);
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 4, TravelDistance() >= 100);
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 4, TravelDistance() >= 100);
+			Spawn(.Iceman_bullet, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Set("gravityeff", DynamicFilter("this"),  1);
+			Goto(.move);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")));
+		}
+	}
+}
+
+.Iceman_bullet{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 4, false);
+		}
+	}
+}

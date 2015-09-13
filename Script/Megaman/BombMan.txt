@@ -1,0 +1,78 @@
+.BombMan{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,400)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.jump{
+		.seq0{
+			if(Random(DecimalSet(1,5,1)) == 1){
+				Jump( Get("position", DynamicFilter("player")), 
+					Random(DecimalSet(120,400,1)), 5, SurfaceInDir("south") );
+			}
+			Jump(RandomPositionInRange("c(0,0)","c(640,0)"),
+				Random(DecimalSet(120,400,1)), 5, SurfaceInDir("south") );
+			Goto(.attack);
+		}
+	}
+	.attack{
+		.seq0{
+			Spawn(.Bombman_bomb, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 60);
+			Spawn(.Bombman_bomb, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 60);
+			Spawn(.Bombman_bomb, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Wait(TimePass() >= 60);
+			Goto(.jump);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"), TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq2{
+			if(Abs(DistanceToPlayer("X")) <= 128){
+				Goto(.jump);
+			}
+		}
+	}
+}
+
+.Bombman_bomb{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityeff", DynamicFilter("this"), 1);
+		Set("invul", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			Jump(Get("position", DynamicFilter("player")), 400, 5, SurfaceInDir("south"));
+			Despawn();
+		}
+	}
+	.des{
+		Spawn(.Bombmanbomb_explosion, Get("position", DynamicFilter("this")));
+	}
+}
+
+.Bombmanbomb_explosion{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "96,96");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			Despawn();
+		}
+	}
+}
