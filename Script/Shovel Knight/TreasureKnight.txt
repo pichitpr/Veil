@@ -1,0 +1,233 @@
+.TreasureKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "48,64");
+		Set("gravityeff", DynamicFilter("this"),  0.5);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(400,0)")), 64, 5, SurfaceInDir("south") );
+			if(Get("hp", DynamicFilter("this")) > 50){
+				VarSet(0, Random(DecimalSet(1,4,1)));
+				if(VarGet(0) == 1){
+					Goto(.anchor);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.sand);
+					}else{
+						if(VarGet(0) == 3){
+							Goto(.upanchor);
+						}
+					}
+				}
+			}else{
+				VarSet(0, Random(DecimalSet(1,5,1)));
+				if(VarGet(0) == 1){
+					Goto(.anchor);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.sand);
+					}else{
+						if(VarGet(0) == 3){
+							Goto(.upanchor);
+						}else{
+							if(VarGet(0) == 4){
+								Goto(.mine);
+							}
+						}
+					}
+				}
+			}
+		}
+		.seq1{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(1);
+				if(VarGet(1) >= 400){
+					VarSet(1,0);
+					Goto(.treasurebox);
+				}
+			}
+		}
+	}
+	.anchor{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.TreasureKnight_anchor, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			RunStraight(Get("direction",DynamicFilter("this")), 10,
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Goto(.base);
+		}
+	}
+	.sand{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(160,0)"), 100, 5, Peak());
+			Set("gravityeff", DynamicFilter("this"),  0);
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_sand, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 10);
+			RunStraight("south", 10, SurfaceInDir("south") );
+			Set("gravityeff", DynamicFilter("this"),  0.5);
+			Goto(.base);
+		}
+	}
+	.upanchor{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_anchor, Get("position",DynamicFilter("this")), "north" );
+			Wait(TimePass() >= 30);
+			Set("gravityeff", DynamicFilter("this"),  0);
+			RunStraight("north", 10, SurfaceInDir("north"));
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );			
+			RunStraight(Get("direction",DynamicFilter("this")), 10, TravelDistance() >= Random(DecimalSet(200,400,1))$ ||
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_anchor, Get("position",DynamicFilter("this")), "south" );
+			Wait(TimePass() >= 20);
+			RunStraight("south", 10, SurfaceInDir("south") );
+			Set("gravityeff", DynamicFilter("this"),  0.5);
+			Goto(.base);
+		}
+	}
+	.mine{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
+			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
+			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 60);
+			Goto(.base);
+		}
+	}
+	.treasurebox{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_box, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
+			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
+			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
+			Wait(TimePass() >= 80);
+			Goto(.base);
+		}
+	}
+}
+
+.TreasureKnight_anchor{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}
+
+.TreasureKnight_sand{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "160,400");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 10);
+			Despawn();
+		}
+	}
+}
+
+.TreasureKnight_mine{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunTo(RandomPositionInRange("c(0,500)","c(640,500)")$, 6);
+			Despawn();
+		}
+	}
+}
+
+.TreasureKnight_mine2{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.launched{
+		.seq0{
+			RunTo(RandomPositionInRange("c(200,500)","c(440,500)")$, 6);
+			Goto(.fall);
+		}
+	}
+	.fall{
+		.seq0{
+			RunHarmonic(Get("direction",DynamicFilter("this")), 5, 
+				TravelDistance() % Random(DecimalSet(100,400,1))$ == 0);
+		}
+		.seq1{
+			RunStraight("south", 2, false);
+		}
+	}
+}
+
+.TreasureKnight_box{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.launched{
+		.seq0{
+			Jump("c(320,0)", 200, 5, SurfaceInDir("south"));
+			Goto(.whirlpool);
+		}
+	}
+	.whirlpool{
+		.seq0{
+			if(DistanceToPlayer("X") > 0){
+				AddExtraVelocityToPlayer("east", 10, TimePass() >= 1);
+			}else{
+				AddExtraVelocityToPlayer("west", 10, TimePass() >= 1);
+			}
+		}
+		.seq1{
+			Wait(TimePass() >= 300);
+			Despawn();
+		}
+	}
+}

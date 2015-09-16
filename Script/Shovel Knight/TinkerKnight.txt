@@ -1,0 +1,107 @@
+.TinkerKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 7, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+		}
+		.seq1{
+			Wait(TimePass() >= 40);
+			Spawn(.TinkerKnight_wrench, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+		}
+		.seq2{
+			Wait(TimePass() >= 40);
+			if(Abs(DistanceToPlayer("X")) < 128){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+				Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south"));
+			}
+		}
+		.seq3{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) >= 300){
+					VarSet(0,0);
+					Goto(.tantrum);
+				}
+			}
+		}
+	}
+	.tantrum{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 12, TravelDistance() >= 48 || 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+		}
+		.seq1{
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Goto(.base);
+		}
+	}
+}
+
+.TinkerKnight_wrench{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}
+
+.TinkerKnight_wrench2{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(100,0)","c(400,0)")), 250, 5, false);
+		}
+	}
+}

@@ -1,0 +1,55 @@
+.SpecterKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(520,300)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,64");
+		Set("gravityeff", DynamicFilter("this"),  0);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction", DynamicFilter("this")), 8, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+			RunStraight(Get("direction", DynamicFilter("this")), 8, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			VarInc(0);
+			if(VarGet(0) > 2){
+				VarInc(0,0);
+				Goto(.charge);
+			}else{
+				Goto(.throw);
+			}
+		}
+		.seq1{
+			VarInc(1);
+			if(VarGet(1) >= 200){
+				VarSet(1,0);
+				Goto(.summon);
+			}
+		}
+	}
+	.throw{
+		.seq0{
+			Goto(.base);
+		}
+	}
+	.charge{
+		.seq0{
+			Goto(.base);
+		}
+	}
+	.summon{
+		.seq0{
+			Goto(.base);
+		}
+	}
+}

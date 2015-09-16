@@ -1,0 +1,212 @@
+.PlagueKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.base{
+		.seq0{
+			Jump(RandomPositionInRange("c(0,0)","c(640,0)"), 300, 5, SurfaceInDir("south"));
+			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.PlagueKnight_flask, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.PlagueKnight_flask2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.PlagueKnight_flask, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+		}
+		.seq1{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) >= 250){
+					VarSet(0,0);
+					Goto(.throwtriple);
+				}
+			}
+		}
+		.seq2{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(1);
+				if(VarGet(1) >= 400){
+					VarSet(1,0);
+					Set("attacker", DynamicFilter("this"), false);
+					Set("position", DynamicFilter("this"),  RandomPositionInRange("c(200,200)","c(500,200)"));
+					Goto(.throwmulti);
+				}
+			}
+		}
+	}
+	.throwtriple{
+		.seq0{
+			if(!InTheAir()){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				Wait(TimePass() >= 50);
+				Goto(.base);
+			}
+		}
+	}
+	.throwmulti{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(160,0)"), 400, 5, Peak());
+			Set("gravityEff", DynamicFilter("this"),  0);
+			Spawn(.PlagueKnight_flask4, Get("position",DynamicFilter("this")), "210" );
+			Wait(TimePass() >= 10);
+			Spawn(.PlagueKnight_flask4, Get("position",DynamicFilter("this")), "240" );
+			Wait(TimePass() >= 10);
+			Spawn(.PlagueKnight_flask4, Get("position",DynamicFilter("this")), "270" );
+			Wait(TimePass() >= 10);
+			Spawn(.PlagueKnight_flask4, Get("position",DynamicFilter("this")), "300" );
+			Wait(TimePass() >= 10);
+			Spawn(.PlagueKnight_flask4, Get("position",DynamicFilter("this")), "330" );
+			Wait(TimePass() >= 20);
+			Set("gravityEff", DynamicFilter("this"),  1);
+			Wait(TimePass() >= 30);
+			Goto(.base);
+		}
+		.seq1{
+			Wait(TimePass() >= 20);
+			Set("attacker", DynamicFilter("this"), true);
+		}
+	}
+}
+
+.PlagueKnight_flask{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Get("position",DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			Despawn();
+		}
+	}
+}
+
+.PlagueKnight_flask2{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Get("position",DynamicFilter("player")), 300, 5, SurfaceInDir("south"));
+			Spawn(.PlagueKnight_fireball, Get("position",DynamicFilter("this")), "west");
+			Spawn(.PlagueKnight_fireball, Get("position",DynamicFilter("this")), "east");
+			Despawn();
+		}
+		.seq1{
+			if(Attacked()){
+				Set("direction", DynamicFilter("this"), DirectionComponent("X", Get("direction", DynamicFilter("player"))) );
+				Set("group", DynamicFilter("this"), 0);
+				Goto(.reflected);
+			}
+		}
+		.seq2{
+			if(Attack()){
+				Despawn();
+			}
+		}
+	}
+	.reflected{
+		.seq0{
+			Jump(Anchor("c(300,0)"), 300, 5, false);
+		}
+		.seq1{
+			if(Attack()){
+				Despawn();
+			}
+		}
+	}
+}
+
+.PlagueKnight_flask3{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(500,0)")), 300, 5, SurfaceInDir("south"));
+			Spawn(.PlagueKnight_firepillar, Get("position",DynamicFilter("this")) );
+			Despawn();
+		}
+	}
+}
+
+.PlagueKnight_flask4{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 12, false);
+		}
+	}
+}
+
+.PlagueKnight_fireball{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 4, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+			);
+			Despawn();
+		}
+	}
+}
+
+.PlagueKnight_firepillar{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,96");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 40);
+			Despawn();
+		}
+	}
+}

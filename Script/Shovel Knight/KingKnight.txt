@@ -1,0 +1,128 @@
+.KingKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			Jump(Anchor("c(150,0)"), 150, 5, SurfaceInDir("south"));
+			Jump(Anchor("c(150,0)"), 150, 5, SurfaceInDir("south"));
+			if( SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) ) ){
+				FlipDirection("H");
+			}
+			if(Get("hp", DynamicFilter("this")) > 50){
+				VarSet(0, Random(DecimalSet(1,3,1)));
+				if(VarGet(0) == 1){
+					Goto(.stomp);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.dash);
+					}else{
+						Wait(TimePass() >= 20);
+					}
+				}
+			}else{
+				VarSet(0, Random(DecimalSet(1,4,1)));
+				if(VarGet(0) == 1){
+					Goto(.stomp);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.dash);
+					}else{
+						if(VarGet(0) == 3){
+							Goto(.summon);
+						}else{
+							Wait(TimePass() >= 20);
+						}
+					}
+				}
+			}
+		}
+	}
+	.stomp{
+		.seq0{
+			Jump(Rel("c(0,300)"), 300, 5, Peak());
+			RunStraight("south", 7, SurfaceInDir("south") );
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.KingKnight_melee, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Goto(.base);			
+		}
+	}
+	.dash{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			RunStraight(Get("direction", DynamicFilter("this")), 20, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Wait(TimePass() >= 20);
+			FlipDirection("H");
+			RunStraight(Get("direction", DynamicFilter("this")), 20, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Goto(.base);
+		}
+	}
+	.summon{
+		.seq0{
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
+			Wait(TimePass() >= 30);
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
+			Wait(TimePass() >= 30);
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
+			Wait(TimePass() >= 30);
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
+			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
+			Wait(TimePass() >= 30);
+			Wait(TimePass() >= 50);
+			Goto(.base);
+		}
+	}
+}
+
+.KingKnight_melee{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, TravelDistance() >= 96);
+			Despawn();
+		}
+	}
+}
+
+.KingKnight_paper{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,8");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 7, TravelDistance() >= 200);
+			Wait(TimePass() >= 10);
+			FlipDirection("H");
+		}
+	}
+}

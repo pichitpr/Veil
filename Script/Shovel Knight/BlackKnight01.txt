@@ -1,0 +1,139 @@
+.BlackKnight01{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(320,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 5, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+		}
+		.seq1{
+			if(Abs(DistanceToPlayer("X")) < 128){
+				VarSet(0, Random(DecimalSet(1,4,1)) );
+				if(VarGet(0) == 1){
+					Goto(.meleeattack);
+				}else{
+					if(VarGet(0) == 2){
+						Goto(.avoid);
+					}else{
+						if(VarGet(0) == 2){
+							Goto(.jumpattack);
+						}else{
+							Wait(TimePass() >= 20);
+						}
+					}
+				}
+			}else{
+				Wait(TimePass() >= 40);
+				if(Random(DecimalSet(1,2,1)) == 1){
+					Goto(.jumpattack);
+				}else{
+					Goto(.chargeattack);
+				}				
+			}
+		}
+	}
+	.meleeattack{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.BlackKnight01_shovel, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Goto(.base);			
+		}
+	}
+	.jumpattack{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(128,0)"), 300, 5, Peak());
+			RunStraight("south", 7, SurfaceInDir("south") );
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(128,0)"), 300, 5, Peak());
+			RunStraight("south", 7, SurfaceInDir("south") );
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(128,0)"), 300, 5, Peak());
+			RunStraight("south", 7, SurfaceInDir("south") );
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor("c(128,0)"), 300, 5, Peak());
+			RunStraight("south", 7, SurfaceInDir("south") );
+			Goto(.base);
+		}
+	}
+	.chargeattack{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.BlackKnight01_charge, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Goto(.base);
+		}
+	}
+	.avoid{
+		.seq0{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			FlipDirection("H");
+			Jump(Anchor("c(128,0)"), 128, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+	}
+}
+
+.BlackKnight01_shovel{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, TravelDistance() >= 96);
+			Despawn();
+		}
+	}
+}
+
+.BlackKnight01_charge{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 8, false);
+		}
+		.seq1{
+			if(Attacked()){
+				Set("direction", DynamicFilter("this"), DirectionComponent("X", Get("direction", DynamicFilter("player"))) );
+				Set("group", DynamicFilter("this"), 0);
+				Goto(.reflected);
+			}
+		}
+	}
+	.reflected{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 8, false);
+		}
+		.seq1{
+			if(Attack()){
+				Despawn();
+			}
+		}
+	}
+}

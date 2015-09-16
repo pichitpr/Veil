@@ -1,0 +1,83 @@
+.PropellerKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(550,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 30);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(400,0)")), 64, 5, SurfaceInDir("south") );
+			Wait(TimePass() >= 30);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(400,0)")), 64, 5, SurfaceInDir("south") );
+			Wait(TimePass() >= 30);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Jump(Anchor(RandomPositionInRange("c(200,0)","c(400,0)")), 64, 5, SurfaceInDir("south") );
+			Wait(TimePass() >= 30);
+			if(Random(DecimalSet(1,2,1)) == 1){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+				if(Random(DecimalSet(1,2,1)) == 1){
+					AddExtraVelocityToPlayer(Get("direction", DynamicFilter("this")), 15, TimePass() >= 100);
+				}else{
+					AddExtraVelocityToPlayer(RelDirection("180"), 15, TimePass() >= 100);
+				}
+			}else{
+				Set("gravityEff", DynamicFilter("this"), 0);
+				Set("phasing", DynamicFilter("this"), true);
+				RunTo("c(150,400)", 10);
+				Wait(TimePass() >= 10);
+				RunTo(Get("position",DynamicFilter("player"))$, 15);
+				RunTo("c(490,400)", 10);
+				Wait(TimePass() >= 30);
+				RunTo(Get("position",DynamicFilter("player"))$, 15);
+
+				RunTo("c(150,400)", 10);
+				Wait(TimePass() >= 10);
+				RunTo(Get("position",DynamicFilter("player"))$, 15);
+				RunTo("c(490,400)", 10);
+				Wait(TimePass() >= 30);
+				RunTo(Get("position",DynamicFilter("player"))$, 15);
+
+				if(Random(DecimalSet(1,2,1)) == 1){
+					RunTo("c(150,400)", 15);
+				}else{
+					RunTo("c(490,400)", 15);
+				}
+
+				Set("gravityEff", DynamicFilter("this"), 1);
+				Set("phasing", DynamicFilter("this"), false);
+			}
+		}
+		.seq1{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				Wait(TimePass() >= 50);
+				Spawn(.PropellerKnight_cannonball, "c(200,500)");
+				Spawn(.PropellerKnight_cannonball, "c(440,500)");
+			}
+		}
+	}
+}
+
+.PropellerKnight_cannonball{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("gravityEff", DynamicFilter("this"), 0.3);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+		}
+	}
+}

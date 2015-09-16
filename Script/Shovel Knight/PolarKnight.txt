@@ -1,0 +1,189 @@
+.PolarKnight{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(550,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "48,64");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.base{
+		.seq0{
+			Spawn(.PolarKnight_snowball_roll, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 60);
+		}
+		.seq1{
+			if(Attacked()){
+				VarInc(0);
+				if(VarGet(0) == 3){
+					VarSet(0,0);
+					Goto(.stomp);
+				}else{
+					Goto(.charge);
+				}
+			}
+		}
+		.seq2{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(1);
+				if(VarGet(1) % 30 == 0){
+					Spawn(.PolarKnight_icedrop, RandomPositionInRange("c(0,500)","c(640,500)"));
+				}
+				if(VarGet(1) % 100 == 0){
+					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+					Spawn(.PolarKnight_spike, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+				}
+			}
+		}
+	}
+	.charge{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 8, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 30);
+			Goto(.base);
+		}
+		.seq1{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(1);
+				if(VarGet(1) % 30 == 0){
+					Spawn(.PolarKnight_icedrop, RandomPositionInRange("c(0,500)","c(640,500)"));
+				}
+			}
+		}
+	}
+	.stomp{
+		.seq0{
+			Set("gravityEff", DynamicFilter("this"), 0);
+			Set("phasing", DynamicFilter("this"), true);
+			RunStraight("north", 25, TravelDistance() >= 700);
+			RunStraight(TurnToPlayer(DirectionSet("H")), 10, Abs(DistanceToPlayer("X")) <= 32);
+			RunStraight("south", 25, TravelDistance() >= 650);
+			Set("gravityEff", DynamicFilter("this"), 1);
+			Set("phasing", DynamicFilter("this"), false);
+			Spawn(.PolarKnight_spike, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			Wait(TimePass() >= 10);
+			Goto(.charge);
+		}
+	}
+}
+
+.PolarKnight_snowball_roll{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("invul", DynamicFilter("this"), true);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.roll1{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 5, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			FlipDirection("H");
+			Goto(.roll2);
+		}
+		.seq1{
+			if(Attacked()){
+				Set("direction", DynamicFilter("this"), DirectionComponent("X", Get("direction", DynamicFilter("player"))) );
+				Set("group", DynamicFilter("this"), 0);
+				Goto(.roll2);
+			}
+		}
+	}
+	.roll2{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 5, 
+				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
+				);
+			Despawn();
+		}
+		.seq1{
+			if(Attack()){
+				Despawn();
+			}
+		}
+	}
+}
+
+.PolarKnight_snowball{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("gravityeff", DynamicFilter("this"),  0.5);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(100,0)","c(500,0)")), 300, 5, false);
+		}
+	}
+}
+
+.PolarKnight_snowball_mini{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(100,0)","c(500,0)")), 300, 5, false);
+		}
+	}
+}
+
+.PolarKnight_spike{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,16");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.base{
+		.seq0{
+			Wait(TimePass() >= 150);
+			Despawn();
+		}
+	}
+}
+
+.PolarKnight_icedrop{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,64");
+		Set("gravityEff", DynamicFilter("this"), 0.3);
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+		}
+	}
+}
