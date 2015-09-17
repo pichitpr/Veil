@@ -1,0 +1,233 @@
+.MrHat{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.sword{
+		.seq0{
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Wait(TimePass() >= 30);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 40);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 40);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Wait(TimePass() >= 30);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 40);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 40);
+			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_hat, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Goto(.thrower);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+	.thrower{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Set("gravityeff", DynamicFilter("this"),  0);
+
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup1, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Set("gravityeff", DynamicFilter("this"),  1);
+
+			Wait(TimePass() >= 20);
+			Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south") );
+			Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south") );
+			Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south") );
+			Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south") );
+			Jump(Anchor("c(200,0)"), 200, 5, SurfaceInDir("south") );
+
+			Wait(TimePass() >= 20);
+			Set("gravityeff", DynamicFilter("this"),  0);
+
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("north", 6, TravelDistance() >= 150);
+
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup1, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			RunStraight("south", 6, TravelDistance() >= 100);
+			Spawn(.MrHat_cup3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+
+			Set("gravityeff", DynamicFilter("this"),  1);
+
+			Wait(TimePass() >= 30);
+			Spawn(.MrHat_hat, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Goto(.sword);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+	}
+}
+
+.MrHat_sword{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 15, TravelDistance() >= 48);
+			Despawn();
+		}
+	}
+}
+
+.MrHat_spear{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,64");
+		Set("gravityEff", DynamicFilter("this"), 0.5);
+		Set("hp", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+		Set("defender", DynamicFilter("this"), true);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor(RandomPositionInRange("c(100,0)","c(400,0)")), 400, 5, SurfaceInDir("south"));
+			Goto(.stay);
+		}
+	}
+	.stay{
+		.seq0{
+		}
+	}
+}
+
+.MrHat_plate{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 8, false);
+		}
+	}
+}
+
+.MrHat_cup1{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor("c(300,0)"), 100, 5, SurfaceInDir("south"));
+		}
+	}
+}
+
+.MrHat_cup2{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor("c(200,0)"), 100, 5, SurfaceInDir("south"));
+		}
+	}
+}
+
+.MrHat_cup3{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("gravityEff", DynamicFilter("this"), 1);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.launched{
+		.seq0{
+			Jump(Anchor("c(100,0)"), 100, 5, SurfaceInDir("south"));
+		}
+	}
+}
+
+.MrHat_hat{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 20);
+			Despawn();
+		}
+	}
+}

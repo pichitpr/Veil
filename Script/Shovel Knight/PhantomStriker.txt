@@ -1,0 +1,160 @@
+.PhantomStriker{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "32,48");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+	}
+	.base{
+		.seq0{
+			if(Abs(DistanceToPlayer("X")) <= 128){
+				RunStraight(RelDirection("180"), 6, TimePass() >= 30);
+			}else{
+				RunStraight(Get("direction",DynamicFilter("this")), 3, TimePass() >= 30);
+			}
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq2{
+			Wait(TimePass() >= 100);
+			Set("invul", DynamicFilter("this"), true);
+			Wait(TimePass() >= 20);
+			Spawn(.Phantom_thundershield, Get("position",DynamicFilter("this")), "east");
+			Spawn(.Phantom_thundershield, Get("position",DynamicFilter("this")), "west");
+			Set("invul", DynamicFilter("this"), false);
+			VarInc(0);
+			if(VarGet(0) == 3){
+				VarSet(0,0);
+				Goto(.vanish);
+			}else{
+				Goto(.attack);
+			}
+		}
+		.seq3{
+			if(Get("hp",DynamicFilter("this")) <= 50){
+				AddExtraVelocityToPlayer("west", 5, false);
+			}
+		}
+	}
+	.attack{
+		.seq0{
+			Wait(TimePass() >= 40);
+			Spawn(.Phantom_thunder, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 40);
+			Spawn(.Phantom_thunder, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 10);
+			Spawn(.Phantom_thunder, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Spawn(.Phantom_thunder, Rel("c(0,64)"), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 30);
+			Goto(.base);
+		}
+		.seq1{
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		}
+		.seq3{
+			if(Get("hp",DynamicFilter("this")) <= 50){
+				AddExtraVelocityToPlayer("west", 5, false);
+			}
+		}
+	}
+	.vanish{
+		.seq0{
+			Wait(TimePass() >= 40);
+			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+			Spawn(.Phantom_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Set("attacker", DynamicFilter("this"), false);
+			Set("defender", DynamicFilter("this"), false);
+			Spawn(.Phantom_thunderball, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Spawn(.Phantom_thunderball, RandomPositionInRange("c(40,240)","c(600,500)") );
+			Wait(TimePass() >= 20);
+			Spawn(.Phantom_thunderball, RandomPositionInRange("c(40,240)","c(600,500)") );
+			Wait(TimePass() >= 20);
+			Set("position", DynamicFilter("this"), RandomPositionInRange("c(140,240)","c(500,500)"));
+			Set("defender", DynamicFilter("this"), true);
+			Spawn(.Phantom_thunderball, Get("position",DynamicFilter("this")) );
+			Wait(TimePass() >= 20);
+			Set("attacker", DynamicFilter("this"), true);
+			Goto(.base);
+		}
+		.seq3{
+			if(Get("hp",DynamicFilter("this")) <= 50){
+				AddExtraVelocityToPlayer("west", 5, false);
+			}
+		}
+	}
+}
+
+.Phantom_thundershield{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, TravelDistance() >= 96);
+			Despawn();
+		}
+	}
+}
+
+.Phantom_thunder{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "64,64");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, false);
+		}
+	}
+}
+
+.Phantom_sword{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "48,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, TravelDistance() >= 96);
+			Despawn();
+		}
+	}
+}
+
+.Phantom_thunderball{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,32");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			Wait(TimePass() >= 20);
+			RunStraight( TurnToPlayer(DirectionSetDivide(120))$ , 7, false);
+		}
+	}
+}

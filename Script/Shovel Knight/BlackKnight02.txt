@@ -1,4 +1,4 @@
-.BlackKnight01{
+.BlackKnight02{
 	.init{
 		Set("texture", DynamicFilter("this"), 4);
 		Set("position", DynamicFilter("this"), "c(320,200)");
@@ -47,7 +47,7 @@
 	.meleeattack{
 		.seq0{
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Spawn(.BlackKnight01_shovel, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Spawn(.BlackKnight02_shovel, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
 			Wait(TimePass() >= 20);
 			Goto(.base);			
 		}
@@ -73,7 +73,7 @@
 		.seq0{
 			Wait(TimePass() >= 20);
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Spawn(.BlackKnight01_charge, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			Spawn(.BlackKnight02_charge, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
 			Wait(TimePass() >= 20);
 			Goto(.base);
 		}
@@ -88,7 +88,7 @@
 	}
 }
 
-.BlackKnight01_shovel{
+.BlackKnight02_shovel{
 	.init{
 		Set("texture", DynamicFilter("this"), 6);
 		Set("collider", DynamicFilter("this"), "48,48");
@@ -104,7 +104,7 @@
 	}
 }
 
-.BlackKnight01_charge{
+.BlackKnight02_charge{
 	.init{
 		Set("texture", DynamicFilter("this"), 6);
 		Set("collider", DynamicFilter("this"), "64,48");

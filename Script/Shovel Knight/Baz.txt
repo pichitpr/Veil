@@ -1,0 +1,199 @@
+.Baz{
+	.init{
+		Set("texture", DynamicFilter("this"), 4);
+		Set("position", DynamicFilter("this"), "c(500,200)");
+		Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+		Set("collider", DynamicFilter("this"),  "48,64");
+		Set("gravityeff", DynamicFilter("this"),  1);
+		Set("hp", DynamicFilter("this"), 100);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 10);
+		Set("defender", DynamicFilter("this"), true);
+		VarSet(0,0);
+		VarSet(1,0);
+	}
+	.base{
+		.seq0{
+			RunStraight(Get("direction",DynamicFilter("this")), 3, false);
+		}
+		.seq1{
+			if(SurfaceInDir("east")){
+				FlipDirection("H");
+				Goto(.swingfromright);
+			}else{
+				if(SurfaceInDir("west")){
+					FlipDirection("H");
+					Goto(.swingfromleft);
+				}
+			}
+		}
+		.seq2{
+			VarInc(1);
+			if(VarGet(1) == 50){
+				VarSet(1,0);
+				Spawn(.Baz_whip, Get("position",DynamicFilter("this")), TurnToPlayer(DirectionSet("H")));
+			}
+		}
+		.seq3{
+			Wait(TimePass() >= 80);
+			Goto(.jump);
+		}
+		.seq4{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) == 70){
+					VarSet(0,0);
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "45");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "135");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "225");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "315");
+				}
+			}
+		}
+	}
+	.jump{
+		.seq0{
+			Jump(Anchor("c(120,0)"), 300, 5, SurfaceInDir("south"));
+			Goto(.base);
+		}
+		.seq4{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) == 70){
+					VarSet(0,0);
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "45");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "135");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "225");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "315");
+				}
+			}
+		}
+	}
+	.swingfromleft{
+		.seq0{
+			Jump(Anchor("c(0,400)"), 400, 5, Peak());
+			Set("gravityeff", DynamicFilter("this"),  0);
+			Set("phasing", DynamicFilter("this"), true);
+			Wait(TimePass() >= 10);
+
+			RunTo("c(180,200)", 15);
+			RunTo("c(320,400)", 15);
+			Wait(TimePass() >= 10);
+			RunTo("c(180,200)", 15);
+
+			RunTo("c(40,400)", 15);
+			Wait(TimePass() >= 10);
+			RunTo("c(180,200)", 15);
+			RunTo("c(320,400)", 15);
+			Wait(TimePass() >= 10);
+
+			Set("gravityeff", DynamicFilter("this"),  1);			
+			Set("phasing", DynamicFilter("this"), false);
+			RunStraight("south", 7, SurfaceInDir("south"));
+			Spawn(.Baz_groundlightning, Get("position",DynamicFilter("this")), "east");
+			Spawn(.Baz_groundlightning, Get("position",DynamicFilter("this")), "west");
+			Wait(TimePass() >= 10);
+			Goto(.base);
+		}
+		.seq4{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) == 70){
+					VarSet(0,0);
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "45");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "135");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "225");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "315");
+				}
+			}
+		}
+	}
+	.swingfromright{
+		.seq0{
+			Jump(Anchor("c(0,400)"), 400, 5, Peak());
+			Set("gravityeff", DynamicFilter("this"),  0);
+			Set("phasing", DynamicFilter("this"), true);
+			Wait(TimePass() >= 10);
+
+			RunTo("c(460,200)", 15);
+			RunTo("c(320,400)", 15);
+			Wait(TimePass() >= 10);
+			RunTo("c(460,200)", 15);
+
+			RunTo("c(600,400)", 15);
+			Wait(TimePass() >= 10);
+			RunTo("c(460,200)", 15);
+			RunTo("c(320,400)", 15);
+			Wait(TimePass() >= 10);
+
+			Set("gravityeff", DynamicFilter("this"),  1);			
+			Set("phasing", DynamicFilter("this"), false);
+			RunStraight("south", 7, SurfaceInDir("south"));
+			Spawn(.Baz_groundlightning, Get("position",DynamicFilter("this")), "east");
+			Spawn(.Baz_groundlightning, Get("position",DynamicFilter("this")), "west");
+			Wait(TimePass() >= 10);
+			Goto(.base);
+		}
+		.seq4{
+			if(Get("hp", DynamicFilter("this")) <= 50){
+				VarInc(0);
+				if(VarGet(0) == 70){
+					VarSet(0,0);
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "45");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "135");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "225");
+					Spawn(.Baz_lightning, Get("position",DynamicFilter("this")), "315");
+				}
+			}
+		}
+	}
+}
+
+.Baz_whip{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,48");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, TravelDistance() >= 160);
+			Despawn();
+		}
+	}
+}
+
+.Baz_groundlightning{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "32,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 12, false);
+		}
+	}
+}
+
+.Baz_lightning{
+	.init{
+		Set("texture", DynamicFilter("this"), 6);
+		Set("collider", DynamicFilter("this"), "16,16");
+		Set("projectile", DynamicFilter("this"), true);
+		Set("invul", DynamicFilter("this"), true);
+		Set("attacker", DynamicFilter("this"), true);
+		Set("atk", DynamicFilter("this"), 1);
+	}
+	.state0{
+		.seq0{
+			RunStraight( Get("direction", DynamicFilter("this")) , 10, false);
+		}
+	}
+}
