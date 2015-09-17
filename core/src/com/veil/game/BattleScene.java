@@ -41,11 +41,12 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, new Rectangle(400,70,32,32), 2));
 		//temporaryDynList = new ArrayList<DynamicEntity>();
 		
-		//permanentDynList.add(new ScriptedEntity(this, "Watton"));
 		//permanentDynList.add(new ScriptedEntity(this, "Lakitu"));
 		//permanentDynList.add(new ScriptedEntity(this, "ShellKoopa"));
 		//permanentDynList.add(new ScriptedEntity(this, "TomahawkMan"));
+		
 		//permanentDynList.add(new ScriptedEntity(this, "Batonton"));
+		//permanentDynList.add(new ScriptedEntity(this, "Biree"));
 		//permanentDynList.add(new ScriptedEntity(this, "BoulderSpawner"));
 		//permanentDynList.add(new ScriptedEntity(this, "DocronHatcher"));
 		//permanentDynList.add(new ScriptedEntity(this, "Dompan"));
@@ -74,6 +75,98 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, "TotemPolem"));
 		//permanentDynList.add(new ScriptedEntity(this, "UpDown"));
 		//permanentDynList.add(new ScriptedEntity(this, "WallBlaster"));
+		//permanentDynList.add(new ScriptedEntity(this, "Watton"));
+		//permanentDynList.add(new ScriptedEntity(this, "Moby"));
+		//permanentDynList.add(new ScriptedEntity(this, "BrightMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "ToadMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "DrillMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "PharaohMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "DustMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "DiveMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "SkullMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "Roach01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Roach02"));
+		//permanentDynList.add(new ScriptedEntity(this, "CossackMachine"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetallDaddy"));
+		//permanentDynList.add(new ScriptedEntity(this, "Wily04_01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Wily04_02"));
+		//permanentDynList.add(new ScriptedEntity(this, "Wily04_03"));
+		
+		//permanentDynList.add(new ScriptedEntity(this, "Crawler01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Flyer01Spawner"));
+		//permanentDynList.add(new ScriptedEntity(this, "Swarm01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Swooper01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Hopper01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Hopper02"));
+		//permanentDynList.add(new ScriptedEntity(this, "Floater01"));
+		//permanentDynList.add(new ScriptedEntity(this, "Floater02"));
+		//permanentDynList.add(new ScriptedEntity(this, "Skree"));
+		//permanentDynList.add(new ScriptedEntity(this, "Multiviola"));
+		//permanentDynList.add(new ScriptedEntity(this, "Waver"));
+		//permanentDynList.add(new ScriptedEntity(this, "Squeept"));
+		//permanentDynList.add(new ScriptedEntity(this, "LavaDragon"));
+		//permanentDynList.add(new ScriptedEntity(this, "RinkaSpawner"));
+		//permanentDynList.add(new ScriptedEntity(this, "MetroidCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "Metroid"));
+		//permanentDynList.add(new ScriptedEntity(this, "Kraid"));
+		//permanentDynList.add(new ScriptedEntity(this, "Ridley"));
+		
+		//permanentDynList.add(new ScriptedEntity(this, "Soldier"));
+		//permanentDynList.add(new ScriptedEntity(this, "Sniper"));
+		//permanentDynList.add(new ScriptedEntity(this, "SniperCrawl"));
+		//permanentDynList.add(new ScriptedEntity(this, "BombThrower"));
+		//permanentDynList.add(new ScriptedEntity(this, "HiddenCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "ShootingSoldier"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLSoldier"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLSniperStand"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLSniperMove"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLTank"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "GroundBarrel"));
+		//permanentDynList.add(new ScriptedEntity(this, "HiddenSniper"));
+		//permanentDynList.add(new ScriptedEntity(this, "Sniper3Shot"));
+		//permanentDynList.add(new ScriptedEntity(this, "SplashCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "SpiderTank"));
+		//permanentDynList.add(new ScriptedEntity(this, "AlienEggSpawner"));
+		//permanentDynList.add(new ScriptedEntity(this, "WingedSoldier"));
+		//permanentDynList.add(new ScriptedEntity(this, "AlienEggHoming"));
+		//permanentDynList.add(new ScriptedEntity(this, "RailCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "HiddenCannon02"));
+		//permanentDynList.add(new ScriptedEntity(this, "HiddenDomeCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "FlyingSniper"));
+		//permanentDynList.add(new ScriptedEntity(this, "GroundBarrel02"));
+		//permanentDynList.add(new ScriptedEntity(this, "SkullUFO"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLSpider"));
+		//permanentDynList.add(new ScriptedEntity(this, "RLSpiderShooter"));
+		//permanentDynList.add(new ScriptedEntity(this, "BigSpiky"));
+		//permanentDynList.add(new ScriptedEntity(this, "Hydra"));
+		//permanentDynList.add(new ScriptedEntity(this, "TwinMouth"));
+		//permanentDynList.add(new ScriptedEntity(this, "AlienMinionSpawner"));
+		//permanentDynList.add(new ScriptedEntity(this, "ShootingMouth"));
+		//permanentDynList.add(new ScriptedEntity(this, "AlienCannon"));
+		//permanentDynList.add(new ScriptedEntity(this, "RedFalcon"));
+		
+		//permanentDynList.add(new ScriptedEntity(this, "BombMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "GutsMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "FireMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "ElecMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "IceMan"));
+		//permanentDynList.add(new ScriptedEntity(this, "CopyRobot"));
+		//permanentDynList.add(new ScriptedEntity(this, "CWU01P"));
+		//permanentDynList.add(new ScriptedEntity(this, "Wily01_01"));
+		
+		//permanentDynList.add(new ScriptedEntity(this, "BlackKnight01"));
+		//permanentDynList.add(new ScriptedEntity(this, "KingKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "PlagueKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "TreasureKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "MoleKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "TinkerKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "PolarKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "PropellerKnight"));
+		//permanentDynList.add(new ScriptedEntity(this, "BlackKnight03"));
+		//permanentDynList.add(new ScriptedEntity(this, "Baz"));
+		//permanentDynList.add(new ScriptedEntity(this, "PhantomStriker"));
+		permanentDynList.add(new ScriptedEntity(this, "MrHat"));
 	}
 	
 	@Override
