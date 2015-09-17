@@ -219,7 +219,7 @@
 .MoleKnight_fireball2{
 	.init{
 		Set("texture", DynamicFilter("this"), 6);
-		Set("collider", DynamicFilter("this"), "100,100");
+		Set("collider", DynamicFilter("this"), "16,16");
 		Set("projectile", DynamicFilter("this"), true);
 		Set("gravityEff", DynamicFilter("this"), 1);
 		Set("invul", DynamicFilter("this"), true);
