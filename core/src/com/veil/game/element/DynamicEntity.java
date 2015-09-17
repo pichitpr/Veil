@@ -114,6 +114,13 @@ public abstract class DynamicEntity extends Entity{
 		}
 	}
 	
+	/**
+	 * Set center of the entity to the position pos according to its reference frame
+	 */
+	public void setCenteredPositionCorrespondToRF(float x, float y){
+		setCenteredPositionCorrespondToRF(new Vector2(x, y));
+	}
+	
 	public Vector2 getLastPos(){
 		return lastPos;
 	}
