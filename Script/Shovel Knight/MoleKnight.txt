@@ -90,32 +90,17 @@
 	.summon{
 		.seq0{
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Wait(TimePass() >= 20);
-			Spawn(.MoleKnight_rock, Anchor("c(64,-10)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,22)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,56)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,88)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,120)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,152)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,184)"), Get("direction",DynamicFilter("this")) );
 
-			Wait(TimePass() >= 40);
-			Spawn(.MoleKnight_rock, Anchor("c(64,-10)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,22)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,56)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,88)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,120)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,152)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,184)"), Get("direction",DynamicFilter("this")) );
-
-			Wait(TimePass() >= 40);
-			Spawn(.MoleKnight_rock, Anchor("c(64,-10)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,22)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,56)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,88)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,120)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,152)"), Get("direction",DynamicFilter("this")) );
-			Spawn(.MoleKnight_rock, Anchor("c(64,184)"), Get("direction",DynamicFilter("this")) );
+			loop(3){
+				Wait(TimePass() >= 40);
+				Spawn(.MoleKnight_rock, Anchor("c(64,-10)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,22)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,56)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,88)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,120)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,152)"), Get("direction",DynamicFilter("this")) );
+				Spawn(.MoleKnight_rock, Anchor("c(64,184)"), Get("direction",DynamicFilter("this")) );
+			}
 
 			Wait(TimePass() >= 40);
 			Jump(Get("position", DynamicFilter("this")), 200, 5, SurfaceInDir("south"));
@@ -134,18 +119,15 @@
 	.holeambush{
 		.seq0{
 			Wait(TimePass() >= 10);
-			Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "east");
-			Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "west");
-			Wait(TimePass() >= 50);
-			Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "east");
-			Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "west");
-			Wait(TimePass() >= 50);
-			Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "east");
-			Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "west");
-			Wait(TimePass() >= 50);
-			Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "east");
-			Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "west");
-			Wait(TimePass() >= 40);
+			loop(2){
+				Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "east");
+				Spawn(.MoleKnight_fireball, Get("position",DynamicFilter("this")), "west");
+				Wait(TimePass() >= 50);
+				Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "east");
+				Spawn(.MoleKnight_fireball2, Get("position",DynamicFilter("this")), "west");
+				Wait(TimePass() >= 50);
+			}
+
 			Jump(Get("position", DynamicFilter("this")), 200, 5, SurfaceInDir("south"));
 			Set("gravityEff", DynamicFilter("this"), 0);
 			Set("phasing", DynamicFilter("this"), true);

@@ -47,26 +47,10 @@
 			FlipDirection("H");
 		}
 		.seq1{
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Wait(TimePass() >= 10);
-			Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			loop(10){
+				Wait(TimePass() >= 10);
+				Spawn(.TinkerKnight_wrench2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			}
 			Wait(TimePass() >= 10);
 			Goto(.base);
 		}

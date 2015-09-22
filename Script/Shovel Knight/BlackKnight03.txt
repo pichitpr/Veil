@@ -171,40 +171,30 @@
 			Jump(Anchor("c(128,0)"), 300, 5, Peak());
 			RunStraight("south", 7, SurfaceInDir("south") );
 			Wait(TimePass() >= 20);
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "0");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "45");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "90");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "135");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "180");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "225");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "270");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "315");
-			Wait(TimePass() >= 5);
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "0");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "45");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "90");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "135");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "180");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "225");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "270");
-			Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "315");
+			loop(2){
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "0");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "45");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "90");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "135");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "180");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "225");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "270");
+				Spawn(.BlackKnight03_feather, Get("position",DynamicFilter("this")), "315");
+				Wait(TimePass() >= 5);
+			}
 			Wait(TimePass() >= 20);
 
 			Set("gravityEff", DynamicFilter("this"), 0);
 			Set("phasing", DynamicFilter("this"), true);
-			RunTo("c(150,400)", 10);
-			Wait(TimePass() >= 10);
-			RunTo("c(320,200)", 10);
-			RunTo("c(490,400)", 10);
-			Wait(TimePass() >= 10);
-			RunTo("c(320,200)", 10);
 
-			RunTo("c(150,400)", 10);
-			Wait(TimePass() >= 10);
-			RunTo("c(320,200)", 10);
-			RunTo("c(490,400)", 10);
-			Wait(TimePass() >= 10);
-			RunTo("c(320,200)", 10);
+			loop(2){
+				RunTo("c(150,400)", 10);
+				Wait(TimePass() >= 10);
+				RunTo("c(320,200)", 10);
+				RunTo("c(490,400)", 10);
+				Wait(TimePass() >= 10);
+				RunTo("c(320,200)", 10);
+			}
 
 			RunTo("c(150,400)", 10);
 			if(Get("hp", DynamicFilter("this")) <= 50){

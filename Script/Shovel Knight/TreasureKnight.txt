@@ -108,9 +108,9 @@
 	.mine{
 		.seq0{
 			Wait(TimePass() >= 20);
-			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
-			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
-			Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
+			loop(3){
+				Spawn(.TreasureKnight_mine, Get("position",DynamicFilter("this")) );
+			}
 			Wait(TimePass() >= 60);
 			Goto(.base);
 		}
@@ -120,9 +120,9 @@
 			Wait(TimePass() >= 20);
 			Spawn(.TreasureKnight_box, Get("position",DynamicFilter("this")) );
 			Wait(TimePass() >= 20);
-			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
-			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
-			Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
+			loop(3){
+				Spawn(.TreasureKnight_mine2, Get("position",DynamicFilter("this")), Random(DirectionSetDivide(2)) );
+			}
 			Wait(TimePass() >= 80);
 			Goto(.base);
 		}

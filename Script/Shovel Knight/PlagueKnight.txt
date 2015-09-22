@@ -15,14 +15,17 @@
 	.base{
 		.seq0{
 			Jump(RandomPositionInRange("c(0,0)","c(640,0)"), 300, 5, SurfaceInDir("south"));
+			
 			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
 			Spawn(.PlagueKnight_flask, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
 			Wait(TimePass() >= 20);
+
 			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
 			Spawn(.PlagueKnight_flask2, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
 			Wait(TimePass() >= 20);
+
 			Jump(Anchor("c(160,0)"), 300, 5, SurfaceInDir("south"));
 			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
 			Spawn(.PlagueKnight_flask, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
@@ -53,9 +56,9 @@
 		.seq0{
 			if(!InTheAir()){
 				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-				Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				loop(3){
+					Spawn(.PlagueKnight_flask3, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				}
 				Wait(TimePass() >= 50);
 				Goto(.base);
 			}

@@ -54,18 +54,11 @@
 	}
 	.jumpattack{
 		.seq0{
-			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Jump(Anchor("c(128,0)"), 300, 5, Peak());
-			RunStraight("south", 7, SurfaceInDir("south") );
-			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Jump(Anchor("c(128,0)"), 300, 5, Peak());
-			RunStraight("south", 7, SurfaceInDir("south") );
-			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Jump(Anchor("c(128,0)"), 300, 5, Peak());
-			RunStraight("south", 7, SurfaceInDir("south") );
-			Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
-			Jump(Anchor("c(128,0)"), 300, 5, Peak());
-			RunStraight("south", 7, SurfaceInDir("south") );
+			loop(4){
+				Set("direction", DynamicFilter("this"),  TurnToPlayer(DirectionSet("H")) );
+				Jump(Anchor("c(128,0)"), 300, 5, Peak());
+				RunStraight("south", 7, SurfaceInDir("south") );
+			}
 			Goto(.base);
 		}
 	}

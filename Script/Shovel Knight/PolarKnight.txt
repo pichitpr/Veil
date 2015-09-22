@@ -35,9 +35,9 @@
 					Spawn(.PolarKnight_icedrop, RandomPositionInRange("c(0,500)","c(640,500)"));
 				}
 				if(VarGet(1) % 100 == 0){
-					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-					Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+					loop(3){
+						Spawn(.PolarKnight_snowball_mini, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+					}
 					Spawn(.PolarKnight_spike, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
 				}
 			}
@@ -49,9 +49,9 @@
 				SurfaceInDir( DirectionComponent("X", Get("direction", DynamicFilter("this"))) )
 				);
 			FlipDirection("H");
-			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
-			Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			loop(3){
+				Spawn(.PolarKnight_snowball, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")));
+			}
 			Wait(TimePass() >= 30);
 			Goto(.base);
 		}

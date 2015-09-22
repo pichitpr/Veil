@@ -75,18 +75,11 @@
 	}
 	.summon{
 		.seq0{
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
-			Wait(TimePass() >= 30);
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
-			Wait(TimePass() >= 30);
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
-			Wait(TimePass() >= 30);
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
-			Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
-			Wait(TimePass() >= 30);
+			loop(4){
+				Spawn(.KingKnight_paper, RandomPositionInRange("c(0,500)","c(320,500)"), "-30");
+				Spawn(.KingKnight_paper, RandomPositionInRange("c(320,500)","c(640,500)"), "210");
+				Wait(TimePass() >= 30);
+			}
 			Wait(TimePass() >= 50);
 			Goto(.base);
 		}

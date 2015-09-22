@@ -12,39 +12,17 @@
 	}
 	.sword{
 		.seq0{
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-
-			Wait(TimePass() >= 30);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 40);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 40);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 30);
-			Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-
-			Wait(TimePass() >= 30);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 40);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			Wait(TimePass() >= 40);
-			RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
-			Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+			loop(2){
+				loop(3){
+					Wait(TimePass() >= 30);
+					Spawn(.MrHat_spear, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				}
+				loop(3){
+					Wait(TimePass() >= 40);
+					RunStraight( Get("direction", DynamicFilter("this")), 10, Abs(DistanceTo("X", Get("position", DynamicFilter("player")))) <= 24);
+					Spawn(.MrHat_sword, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				}
+			}
 
 			Wait(TimePass() >= 30);
 			Spawn(.MrHat_hat, Get("position",DynamicFilter("this")) );
@@ -60,12 +38,10 @@
 			Wait(TimePass() >= 20);
 			Set("gravityeff", DynamicFilter("this"),  0);
 
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
+			loop(3){
+				Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				RunStraight("north", 6, TravelDistance() >= 150);
+			}
 
 			RunStraight("south", 6, TravelDistance() >= 100);
 			Spawn(.MrHat_cup1, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
@@ -86,12 +62,10 @@
 			Wait(TimePass() >= 20);
 			Set("gravityeff", DynamicFilter("this"),  0);
 
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
-			Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
-			RunStraight("north", 6, TravelDistance() >= 150);
+			loop(3){
+				Spawn(.MrHat_plate, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
+				RunStraight("north", 6, TravelDistance() >= 150);
+			}
 
 			RunStraight("south", 6, TravelDistance() >= 100);
 			Spawn(.MrHat_cup1, Get("position",DynamicFilter("this")), Get("direction",DynamicFilter("this")) );
