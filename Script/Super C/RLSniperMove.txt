@@ -19,7 +19,7 @@
 		}
 		.seq2{
 			Wait(TimePass() >= 70);
-			Spawn(.RLSniperStand_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
+			Spawn(.RLSniperMove_bullet, Get("position", DynamicFilter("this")), Get("direction", DynamicFilter("this")) );
 		}
 	}
 }

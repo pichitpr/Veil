@@ -15,9 +15,9 @@
 			Set("invul", DynamicFilter("this"), true);
 			if(Abs(DistanceToPlayer("X")) <= 96){
 				Set("invul", DynamicFilter("this"), false);				
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
+				Spawn(.MetallJump_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+				Spawn(.MetallJump_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
+				Spawn(.MetallJump_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
 				Wait(TimePass() >= 20);
 				Goto(.move);
 			}

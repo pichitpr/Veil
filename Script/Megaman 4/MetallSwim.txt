@@ -15,9 +15,9 @@
 			Set("invul", DynamicFilter("this"), true);
 			if(Abs(DistanceToPlayer("X")) <= 96){
 				Set("invul", DynamicFilter("this"), false);				
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
-				Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
+				Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+				Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
+				Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
 				Wait(TimePass() >= 20);
 				Goto(.move);
 			}
@@ -29,13 +29,13 @@
 	.move{
 		.seq0{
 			Jump(Anchor("c(32,0)"), 96, 5, Peak());
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
 			Jump(Anchor("c(32,0)"), 96, 5, Peak());
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("-45"));
+			Spawn(.MetallSwim_Bullet, Get("position", DynamicFilter("this")), RelDirection("45"));
 			Jump(Anchor("c(32,0)"), 96, 5, Peak());
 			Goto(.hide);
 		}

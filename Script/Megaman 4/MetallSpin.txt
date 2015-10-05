@@ -24,8 +24,8 @@
 	}
 	.spin{
 		.seq0{
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
-			Spawn(.MetallRun_Bullet, Get("position", DynamicFilter("this")), RelDirection("180"));
+			Spawn(.MetallSpin_Bullet, Get("position", DynamicFilter("this")), RelDirection("0"));
+			Spawn(.MetallSpin_Bullet, Get("position", DynamicFilter("this")), RelDirection("180"));
 			Wait(TimePass() >= 30);
 		}
 	}
