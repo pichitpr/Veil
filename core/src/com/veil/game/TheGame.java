@@ -36,6 +36,7 @@ public class TheGame extends Game {
         batch = new SpriteBatch();
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
+        font.setScale(2);
         
         this.setScreen(new BattleScene(this));
     }

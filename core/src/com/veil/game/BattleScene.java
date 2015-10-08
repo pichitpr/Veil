@@ -23,6 +23,7 @@ public class BattleScene implements Screen, LevelContainer{
 	
 	private GameMap map;
 	private Player player;
+	private DynamicEntity enemy;
 	private List<DynamicEntity> permanentDynList;
 	private List<DynamicEntity> pendingSpawnList;
 	//private List<DynamicEntity> temporaryDynList;
@@ -166,7 +167,9 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, "BlackKnight03"));
 		//permanentDynList.add(new ScriptedEntity(this, "Baz"));
 		//permanentDynList.add(new ScriptedEntity(this, "PhantomStriker"));
-		permanentDynList.add(new ScriptedEntity(this, "MrHat"));
+		//permanentDynList.add(new ScriptedEntity(this, "MrHat"));
+		
+		enemy = permanentDynList.get(0);
 	}
 	
 	@Override
@@ -264,6 +267,7 @@ public class BattleScene implements Screen, LevelContainer{
 			dyn.render(game.batch,game.region);
 		}*/
 		game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
+		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
 		game.batch.end();
 		
 		//===========================================================
