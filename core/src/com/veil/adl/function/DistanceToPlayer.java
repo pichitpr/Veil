@@ -17,9 +17,10 @@ public class DistanceToPlayer implements IFunction{
 		String axis = param[0].toString();
 		if(axis.equalsIgnoreCase("Y")){
 			return dyn.getWorldCenteredPosition().y - level.getPlayer().getWorldCenteredPosition().y;
-		}else{
+		}else if(axis.equalsIgnoreCase("X")){
 			return dyn.getWorldCenteredPosition().x - level.getPlayer().getWorldCenteredPosition().x;
-		}
+		}else
+			return null;
 	}
 
 }

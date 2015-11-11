@@ -16,9 +16,10 @@ public class DistanceTo implements IFunction{
 		Position pos = Position.parse(param[1]);
 		if(axis.equalsIgnoreCase("Y")){
 			return dyn.getWorldCenteredPosition().y - pos.getY();
-		}else{
+		}else if(axis.equalsIgnoreCase("X")){
 			return dyn.getWorldCenteredPosition().x - pos.getX();
-		}
+		}else
+			return null;
 	}
 
 }

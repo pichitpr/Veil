@@ -13,8 +13,10 @@ public class DirectionComponent implements IFunction {
 		Direction dir = Direction.parse(param[1]);
 		if(component.equalsIgnoreCase("Y"))
 			return new Direction(0,dir.getY());
-		else
+		else if(component.equalsIgnoreCase("X"))
 			return new Direction(dir.getX(),0);
+		else
+			return null;
 	}
 
 }

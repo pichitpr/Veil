@@ -14,7 +14,7 @@
 	.base{
 		.seq0{
 			Wait(TimePass() >= 50);
-			if(Abs(DistanceToPlayer("H")) <= 96){
+			if(Abs(DistanceToPlayer("X")) <= 96){
 				VarSet(0, Random(DecimalSet(1,10,1)) );
 				if(VarGet(0) >= 9){
 					Goto(.attack);
