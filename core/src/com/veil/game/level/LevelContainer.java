@@ -11,6 +11,7 @@ public interface LevelContainer {
 	public Player getPlayer();
 	public List<DynamicEntity> getPermanentDynamicEntity();
 	public void pendingSpawn(DynamicEntity dyn);
+	public boolean canHandleMoreEntity();
 	//public List<DynamicEntity> getTemporaryDynamicEntity();
 	
 }

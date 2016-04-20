@@ -28,4 +28,9 @@ public class GameConstant {
 	 * Auto despawning time (in frame) after the dynamic leaves the screen
 	 */
 	public static final int autoDespawnTime = 100;
+	
+	/**
+	 * Max number of objects in the pool that does not allow Spawn() to spawn more
+	 */
+	public static final int maxObjectPool = 100;
 }

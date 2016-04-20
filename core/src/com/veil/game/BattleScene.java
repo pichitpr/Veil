@@ -42,6 +42,7 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, new Rectangle(400,70,32,32), 2));
 		//temporaryDynList = new ArrayList<DynamicEntity>();
 		
+		permanentDynList.add(new ScriptedEntity(this, "agent0"));
 		//permanentDynList.add(new ScriptedEntity(this, "Lakitu"));
 		//permanentDynList.add(new ScriptedEntity(this, "ShellKoopa"));
 		//permanentDynList.add(new ScriptedEntity(this, "TomahawkMan"));
@@ -381,6 +382,11 @@ public class BattleScene implements Screen, LevelContainer{
 	@Override
 	public void pendingSpawn(DynamicEntity dyn) {
 		pendingSpawnList.add(dyn);
+	}
+
+	@Override
+	public boolean canHandleMoreEntity() {
+		return permanentDynList.size() + pendingSpawnList.size() <= GameConstant.maxObjectPool;
 	}
 
 	/*

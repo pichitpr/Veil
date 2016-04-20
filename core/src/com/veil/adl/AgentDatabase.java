@@ -77,7 +77,7 @@ public class AgentDatabase {
 		registerAction();
 		registerFunction();
 		modelMap = new HashMap<String, AgentModel>();
-		return parseScriptInDir(PlatformUtility.fileOperator.getStorageRoot().child("Script"));
+		return parseScriptInDir(PlatformUtility.fileOperator.getStorageRoot().child("ScriptGen"));
 	}
 	
 	private static HashMap<String,AgentModel> modelMap;
@@ -163,6 +163,9 @@ public class AgentDatabase {
 				if(!parseScriptInDir(f))
 					return false;
 			}else{
+				if(f.name().startsWith("_")){
+					continue;
+				}
 				System.out.println("Parsing & compiling file : "+f.name());
 				try {
 					script = f.readString();
