@@ -21,7 +21,7 @@ public class TheGame extends Game {
     	}
     	System.out.println("Data loaded successful!!");
     	
-    	MathUtils.random = new RandomXS128();
+    	MathUtils.random = new RandomXS128(1000);
     	
     	TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("panel.atlas"));
     	region = new AtlasRegion[7];
