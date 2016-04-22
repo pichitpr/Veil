@@ -19,6 +19,11 @@ public class DynamicCount implements IFunction {
 				counter++;
 			}
 		}
+		for(DynamicEntity dyn : level.getTemporaryDynamicEntity()){
+			if(dyn.identifier.equalsIgnoreCase(identifier)){
+				counter++;
+			}
+		}
 		return counter;
 	}
 
