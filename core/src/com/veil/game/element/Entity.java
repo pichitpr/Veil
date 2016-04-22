@@ -69,8 +69,8 @@ public abstract class Entity {
 	}
 	
 	public boolean completelyOutOfScreen(){
-		return (collider.x < -collider.width || collider.x >= GameConstant.screenW) && 
-				(collider.y < -collider.height || collider.y >= GameConstant.screenH);
+		return collider.x < -collider.width || collider.x >= GameConstant.screenW || 
+				collider.y < -collider.height || collider.y >= GameConstant.screenH;
 	}
 	
 	/*
