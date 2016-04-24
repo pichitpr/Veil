@@ -34,13 +34,18 @@ public class Jump implements IAction{
 			//acc vector g
 			float g = -dyn.getGravityEff()*level.getGravity();
 			if(g > 0) maxHeight = -maxHeight;
+			
+			//distance vector dy
+			float dy = pos.getY()-dyn.getWorldCenteredPosition().y;
+			//dy may exceed specified maxHeight
+			if((g > 0 && dy < maxHeight) || (g < 0 && dy > maxHeight)){
+				maxHeight = dy;
+			}
+			
 			//velocity vector vy
 			float vy = (float)Math.sqrt(2.0*Math.abs(g*maxHeight));
 			if(g > 0) vy = -vy;
-			//distance vector dy
-			float dy = pos.getY()-dyn.getWorldCenteredPosition().y;
-			if(Math.abs(dy) > maxHeight)
-				dy = Math.signum(dy)*maxHeight;
+			
 			
 			float t = (float)( -vy+Math.sqrt(vy*vy+2.0*g*dy) )/g;
 			float t2 = (float)( -vy-Math.sqrt(vy*vy+2.0*g*dy) )/g;
