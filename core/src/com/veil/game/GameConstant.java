@@ -32,5 +32,7 @@ public class GameConstant {
 	/**
 	 * Max number of objects in the pool that does not allow Spawn() to spawn more
 	 */
-	public static final int maxObjectPool = 100;
+	public static final int maxObjectPool = 20;
+	
+	public static final boolean useAI = true;
 }

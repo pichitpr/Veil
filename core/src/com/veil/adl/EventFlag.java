@@ -49,5 +49,15 @@ public class EventFlag {
 	}
 	
 	public boolean jumping = false;
+	
+	public EventFlag cloneImportantFlag(){
+		EventFlag flag = new EventFlag();
+		flag.surfaceInFront = surfaceInFront.clone();
+		flag.reachJumpingPeak = reachJumpingPeak;
+		flag.damaged = damaged;
+		flag.collideDynamic = collideDynamic;
+		flag.jumping = jumping;
+		return flag;
+	}
 }
 

@@ -7,6 +7,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.veil.ai.Controller;
+import com.veil.ai.GameAI;
+import com.veil.ai.LevelSnapshot;
 import com.veil.game.collider.CollisionResolver;
 import com.veil.game.element.DynamicEntity;
 import com.veil.game.element.Player;
@@ -179,6 +182,14 @@ public class BattleScene implements Screen, LevelContainer{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
+		
+		//=================================================================
+		// Pre-Update
+		//=================================================================
+		Controller.instance.preUpdate();
+		if(GameConstant.useAI){
+			GameAI.instance.aiUpdate(Controller.instance, new LevelSnapshot(player, permanentDynList, temporaryDynList));
+		}
 		
 		//=================================================================
 		// Update

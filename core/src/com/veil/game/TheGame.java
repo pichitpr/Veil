@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.veil.adl.AgentDatabase;
+import com.veil.ai.Controller;
 
 public class TheGame extends Game {
 	public SpriteBatch batch;

@@ -215,6 +215,10 @@ public abstract class DynamicEntity extends Entity{
 		}
 	}
 	
+	public boolean onFloor(){
+		return reachFloor;
+	}
+	
 	public void reachFloor(){
 		reachFloor = true;
 	}

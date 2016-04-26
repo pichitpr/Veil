@@ -1,8 +1,7 @@
 package com.veil.game.element;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
+import com.veil.ai.Controller;
 import com.veil.game.GameConstant;
 import com.veil.game.level.LevelContainer;
 
@@ -37,16 +36,17 @@ public class Player extends DynamicEntity{
 		}
 		
 		if(!GameConstant.isPlaformer){
-			if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+			if(Controller.instance.up){
 				vy = GameConstant.speed;
 				this.direction.setDirection(0, 1);
-			}else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+			}else if(Controller.instance.up){
 				vy = -GameConstant.speed;
 				this.direction.setDirection(0, -1);
 			}
 		}else{
-			if(Gdx.input.isKeyPressed(Input.Keys.Z)){
+			if(Controller.instance.jump){
 				if(!pressJump && reachFloor){
+					flag.jumping = true;
 					pressJump = true;
 					timeCount = GameConstant.jumpCounter;
 				}
@@ -60,15 +60,15 @@ public class Player extends DynamicEntity{
 			}
 		}
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+		if(Controller.instance.left){
 			vx = -GameConstant.speed;
 			this.direction.setDirection(-1, 0);
-		}else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+		}else if(Controller.instance.right){
 			vx = GameConstant.speed;
 			this.direction.setDirection(1, 0);
 		}
 		
-		if(Gdx.input.isKeyPressed(Input.Keys.X)){
+		if(Controller.instance.shoot){
 			if(!pressShoot){
 				level.pendingSpawn(new ScriptedEntity(level, "Bullet_Player"));
 				pressShoot = true;
