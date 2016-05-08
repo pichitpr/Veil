@@ -39,7 +39,7 @@ public class Player extends DynamicEntity{
 			if(Controller.instance.up){
 				vy = GameConstant.speed;
 				this.direction.setDirection(0, 1);
-			}else if(Controller.instance.up){
+			}else if(Controller.instance.down){
 				vy = -GameConstant.speed;
 				this.direction.setDirection(0, -1);
 			}
@@ -141,4 +141,37 @@ public class Player extends DynamicEntity{
 		}
 	}
 	
+	/**
+	 * Simulate player movement from button. Return simulated [vx, vy, gravityVy]
+	 */
+	public float[] simulateMovement(boolean left, boolean right, boolean up, boolean down, boolean jump){
+		float _vx = vx;
+		float _vy = vy;
+		float _gravityVy = gravityVy;
+		int _timeCount = timeCount;
+		if(!GameConstant.isPlaformer){
+			if(up){
+				_vy = GameConstant.speed;
+			}else if(down){
+				_vy = -GameConstant.speed;
+			}
+		}else{
+			if(jump){
+				if(!pressJump && reachFloor){
+					_timeCount = GameConstant.jumpCounter;
+				}
+				if(_timeCount > 0){
+					_gravityVy += GameConstant.jumpSpeed*gravityEff*level.getGravity();
+				}
+			}
+		}
+		
+		if(left){
+			_vx = -GameConstant.speed;
+		}else if(right){
+			_vx = GameConstant.speed;
+		}
+		
+		return new float[]{_vx, _vy, _gravityVy};
+	}
 }
