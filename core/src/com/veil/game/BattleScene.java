@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Rectangle;
 import com.veil.ai.Controller;
 import com.veil.ai.GameAI;
 import com.veil.ai.LevelSnapshot;
@@ -183,6 +186,23 @@ public class BattleScene implements Screen, LevelContainer{
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 		
+		if(GameConstant.timeStepping){
+			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+				if(GameAI.predictedEnemyPos != null){
+					Color c = game.batch.getColor();
+					game.batch.setColor(c.r, c.g, c.b, 0.2f);
+					game.batch.begin();
+					for(Rectangle rect : GameAI.predictedEnemyPos){
+						game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+					}
+					game.batch.end();
+					game.batch.setColor(c);
+				}
+				renderGame(delta);
+				return;
+			}
+		}
+		
 		//=================================================================
 		// Pre-Update
 		//=================================================================
@@ -191,6 +211,12 @@ public class BattleScene implements Screen, LevelContainer{
 			GameAI.instance.aiUpdate(Controller.instance, new LevelSnapshot(player, permanentDynList, temporaryDynList));
 		}
 		
+		update(delta);
+		renderGame(delta);
+		despawnAndPostDespawn(delta);
+	}
+
+	private void update(float delta){
 		//=================================================================
 		// Update
 		//=================================================================
@@ -286,7 +312,9 @@ public class BattleScene implements Screen, LevelContainer{
 		for(DynamicEntity dyn : temporaryDynList){
 			dyn.handleCollisionEvent();
 		}
-		
+	}
+	
+	private void renderGame(float delta){
 		//===========================================================
 		// Render
 		//===========================================================
@@ -302,11 +330,13 @@ public class BattleScene implements Screen, LevelContainer{
 		game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
 		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
 		game.batch.end();
-		
+	}
+	
+	private void despawnAndPostDespawn(float delta){
 		//===========================================================
 		// Despawn
 		//===========================================================
-		
+
 		//Propagate despawning to children
 		for(int i=0; i<permanentDynList.size(); i++){
 			if(permanentDynList.get(i).shouldBeRemovedFromWorld()){
@@ -322,7 +352,7 @@ public class BattleScene implements Screen, LevelContainer{
 				}
 			}
 		}
-		
+
 		//Handle OnDespawn event
 		for(int i=0; i<permanentDynList.size(); i++){
 			if(permanentDynList.get(i).shouldBeRemovedFromWorld()){
@@ -334,7 +364,7 @@ public class BattleScene implements Screen, LevelContainer{
 				temporaryDynList.get(i).onDespawn(delta);
 			}
 		}
-		
+
 		//Clear "despawned" entity
 		for(int i=permanentDynList.size()-1; i>=0; i--){
 			if(permanentDynList.get(i).shouldBeRemovedFromWorld()){
@@ -346,13 +376,13 @@ public class BattleScene implements Screen, LevelContainer{
 				temporaryDynList.remove(i);
 			}
 		}
-		
+
 		for(DynamicEntity dyn : pendingSpawnList){
 			temporaryDynList.add(dyn);
 		}
 		pendingSpawnList.clear();
 	}
-
+	
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
