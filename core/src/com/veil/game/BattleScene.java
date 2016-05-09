@@ -190,51 +190,7 @@ public class BattleScene implements Screen, LevelContainer{
 		if(GameConstant.timeStepping){
 			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 				renderGame(delta);
-				if(!GameConstant.debugDrawing){
-					return;
-				}
-				if(GameAI.bufferedEnemyPos != null){
-					Color c = game.batch.getColor();
-					game.batch.begin();
-					game.batch.setColor(1f, 1f, 0.5f, 0.2f);
-					for(Rectangle rect : GameAI.bufferedEnemyPos){
-						game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
-					}
-					game.batch.setColor(c);
-					game.batch.end();
-					
-					game.shapeBatch.begin(ShapeType.Line);
-					game.shapeBatch.setColor(0, 1, 1, 1);
-					Rectangle lastRect = null;
-					for(Rectangle rect : GameAI.bufferedEnemyPos){
-						if(lastRect != null){
-							game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
-						}
-						lastRect = rect;
-					}
-					game.shapeBatch.end();
-				}
-				if(GameAI.predictedEnemyPos != null){
-					Color c = game.batch.getColor();
-					game.batch.begin();
-					game.batch.setColor(c.r, c.g, c.b, 0.2f);
-					for(Rectangle rect : GameAI.predictedEnemyPos){
-						game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
-					}
-					game.batch.setColor(c);
-					game.batch.end();
-					
-					game.shapeBatch.begin(ShapeType.Line);
-					game.shapeBatch.setColor(1, 1, 0, 1);
-					Rectangle lastRect = null;
-					for(Rectangle rect : GameAI.predictedEnemyPos){
-						if(lastRect != null){
-							game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
-						}
-						lastRect = rect;
-					}
-					game.shapeBatch.end();
-				}
+				debugRender(delta);
 				return;
 			}
 		}
@@ -244,14 +200,74 @@ public class BattleScene implements Screen, LevelContainer{
 		//=================================================================
 		Controller.instance.preUpdate();
 		if(GameConstant.useAI){
-			GameAI.instance.aiUpdate(Controller.instance, new LevelSnapshot(player, permanentDynList, temporaryDynList));
+			GameAI.instance.aiUpdate(Controller.instance, 
+					new LevelSnapshot(this, player, permanentDynList, temporaryDynList), delta);
 		}
 		
 		update(delta);
 		renderGame(delta);
+		debugRender(delta);
 		despawnAndPostDespawn(delta);
 	}
 
+	private void debugRender(float delta){
+		if(!GameConstant.debugDrawing){
+			return;
+		}
+		if(GameAI.simulatedPlayerPos != null){
+			Color c = game.batch.getColor();
+			game.batch.begin();
+			game.batch.setColor(0.2f, 0.2f, 1f, 0.2f);
+			for(Rectangle rect : GameAI.simulatedPlayerPos){
+				game.batch.draw(game.region[1],rect.x,rect.y,rect.width,rect.height);
+			}
+			game.batch.setColor(c);
+			game.batch.end();
+		}
+		if(GameAI.bufferedEnemyPos != null){
+			Color c = game.batch.getColor();
+			game.batch.begin();
+			game.batch.setColor(1f, 1f, 0.5f, 0.2f);
+			for(Rectangle rect : GameAI.bufferedEnemyPos){
+				game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+			}
+			game.batch.setColor(c);
+			game.batch.end();
+			
+			game.shapeBatch.begin(ShapeType.Line);
+			game.shapeBatch.setColor(0, 1, 1, 1);
+			Rectangle lastRect = null;
+			for(Rectangle rect : GameAI.bufferedEnemyPos){
+				if(lastRect != null){
+					game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
+				}
+				lastRect = rect;
+			}
+			game.shapeBatch.end();
+		}
+		if(GameAI.predictedEnemyPos != null){
+			Color c = game.batch.getColor();
+			game.batch.begin();
+			game.batch.setColor(c.r, c.g, c.b, 0.2f);
+			for(Rectangle rect : GameAI.predictedEnemyPos){
+				game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+			}
+			game.batch.setColor(c);
+			game.batch.end();
+			
+			game.shapeBatch.begin(ShapeType.Line);
+			game.shapeBatch.setColor(1, 1, 0, 1);
+			Rectangle lastRect = null;
+			for(Rectangle rect : GameAI.predictedEnemyPos){
+				if(lastRect != null){
+					game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
+				}
+				lastRect = rect;
+			}
+			game.shapeBatch.end();
+		}
+	}
+	
 	private void update(float delta){
 		//=================================================================
 		// Update

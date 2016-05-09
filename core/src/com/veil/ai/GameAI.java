@@ -13,6 +13,7 @@ public class GameAI {
 	public static GameAI instance = new GameAI();
 	
 	//For debugging purpose
+	public static Rectangle[] simulatedPlayerPos;
 	public static Rectangle[] predictedEnemyPos;
 	public static Rectangle[] bufferedEnemyPos;
 	
@@ -27,11 +28,11 @@ public class GameAI {
 	private int goalX, goalY;
 	private boolean pressJump = false;
 	
-	public void aiUpdate(Controller controller, LevelSnapshot info){
+	public void aiUpdate(Controller controller, LevelSnapshot info, float delta){
 		//Setup frame data for prediction
 		setupFrameData(info);
 		//Set goal based on predicted enemy path
-		setGoal(info);
+		simulateAndSetGoal(info, delta);
 		//Move according to goal
 		moveToGoal(controller, goalX, goalY, info.playerRect, !info.playerState.surfaceInFront[2]);
 	}
@@ -66,12 +67,12 @@ public class GameAI {
 		{false, true, true}
 	};
 	
-	private void setGoal(LevelSnapshot info){
+	private void simulateAndSetGoal(LevelSnapshot info, float delta){
 		Rectangle[][] predictedFrames = new Rectangle[entityTracker.size()][];
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(20);
-			if(dyn == info.enemy && GameConstant.debugDrawing){
+			if(dyn == info.enemy){
 				predictedEnemyPos = predictedFrames[index];
 				bufferedEnemyPos = new Rectangle[entityTracker.get(dyn).getBuffer().size()];
 				int i=0;
@@ -86,7 +87,7 @@ public class GameAI {
 		int combination = -1;
 		for(int i=0; i<buttonCombination.length; i++){
 			Rectangle player = simulatePlayerPlatformer(info, 
-					buttonCombination[i][0], buttonCombination[i][1], buttonCombination[i][2]);
+					buttonCombination[i][0], buttonCombination[i][1], buttonCombination[i][2], delta);
 			int cost = 0;
 			index = 0;
 			for(DynamicEntity dyn : entityTracker.keySet()){
@@ -103,7 +104,7 @@ public class GameAI {
 			}
 		}
 		Rectangle goalRect = simulatePlayerPlatformer(info, buttonCombination[combination][0], 
-				buttonCombination[combination][1], buttonCombination[combination][2]);
+				buttonCombination[combination][1], buttonCombination[combination][2], delta);
 		goalX = Math.round(goalRect.x);
 		goalY = Math.round(goalRect.y);
 	}
@@ -134,11 +135,8 @@ public class GameAI {
 		}
 	}
 	
-	private Rectangle simulatePlayerPlatformer(LevelSnapshot info, boolean left, boolean right, boolean jump){
-		Rectangle rect = new Rectangle(info.playerRect);
-		float[] simulatedVelocity = info.player.simulateMovement(left, right, false, false, jump);
-		rect.x += simulatedVelocity[0];
-		rect.y += simulatedVelocity[1]+simulatedVelocity[2];
-		return rect;
+	private Rectangle simulatePlayerPlatformer(LevelSnapshot info, boolean left, boolean right, boolean jump, float simDelta){
+		DummyPlayer dummy = new DummyPlayer(info.level, 1);
+		return dummy.simulatePosition(info.player, left, right, false, false, jump, 50, simDelta)[20];
 	}
 }

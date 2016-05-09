@@ -9,12 +9,12 @@ public class Player extends DynamicEntity{
 	
 	//TODO: Enable 2axis simultaneous move for shooting genre!!
 	//TODO: Enable fixed facing movement
-	private int floorStunDuration = 0;
+	protected int floorStunDuration = 0;
 	
-	private boolean pressJump = false;
-	private int timeCount = 0;
-	private int invulFrame = 0; //TODO: combine invul frame with invuk flag for dyn
-	private boolean pressShoot = false;
+	protected boolean pressJump = false;
+	protected int timeCount = 0;
+	protected int invulFrame = 0; //TODO: combine invul frame with invuk flag for dyn
+	protected boolean pressShoot = false;
 	
 	public Player(LevelContainer level, int texture) {
 		super(level, new Rectangle(50,500,32,48), texture);
@@ -141,37 +141,4 @@ public class Player extends DynamicEntity{
 		}
 	}
 	
-	/**
-	 * Simulate player movement from button. Return simulated [vx, vy, gravityVy]
-	 */
-	public float[] simulateMovement(boolean left, boolean right, boolean up, boolean down, boolean jump){
-		float _vx = vx;
-		float _vy = vy;
-		float _gravityVy = gravityVy;
-		int _timeCount = timeCount;
-		if(!GameConstant.isPlaformer){
-			if(up){
-				_vy = GameConstant.speed;
-			}else if(down){
-				_vy = -GameConstant.speed;
-			}
-		}else{
-			if(jump){
-				if(!pressJump && reachFloor){
-					_timeCount = GameConstant.jumpCounter;
-				}
-				if(_timeCount > 0){
-					_gravityVy += GameConstant.jumpSpeed*gravityEff*level.getGravity();
-				}
-			}
-		}
-		
-		if(left){
-			_vx = -GameConstant.speed;
-		}else if(right){
-			_vx = GameConstant.speed;
-		}
-		
-		return new float[]{_vx, _vy, _gravityVy};
-	}
 }
