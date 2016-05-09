@@ -14,6 +14,7 @@ public class GameAI {
 	
 	//For debugging purpose
 	public static Rectangle[] predictedEnemyPos;
+	public static Rectangle[] bufferedEnemyPos;
 	
 	//Human parameter
 	private int buttonSpamDelay; //A number of frame delay for pressing shoot button (min 2)
@@ -70,8 +71,14 @@ public class GameAI {
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(20);
-			if(dyn == info.enemy){
+			if(dyn == info.enemy && GameConstant.debugDrawing){
 				predictedEnemyPos = predictedFrames[index];
+				bufferedEnemyPos = new Rectangle[entityTracker.get(dyn).getBuffer().size()];
+				int i=0;
+				for(Rectangle rect : entityTracker.get(dyn).getBuffer()){
+					bufferedEnemyPos[i] = rect;
+					i++;
+				}
 			}
 			index++;
 		}

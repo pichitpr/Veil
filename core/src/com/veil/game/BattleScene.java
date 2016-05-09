@@ -9,6 +9,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.veil.ai.Controller;
 import com.veil.ai.GameAI;
@@ -188,6 +189,31 @@ public class BattleScene implements Screen, LevelContainer{
 		
 		if(GameConstant.timeStepping){
 			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+				renderGame(delta);
+				if(!GameConstant.debugDrawing){
+					return;
+				}
+				if(GameAI.bufferedEnemyPos != null){
+					Color c = game.batch.getColor();
+					game.batch.begin();
+					game.batch.setColor(1f, 1f, 0.5f, 0.2f);
+					for(Rectangle rect : GameAI.bufferedEnemyPos){
+						game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+					}
+					game.batch.setColor(c);
+					game.batch.end();
+					
+					game.shapeBatch.begin(ShapeType.Line);
+					game.shapeBatch.setColor(0, 1, 1, 1);
+					Rectangle lastRect = null;
+					for(Rectangle rect : GameAI.bufferedEnemyPos){
+						if(lastRect != null){
+							game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
+						}
+						lastRect = rect;
+					}
+					game.shapeBatch.end();
+				}
 				if(GameAI.predictedEnemyPos != null){
 					Color c = game.batch.getColor();
 					game.batch.begin();
@@ -198,19 +224,17 @@ public class BattleScene implements Screen, LevelContainer{
 					game.batch.setColor(c);
 					game.batch.end();
 					
-					game.shapeBatch.setAutoShapeType(true);
-					game.shapeBatch.begin();
+					game.shapeBatch.begin(ShapeType.Line);
 					game.shapeBatch.setColor(1, 1, 0, 1);
 					Rectangle lastRect = null;
 					for(Rectangle rect : GameAI.predictedEnemyPos){
 						if(lastRect != null){
-							game.shapeBatch.line(lastRect.x, lastRect.y, rect.x, rect.y);
+							game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
 						}
 						lastRect = rect;
 					}
 					game.shapeBatch.end();
 				}
-				renderGame(delta);
 				return;
 			}
 		}

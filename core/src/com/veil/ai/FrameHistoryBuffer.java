@@ -24,6 +24,10 @@ public class FrameHistoryBuffer {
 		bufSize = bufferSize;
 	}
 	
+	public List<Rectangle> getBuffer(){
+		return buf;
+	}
+	
 	public void clearUpdateFlag(){
 		updated = false;
 	}
@@ -140,12 +144,13 @@ public class FrameHistoryBuffer {
 			}
 			//Rectangle lastRect = null;
 			Vector2 vec = null;
+			regression.PolynomialRegression displacementRegression = 
+					new regression.PolynomialRegression(displacementPredictor, displacementVar, 1);
+			regression.PolynomialRegression directionRegression = 
+					new regression.PolynomialRegression(directionchangePredictor, directionChangeVar, 1);
 			for(int i=0; i<futureFrame; i++){
-				regression.PolynomialRegression regression = 
-						new regression.PolynomialRegression(displacementPredictor, displacementVar, 1);
-				float predictedDistance = (float)regression.predict(displacementPredictor.length+i);
-				regression = new regression.PolynomialRegression(directionchangePredictor, directionChangeVar, 1);
-				float predictedDirection = (float)regression.predict(directionchangePredictor.length+i);
+				float predictedDistance = (float)displacementRegression.predict(displacementPredictor.length+i);
+				float predictedDirection = (float)directionRegression.predict(directionchangePredictor.length+i);
 				if(i == 0){
 					vec = new Vector2(displacement[displacement.length-1]);
 				}else{
@@ -156,7 +161,11 @@ public class FrameHistoryBuffer {
 				vec.setLength(predictedDistance);
 				result[i] = new Rectangle(lastFrame.x+vec.x, lastFrame.y+vec.y, lastFrame.width, lastFrame.height);
 			}
-			if(verbose) System.out.println("Regression based prediction");
+			if(verbose){ 
+				System.out.println("Regression based prediction");
+				System.out.println("Displacement model : "+displacementRegression);
+				System.out.println("Direction model : "+directionRegression);
+			}
 			/*
 			boolean passFirstFrame = false;
 			for(int i=firstValidFrame+1; i<displacement.length; i++){

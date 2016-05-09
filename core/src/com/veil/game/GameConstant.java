@@ -34,7 +34,9 @@ public class GameConstant {
 	 */
 	public static final int maxObjectPool = 20;
 	
-	public static final boolean useAI = true;
+	public static final boolean useAI = false;
 	
-	public static final boolean timeStepping = true;
+	public static final boolean timeStepping = false;
+	
+	public static final boolean debugDrawing = false;
 }
