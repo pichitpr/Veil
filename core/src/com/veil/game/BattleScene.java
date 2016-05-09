@@ -190,13 +190,25 @@ public class BattleScene implements Screen, LevelContainer{
 			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 				if(GameAI.predictedEnemyPos != null){
 					Color c = game.batch.getColor();
-					game.batch.setColor(c.r, c.g, c.b, 0.2f);
 					game.batch.begin();
+					game.batch.setColor(c.r, c.g, c.b, 0.2f);
 					for(Rectangle rect : GameAI.predictedEnemyPos){
 						game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
 					}
-					game.batch.end();
 					game.batch.setColor(c);
+					game.batch.end();
+					
+					game.shapeBatch.setAutoShapeType(true);
+					game.shapeBatch.begin();
+					game.shapeBatch.setColor(1, 1, 0, 1);
+					Rectangle lastRect = null;
+					for(Rectangle rect : GameAI.predictedEnemyPos){
+						if(lastRect != null){
+							game.shapeBatch.line(lastRect.x, lastRect.y, rect.x, rect.y);
+						}
+						lastRect = rect;
+					}
+					game.shapeBatch.end();
 				}
 				renderGame(delta);
 				return;

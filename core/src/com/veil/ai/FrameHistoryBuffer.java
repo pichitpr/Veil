@@ -13,6 +13,8 @@ public class FrameHistoryBuffer {
 	public static float distanceChangeThreshold = 15; //unit in pixel
 	public static float directionChangeThreshold = 20; //unit in degree
 	
+	public boolean verbose = false;
+	
 	private List<Rectangle> buf;
 	private int bufSize;
 	private boolean updated;
@@ -41,6 +43,7 @@ public class FrameHistoryBuffer {
 	//NOTE:: Prediction algorithm may need to consult research on "path extrapolation in human"
 	public Rectangle[] predictNextFrame(int futureFrame){
 		if(buf.size() == 0){
+			if(verbose) System.out.println("Empty buf");
 			return null;
 		}else if(buf.size() == 1){
 			//Predict as static object since there is not enough data
@@ -49,6 +52,7 @@ public class FrameHistoryBuffer {
 			for(int i=0; i<frames.length; i++){
 				frames[i] = new Rectangle(startingFrame);
 			}
+			if(verbose) System.out.println("Single frame buf");
 			return frames;
 		}else if(buf.size() == 2){
 			//Use the same displacement, we have no enough data for direction change
@@ -62,6 +66,7 @@ public class FrameHistoryBuffer {
 				frames[i] = new Rectangle(frames[i-1].x+displacement.x, frames[i-1].y+displacement.y, 
 						frames[i-1].width, frames[i-1].height);
 			}
+			if(verbose) System.out.println("2 frames buf");
 			return frames;
 		}
 		
@@ -113,6 +118,7 @@ public class FrameHistoryBuffer {
 				result[i] = new Rectangle(result[i-1].x+displacementVec.x, result[i-1].y+displacementVec.y, 
 						result[i-1].width, result[i-1].height);
 			}
+			if(verbose) System.out.println("2 valid frames buf");
 			/*
 			predictedDistance = displacement[displacement.length-1].len();
 			predictedDirection = 0;
@@ -150,6 +156,7 @@ public class FrameHistoryBuffer {
 				vec.setLength(predictedDistance);
 				result[i] = new Rectangle(lastFrame.x+vec.x, lastFrame.y+vec.y, lastFrame.width, lastFrame.height);
 			}
+			if(verbose) System.out.println("Regression based prediction");
 			/*
 			boolean passFirstFrame = false;
 			for(int i=firstValidFrame+1; i<displacement.length; i++){

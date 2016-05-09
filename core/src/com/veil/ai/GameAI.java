@@ -42,6 +42,7 @@ public class GameAI {
 		if(info.enemy != null){
 			if(!entityTracker.containsKey(info.enemy)){
 				entityTracker.put(info.enemy, new FrameHistoryBuffer(historyBufferSize));
+				entityTracker.get(info.enemy).verbose = true;
 			}
 			entityTracker.get(info.enemy).addFrame(info.enemyRect);
 		}
@@ -65,8 +66,14 @@ public class GameAI {
 	};
 	
 	private void setGoal(LevelSnapshot info){
-		if(info.enemy != null && entityTracker.containsKey(info.enemy)){
-			predictedEnemyPos = entityTracker.get(info.enemy).predictNextFrame(10);
+		Rectangle[][] predictedFrames = new Rectangle[entityTracker.size()][];
+		int index=0;
+		for(DynamicEntity dyn : entityTracker.keySet()){
+			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(20);
+			if(dyn == info.enemy){
+				predictedEnemyPos = predictedFrames[index];
+			}
+			index++;
 		}
 		int lowestCombinationCost = Integer.MAX_VALUE;
 		int combination = -1;
@@ -74,16 +81,16 @@ public class GameAI {
 			Rectangle player = simulatePlayerPlatformer(info, 
 					buttonCombination[i][0], buttonCombination[i][1], buttonCombination[i][2]);
 			int cost = 0;
-			for(FrameHistoryBuffer buf : entityTracker.values()){
-				Rectangle[] enemyRects = buf.predictNextFrame(20);
-				for(Rectangle enemy : enemyRects){
+			index = 0;
+			for(DynamicEntity dyn : entityTracker.keySet()){
+				for(Rectangle enemy : predictedFrames[index]){
 					if(enemy.overlaps(player)){
 						cost++;
 					}
 				}
+				index++;
 			}
 			if(cost < lowestCombinationCost){
-				System.out.println(cost);
 				lowestCombinationCost = cost;
 				combination = i;
 			}

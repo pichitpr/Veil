@@ -6,12 +6,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.veil.adl.AgentDatabase;
 import com.veil.ai.Controller;
 
 public class TheGame extends Game {
+	public ShapeRenderer shapeBatch;
 	public SpriteBatch batch;
 	public AtlasRegion[] region;
     public BitmapFont font;
@@ -33,7 +35,7 @@ public class TheGame extends Game {
 		region[5] = atlas.findRegion("frame_b"); //Enemy 2
 		region[6] = atlas.findRegion("frame_e"); //Bullet 1
     	
-
+		shapeBatch = new ShapeRenderer();
         batch = new SpriteBatch();
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
