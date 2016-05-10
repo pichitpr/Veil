@@ -93,7 +93,8 @@ public class FrameHistoryBuffer {
 					directionChange[frame] = 0;
 				}else{
 					distanceChange[frame] = displacement[frame].len() - displacement[frame-1].len();
-					directionChange[frame] = displacement[frame].angle(displacement[frame-1]);
+					//directionChange[frame] = displacement[frame].angle(displacement[frame-1]);
+					directionChange[frame] = displacement[frame-1].angle(displacement[frame]);
 					if(Math.abs(distanceChange[frame]) > distanceChangeThreshold || 
 							Math.abs(directionChangeThreshold) > directionChangeThreshold){
 						firstValidFrame = frame-1;
@@ -147,7 +148,7 @@ public class FrameHistoryBuffer {
 			regression.PolynomialRegression displacementRegression = 
 					new regression.PolynomialRegression(displacementPredictor, displacementVar, 1);
 			regression.PolynomialRegression directionRegression = 
-					new regression.PolynomialRegression(directionchangePredictor, directionChangeVar, 1);
+					new regression.PolynomialRegression(directionchangePredictor, directionChangeVar, 2);
 			for(int i=0; i<futureFrame; i++){
 				float predictedDistance = (float)displacementRegression.predict(displacementPredictor.length+i);
 				float predictedDirection = (float)directionRegression.predict(directionchangePredictor.length+i);
@@ -164,7 +165,18 @@ public class FrameHistoryBuffer {
 			if(verbose){ 
 				System.out.println("Regression based prediction");
 				System.out.println("Displacement model : "+displacementRegression);
+				System.out.print("\tVar: ");
+				for(double d : displacementVar){
+					System.out.print((float)d+" ");
+				}
+				System.out.println("");
 				System.out.println("Direction model : "+directionRegression);
+				System.out.print("\tVar: ");
+				for(double d : directionChangeVar){
+					System.out.print((float)d+" ");
+				}
+				System.out.println("");
+				System.out.println("================================== END REGRESSION");
 			}
 			/*
 			boolean passFirstFrame = false;

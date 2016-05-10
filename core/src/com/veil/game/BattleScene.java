@@ -249,8 +249,10 @@ public class BattleScene implements Screen, LevelContainer{
 			Color c = game.batch.getColor();
 			game.batch.begin();
 			game.batch.setColor(c.r, c.g, c.b, 0.2f);
-			for(Rectangle rect : GameAI.predictedEnemyPos){
-				game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+			for(Rectangle[] rects : GameAI.predictedEnemyPos){
+				for(Rectangle rect : rects){
+					game.batch.draw(game.region[2],rect.x,rect.y,rect.width,rect.height);
+				}
 			}
 			game.batch.setColor(c);
 			game.batch.end();
@@ -258,11 +260,14 @@ public class BattleScene implements Screen, LevelContainer{
 			game.shapeBatch.begin(ShapeType.Line);
 			game.shapeBatch.setColor(1, 1, 0, 1);
 			Rectangle lastRect = null;
-			for(Rectangle rect : GameAI.predictedEnemyPos){
-				if(lastRect != null){
-					game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
+			for(Rectangle[] rects : GameAI.predictedEnemyPos){
+				for(Rectangle rect : rects){
+					if(lastRect != null){
+						game.shapeBatch.rectLine(lastRect.x, lastRect.y, rect.x, rect.y,3);
+					}
+					lastRect = rect;
 				}
-				lastRect = rect;
+				lastRect = null;
 			}
 			game.shapeBatch.end();
 		}

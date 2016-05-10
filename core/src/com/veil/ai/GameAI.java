@@ -14,14 +14,14 @@ public class GameAI {
 	
 	//For debugging purpose
 	public static Rectangle[] simulatedPlayerPos;
-	public static Rectangle[] predictedEnemyPos;
+	public static Rectangle[][] predictedEnemyPos;
 	public static Rectangle[] bufferedEnemyPos;
 	
 	//Human parameter
 	private int buttonSpamDelay; //A number of frame delay for pressing shoot button (min 2)
 	//private int reactionTime; //A number of frame required to predict any agent 
 	
-	private int historyBufferSize = 8;
+	private int historyBufferSize = 5;
 	
 	private HashMap<DynamicEntity, FrameHistoryBuffer> entityTracker = new HashMap<DynamicEntity, FrameHistoryBuffer>();
 	
@@ -69,11 +69,12 @@ public class GameAI {
 	
 	private void simulateAndSetGoal(LevelSnapshot info, float delta){
 		Rectangle[][] predictedFrames = new Rectangle[entityTracker.size()][];
+		predictedEnemyPos = new Rectangle[entityTracker.size()][];
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(20);
+			predictedEnemyPos[index] = predictedFrames[index];
 			if(dyn == info.enemy){
-				predictedEnemyPos = predictedFrames[index];
 				bufferedEnemyPos = new Rectangle[entityTracker.get(dyn).getBuffer().size()];
 				int i=0;
 				for(Rectangle rect : entityTracker.get(dyn).getBuffer()){
@@ -107,6 +108,13 @@ public class GameAI {
 				buttonCombination[combination][1], buttonCombination[combination][2], delta);
 		goalX = Math.round(goalRect.x);
 		goalY = Math.round(goalRect.y);
+		
+		DummyPlayer dummy = new DummyPlayer(info.level, 1);
+		Rectangle[] rightJumpPlayer = dummy.simulatePosition(info.player, false, true, false, false, true, 40, delta);
+		simulatedPlayerPos = new Rectangle[rightJumpPlayer.length/4];
+		for(int i=0; i<simulatedPlayerPos.length; i++){
+			simulatedPlayerPos[i] = rightJumpPlayer[i*4+3];
+		}
 	}
 	
 	private void moveToGoal(Controller controller,int goalX, int goalY, Rectangle playerRect, boolean playerInAir){
