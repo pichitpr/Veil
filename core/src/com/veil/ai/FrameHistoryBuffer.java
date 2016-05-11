@@ -44,8 +44,41 @@ public class FrameHistoryBuffer {
 		updated = true;
 	}
 	
-	//NOTE:: Prediction algorithm may need to consult research on "path extrapolation in human"
 	public Rectangle[] predictNextFrame(int futureFrame){
+		if(buf.size() == 0){
+			if(verbose) System.out.println("Empty buf");
+			return null;
+		}
+		double[] xPredictor = new double[buf.size()];
+		double[] xVar = new double[buf.size()];
+		double[] yPredictor = new double[buf.size()];
+		double[] yVar = new double[buf.size()];
+		int i=0;
+		float w=0,h=0;
+		for(Rectangle rect : buf){
+			xPredictor[i] = i;
+			xVar[i] = rect.x;
+			yPredictor[i] = i;
+			yVar[i] = rect.y;
+			w = rect.width;
+			h = rect.height;
+			i++;
+		}
+		regression.PolynomialRegression xRegression = 
+				new regression.PolynomialRegression(xPredictor, xVar, 1);
+		regression.PolynomialRegression yRegression = 
+				new regression.PolynomialRegression(yPredictor, yVar, 2);
+		Rectangle[] rects = new Rectangle[futureFrame];
+		for(i=0; i<futureFrame; i++){
+			float predictedX = (float)xRegression.predict(buf.size()+i);
+			float predictedY = (float)yRegression.predict(buf.size()+i);
+			rects[i] = new Rectangle(predictedX, predictedY, w, h);
+		}
+		return rects;
+	}
+	
+	//NOTE:: Prediction algorithm may need to consult research on "path extrapolation in human"
+	public Rectangle[] __predictNextFrame(int futureFrame){
 		if(buf.size() == 0){
 			if(verbose) System.out.println("Empty buf");
 			return null;
