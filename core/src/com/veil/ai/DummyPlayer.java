@@ -60,7 +60,10 @@ public class DummyPlayer extends Player{
 	@Override
 	public void floorStun(int duration){}
 	
-	private void mimicPlayer(Player player){
+	/**
+	 * Copy player current state for simulation
+	 */
+	public void mimicPlayer(Player player){
 		this.flag = player.flag.cloneImportantFlag();
 		this.direction = new Direction(player.direction);
 		this.gravityEff = player.getGravityEff();
@@ -73,6 +76,10 @@ public class DummyPlayer extends Player{
 		this.setWorldCenteredPosition(playerPos.x, playerPos.y);
 	}
 	
+	/**
+	 * Simulate player position from buttons pressed using dummy in current state and starting point. 
+	 * It is assumed that controller buttons are pressed for "futureFrame" frames without any button released in-between.
+	 */
 	public Rectangle[] simulatePosition(Player player, boolean left, boolean right, boolean up, boolean down, boolean jump, 
 			int futureFrame, float simulationDelta){
 		controller.left = left;
@@ -80,7 +87,6 @@ public class DummyPlayer extends Player{
 		controller.up = up;
 		controller.down = down;
 		controller.jump = jump;
-		mimicPlayer(player);
 		Rectangle[] result = new Rectangle[futureFrame];
 		for(int i=1; i<=futureFrame; i++){
 			this.update(simulationDelta);

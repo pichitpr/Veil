@@ -17,24 +17,33 @@ public class GameAI {
 	public static Rectangle[][] predictedEnemyPos;
 	public static Rectangle[] bufferedEnemyPos;
 	
-	//Human parameter
+	//Parameter
 	private int buttonSpamDelay; //A number of frame delay for pressing shoot button (min 2)
-	//private int reactionTime; //A number of frame required to predict any agent 
-	
+	private int reactionTime = 20; //A number of frame required to re-decide button press 
 	private int historyBufferSize = 5;
 	
 	private HashMap<DynamicEntity, FrameHistoryBuffer> entityTracker = new HashMap<DynamicEntity, FrameHistoryBuffer>();
 	
 	private int goalX, goalY;
 	private boolean pressJump = false;
+	private int buttonRetainingTime = 0;
+	private boolean[] previousButtonCombination;
 	
 	public void aiUpdate(Controller controller, LevelSnapshot info, float delta){
 		//Setup frame data for prediction
 		setupFrameData(info);
-		//Set goal based on predicted enemy path
-		simulateAndSetGoal(info, delta);
-		//Move according to goal
-		moveToGoal(controller, goalX, goalY, info.playerRect, !info.playerState.surfaceInFront[2]);
+		if(buttonRetainingTime == 0){
+			//Set goal based on predicted enemy path
+			simulateAndSetGoal(info, delta);
+			//Move according to goal
+			moveToGoal(controller, goalX, goalY, info.playerRect, !info.playerState.surfaceInFront[2]);
+			buttonRetainingTime = reactionTime;
+		}else{
+			controller.left = previousButtonCombination[0];
+			controller.right = previousButtonCombination[1];
+			controller.jump = previousButtonCombination[2];
+			buttonRetainingTime--;
+		}
 	}
 	
 	private void setupFrameData(LevelSnapshot info){
@@ -109,12 +118,7 @@ public class GameAI {
 		goalX = Math.round(goalRect.x);
 		goalY = Math.round(goalRect.y);
 		
-		DummyPlayer dummy = new DummyPlayer(info.level, 1);
-		Rectangle[] rightJumpPlayer = dummy.simulatePosition(info.player, false, true, false, false, true, 40, delta);
-		simulatedPlayerPos = new Rectangle[rightJumpPlayer.length/4];
-		for(int i=0; i<simulatedPlayerPos.length; i++){
-			simulatedPlayerPos[i] = rightJumpPlayer[i*4+3];
-		}
+		simulatedPlayerPos = new Rectangle[]{ goalRect };
 	}
 	
 	private void moveToGoal(Controller controller,int goalX, int goalY, Rectangle playerRect, boolean playerInAir){
@@ -141,10 +145,13 @@ public class GameAI {
 				controller.jump = true; 
 			}
 		}
+		
+		previousButtonCombination = new boolean[]{ controller.left, controller.right, controller.jump };
 	}
 	
 	private Rectangle simulatePlayerPlatformer(LevelSnapshot info, boolean left, boolean right, boolean jump, float simDelta){
 		DummyPlayer dummy = new DummyPlayer(info.level, 1);
-		return dummy.simulatePosition(info.player, left, right, false, false, jump, 50, simDelta)[20];
+		dummy.mimicPlayer(info.player);
+		return dummy.simulatePosition(info.player, left, right, false, false, jump, reactionTime, simDelta)[reactionTime-1];
 	}
 }
