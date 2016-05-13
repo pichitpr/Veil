@@ -44,41 +44,8 @@ public class FrameHistoryBuffer {
 		updated = true;
 	}
 	
-	public Rectangle[] predictNextFrame(int futureFrame){
-		if(buf.size() == 0){
-			if(verbose) System.out.println("Empty buf");
-			return null;
-		}
-		double[] xPredictor = new double[buf.size()];
-		double[] xVar = new double[buf.size()];
-		double[] yPredictor = new double[buf.size()];
-		double[] yVar = new double[buf.size()];
-		int i=0;
-		float w=0,h=0;
-		for(Rectangle rect : buf){
-			xPredictor[i] = i;
-			xVar[i] = rect.x;
-			yPredictor[i] = i;
-			yVar[i] = rect.y;
-			w = rect.width;
-			h = rect.height;
-			i++;
-		}
-		regression.PolynomialRegression xRegression = 
-				new regression.PolynomialRegression(xPredictor, xVar, 1);
-		regression.PolynomialRegression yRegression = 
-				new regression.PolynomialRegression(yPredictor, yVar, 2);
-		Rectangle[] rects = new Rectangle[futureFrame];
-		for(i=0; i<futureFrame; i++){
-			float predictedX = (float)xRegression.predict(buf.size()+i);
-			float predictedY = (float)yRegression.predict(buf.size()+i);
-			rects[i] = new Rectangle(predictedX, predictedY, w, h);
-		}
-		return rects;
-	}
-	
 	//NOTE:: Prediction algorithm may need to consult research on "path extrapolation in human"
-	public Rectangle[] __predictNextFrame(int futureFrame){
+	public Rectangle[] predictNextFrame(int futureFrame){
 		if(buf.size() == 0){
 			if(verbose) System.out.println("Empty buf");
 			return null;
@@ -107,131 +74,74 @@ public class FrameHistoryBuffer {
 			return frames;
 		}
 		
-		//[0] is not used, [x]=frame[x]-frame[x-1]
-		Vector2[] displacement = new Vector2[buf.size()];
-		//[0] is not used, [1]=0, [x]=dist(frame[x]-frame[x-1]) - dist(frame[x-1]-frame[x-2])
-		float[] distanceChange = new float[buf.size()];
-		//[0] is not used, [1]=0, [x]=angdiff(frame[x]-frame[x-1], frame[x-1]-frame[x-2])
-		float[] directionChange = new float[buf.size()];
-		Rectangle lastFrame = null;
 		//Setup displacement & direction change data
+		Vector2 currentDisplacement = null, prevDisplacement = null;
 		Rectangle prevFrame = null;
 		int frame=0;
 		int firstValidFrame = 0;
 		for(Rectangle rect : buf){
 			if(frame > 0){
-				displacement[frame] = new Vector2(rect.x - prevFrame.x, rect.y - prevFrame.y);
-				if(frame == 1){
-					distanceChange[frame] = 0;
-					directionChange[frame] = 0;
-				}else{
-					distanceChange[frame] = displacement[frame].len() - displacement[frame-1].len();
-					//directionChange[frame] = displacement[frame].angle(displacement[frame-1]);
-					directionChange[frame] = displacement[frame-1].angle(displacement[frame]);
-					if(Math.abs(distanceChange[frame]) > distanceChangeThreshold || 
-							Math.abs(directionChangeThreshold) > directionChangeThreshold){
+				currentDisplacement = new Vector2(rect.x - prevFrame.x, rect.y - prevFrame.y);
+				if(frame > 1){
+					if(Math.abs(currentDisplacement.len() - prevDisplacement.len()) > distanceChangeThreshold || 
+							Math.abs(prevDisplacement.angle(currentDisplacement)) > directionChangeThreshold){
 						firstValidFrame = frame-1;
 					}
 				}
-				if(frame == buf.size()-1){
-					lastFrame = rect;
-				}
+				prevDisplacement = currentDisplacement;
 			}
 			prevFrame = rect;
 			frame++;
 		}
 		
 		//Predict based on data
-		/*
-		float predictedDistance = 0;
-		float predictedDirection = 0;
-		*/
 		Rectangle[] result = new Rectangle[futureFrame];
-		if(firstValidFrame+1 == displacement.length-1){
-			//2 valid frames available for prediction
-			Vector2 displacementVec = displacement[displacement.length-1];
-			//Rectangle lastRect = buf.get(buf.size()-1);
-			result[0] = new Rectangle(lastFrame.x+displacementVec.x, lastFrame.y+displacementVec.y, lastFrame.width, lastFrame.height);
-			for(int i=1; i<result.length; i++){
-				result[i] = new Rectangle(result[i-1].x+displacementVec.x, result[i-1].y+displacementVec.y, 
-						result[i-1].width, result[i-1].height);
+		int validFrameCount = buf.size()-firstValidFrame;
+		double[] xPredictor = new double[validFrameCount];
+		double[] xVar = new double[validFrameCount];
+		double[] yPredictor = new double[validFrameCount];
+		double[] yVar = new double[validFrameCount];
+		int i=0;
+		frame = 0;
+		float w=0,h=0;
+		for(Rectangle rect : buf){
+			if(frame >= firstValidFrame){
+				xPredictor[i] = i;
+				xVar[i] = rect.x;
+				yPredictor[i] = i;
+				yVar[i] = rect.y;
+				w = rect.width;
+				h = rect.height;
+				i++;
 			}
-			if(verbose) System.out.println("2 valid frames buf");
-			/*
-			predictedDistance = displacement[displacement.length-1].len();
-			predictedDirection = 0;
-			*/
-		}else{
-			//at least 3 frames for prediction
-			int displacementVarCount = displacement.length-(firstValidFrame+1);
-			double[] displacementPredictor = new double[displacementVarCount];
-			double[] displacementVar = new double[displacementVarCount];
-			double[] directionchangePredictor = new double[displacementVarCount-1];
-			double[] directionChangeVar = new double[displacementVarCount-1];
-			for(int i=0; i<displacementVar.length; i++){
-				displacementPredictor[i] = i;
-				displacementVar[i] = displacement[firstValidFrame+1+i].len();
-				if(i > 0){
-					directionchangePredictor[i-1] = i-1;
-					directionChangeVar[i-1] = directionChange[firstValidFrame+1+i];
-				}
-			}
-			//Rectangle lastRect = null;
-			Vector2 vec = null;
-			regression.PolynomialRegression displacementRegression = 
-					new regression.PolynomialRegression(displacementPredictor, displacementVar, 1);
-			regression.PolynomialRegression directionRegression = 
-					new regression.PolynomialRegression(directionchangePredictor, directionChangeVar, 2);
-			for(int i=0; i<futureFrame; i++){
-				float predictedDistance = (float)displacementRegression.predict(displacementPredictor.length+i);
-				float predictedDirection = (float)directionRegression.predict(directionchangePredictor.length+i);
-				if(i == 0){
-					vec = new Vector2(displacement[displacement.length-1]);
-				}else{
-					vec = new Vector2(result[i-1].x - lastFrame.x, result[i-1].y - lastFrame.y);
-					lastFrame = result[i-1];
-				}
-				vec.rotate(predictedDirection);
-				vec.setLength(predictedDistance);
-				result[i] = new Rectangle(lastFrame.x+vec.x, lastFrame.y+vec.y, lastFrame.width, lastFrame.height);
-			}
-			if(verbose){ 
-				System.out.println("Regression based prediction");
-				System.out.println("Displacement model : "+displacementRegression);
-				System.out.print("\tVar: ");
-				for(double d : displacementVar){
-					System.out.print((float)d+" ");
-				}
-				System.out.println("");
-				System.out.println("Direction model : "+directionRegression);
-				System.out.print("\tVar: ");
-				for(double d : directionChangeVar){
-					System.out.print((float)d+" ");
-				}
-				System.out.println("");
-				System.out.println("================================== END REGRESSION");
-			}
-			/*
-			boolean passFirstFrame = false;
-			for(int i=firstValidFrame+1; i<displacement.length; i++){
-				if(passFirstFrame){
-					predictedDirection += directionChange[i];
-				}
-				predictedDistance += displacement[i].len();
-				passFirstFrame = true;
-			}
-			int frameCount = displacement.length-(firstValidFrame+1);
-			predictedDistance /= frameCount;
-			frameCount--;
-			predictedDirection /= frameCount;
-			*/
+			frame++;
 		}
-		/*
-		Vector2 vec = new Vector2(displacement[displacement.length-1]);
-		vec.rotate(predictedDirection);
-		vec.setLength(predictedDistance);
-		Rectangle result = new Rectangle(lastFrame.x+vec.x, lastFrame.y+vec.y, lastFrame.width, lastFrame.height);
-		*/
+		regression.PolynomialRegression xRegression = 
+				new regression.PolynomialRegression(xPredictor, xVar, 1);
+		regression.PolynomialRegression yRegression = 
+				new regression.PolynomialRegression(yPredictor, yVar, 2);
+		for(i=0; i<futureFrame; i++){
+			float predictedX = (float)xRegression.predict(validFrameCount+i);
+			float predictedY = (float)yRegression.predict(validFrameCount+i);
+			result[i] = new Rectangle(predictedX, predictedY, w, h);
+		}
+		
+		if(verbose){ 
+			System.out.println("Regression based prediction");
+			System.out.println("X model : "+xRegression);
+			System.out.print("\tVar: ");
+			for(double d : xVar){
+				System.out.print((float)d+" ");
+			}
+			System.out.println("");
+			System.out.println("Y model : "+yRegression);
+			System.out.print("\tVar: ");
+			for(double d : yVar){
+				System.out.print((float)d+" ");
+			}
+			System.out.println("");
+			System.out.println("================================== END REGRESSION");
+		}
 		
 		//Clean up obsolete frame
 		while(firstValidFrame > 0){
