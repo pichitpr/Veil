@@ -80,7 +80,7 @@ public class DummyPlayer extends Player{
 	 * Simulate player position from buttons pressed using dummy in current state and starting point. 
 	 * It is assumed that controller buttons are pressed for "futureFrame" frames without any button released in-between.
 	 */
-	public Rectangle[] simulatePosition(Player player, boolean left, boolean right, boolean up, boolean down, boolean jump, 
+	public Rectangle[] simulatePosition(boolean left, boolean right, boolean up, boolean down, boolean jump, 
 			int futureFrame, float simulationDelta){
 		controller.left = left;
 		controller.right = right;
