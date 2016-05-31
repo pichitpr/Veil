@@ -1,5 +1,8 @@
 package com.veil.game;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.veil.platforminterface.PlatformUtility;
+
 
 public class GameConstant {
 
@@ -34,9 +37,14 @@ public class GameConstant {
 	 */
 	public static final int maxObjectPool = 20;
 	
-	public static final boolean useAI = false;
+	/**
+	 * A directory containing all agent scripts to be used
+	 */
+	public static final FileHandle agentDatabaseDir = PlatformUtility.fileOperator.getStorageRoot().child("ScriptGen");
 	
-	public static final boolean timeStepping = false;
-	
-	public static final boolean debugDrawing = false;
+	//Task specific variable
+	public static final boolean profilingMode = true;
+	public static final boolean useAI = true;
+	public static final boolean timeStepping = true;
+	public static final boolean debugDrawing = true;
 }

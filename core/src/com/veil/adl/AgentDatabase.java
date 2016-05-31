@@ -69,7 +69,7 @@ import com.veil.adl.function.TravelDistance;
 import com.veil.adl.function.TurnTo;
 import com.veil.adl.function.TurnToPlayer;
 import com.veil.adl.function.VarGet;
-import com.veil.platforminterface.PlatformUtility;
+import com.veil.game.GameConstant;
 
 public class AgentDatabase {
 
@@ -77,7 +77,7 @@ public class AgentDatabase {
 		registerAction();
 		registerFunction();
 		modelMap = new HashMap<String, AgentModel>();
-		return parseScriptInDir(PlatformUtility.fileOperator.getStorageRoot().child("ScriptGen"));
+		return parseScriptInDir(GameConstant.agentDatabaseDir);
 	}
 	
 	private static HashMap<String,AgentModel> modelMap;
