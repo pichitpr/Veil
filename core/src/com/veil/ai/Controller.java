@@ -19,6 +19,8 @@ public class Controller {
 		shoot = false;
 		
 		if(!GameConstant.useAI){
+			if(GameConstant.profilingMode && !BattleProfile.instance.isStart())
+				return;
 			if(Gdx.input.isKeyPressed(Input.Keys.UP)){
 				up = true;
 			}

@@ -8,10 +8,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class FrameHistoryBuffer {
-
-	//Change threshold that will cause frame[x-2] obsolete when calculating change at frame[x]
-	public static float distanceChangeThreshold = 15; //unit in pixel
-	public static float directionChangeThreshold = 20; //unit in degree
 	
 	public boolean verbose = false;
 	
@@ -19,9 +15,9 @@ public class FrameHistoryBuffer {
 	private int bufSize;
 	private boolean updated;
 	
-	public FrameHistoryBuffer(int bufferSize){
+	public FrameHistoryBuffer(){
 		buf = new LinkedList<Rectangle>();
-		bufSize = bufferSize;
+		bufSize = AIConstant.historyBufferSize;
 	}
 	
 	public List<Rectangle> getBuffer(){
@@ -83,8 +79,8 @@ public class FrameHistoryBuffer {
 			if(frame > 0){
 				currentDisplacement = new Vector2(rect.x - prevFrame.x, rect.y - prevFrame.y);
 				if(frame > 1){
-					if(Math.abs(currentDisplacement.len() - prevDisplacement.len()) > distanceChangeThreshold || 
-							Math.abs(prevDisplacement.angle(currentDisplacement)) > directionChangeThreshold){
+					if(Math.abs(currentDisplacement.len() - prevDisplacement.len()) > AIConstant.distanceChangeThreshold || 
+							Math.abs(prevDisplacement.angle(currentDisplacement)) > AIConstant.directionChangeThreshold){
 						firstValidFrame = frame-1;
 					}
 				}

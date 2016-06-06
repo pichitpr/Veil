@@ -20,17 +20,14 @@ public class GameAI {
 	public static Rectangle[][] predictedEnemyPos;
 	public static Rectangle[] bufferedEnemyPos;
 	
-	//Parameter
-	private int buttonSpamDelay; //A number of frame delay for pressing shoot button (min 2)
-	private int reactionTime = 4; //A number of frame required to re-decide button press 
-	private int historyBufferSize = 5;
-	
 	private HashMap<DynamicEntity, FrameHistoryBuffer> entityTracker = new HashMap<DynamicEntity, FrameHistoryBuffer>();
 	
 	private boolean startFallingDown = false;
 	
 	public void aiUpdate(Controller controller, LevelSnapshot info, float delta){
 		setupFrameDataAndFlag(info);
+		if(GameConstant.profilingMode && !BattleProfile.instance.isStart())
+			return;
 		searchButtonCombination(info, delta);
 		pressButton(controller, info, delta);
 	}
@@ -41,13 +38,13 @@ public class GameAI {
 		}
 		if(info.enemy != null){
 			if(!entityTracker.containsKey(info.enemy)){
-				entityTracker.put(info.enemy, new FrameHistoryBuffer(historyBufferSize));
+				entityTracker.put(info.enemy, new FrameHistoryBuffer());
 			}
 			entityTracker.get(info.enemy).addFrame(info.enemyRect);
 		}
 		for(Entry<DynamicEntity, Rectangle> entry : info.tempRect.entrySet()){
 			if(!entityTracker.containsKey(entry.getKey())){
-				entityTracker.put(entry.getKey(), new FrameHistoryBuffer(historyBufferSize));
+				entityTracker.put(entry.getKey(), new FrameHistoryBuffer());
 			}
 			entityTracker.get(entry.getKey()).addFrame(entry.getValue());
 		}
@@ -57,39 +54,66 @@ public class GameAI {
 		//Setup player's jumping flag
 		if(info.playerState.reachJumpingPeak){
 			startFallingDown = true;
-		}else if(info.playerState.surfaceInFront[2]){
+		}else if(info.playerOnFloor){
 			startFallingDown = false;
 		}
 	}
 	
-	private static final boolean[][] buttonCombination = {
-		{false, false, false},
-		{true, false, false},
-		{false, true, false},
-		{false, false, true},
-		{true, false, true},
-		{false, true, true}
-	};
+	private enum ButtonCombination {
+		None(false, false, false),
+		Left(true, false, false),
+		Right(false, true, false),
+		Jump(false, false, true),
+		LeftJump(true, false, true),
+		RightJump(false, true, true);
+		
+		private boolean[] pressed; 
+		private ButtonCombination(boolean pressLeft, boolean pressRight, boolean pressJump){
+			pressed = new boolean[]{pressLeft, pressRight, pressJump};
+		}
+		
+		public boolean leftPressed(){
+			return pressed[0];
+		}
+		
+		public boolean rightPressed(){
+			return pressed[1];
+		}
+		
+		public boolean jumpPressed(){
+			return pressed[2];
+		}
+		
+		public boolean sameMovingDirectionAs(ButtonCombination comb){
+			return (comb.leftPressed() && this.leftPressed()) || (comb.rightPressed() && this.rightPressed());
+		}
+		
+		public ButtonCombination nonJumpVersion(){
+			if(this == Jump) return None;
+			else if(this == LeftJump) return Left;
+			else if(this == RightJump) return Right;
+			else return this;
+		}
+	}
 	
-	private int currentCombination = 0;
-	private int simulationDepth = 3;
-	private int safeMargin = 3;
+	private ButtonCombination currentCombination = ButtonCombination.None;
 	
 	private void searchButtonCombination(LevelSnapshot info, float delta){
 		Rectangle[][] predictedFrames = new Rectangle[entityTracker.size()][];
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
-			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(reactionTime*simulationDepth + safeMargin);
+			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(
+					AIConstant.reactionTime*AIConstant.simulationDepth + AIConstant.safeMargin
+					);
 			index++;
 		}
 		predictedEnemyPos = predictedFrames;
 		
 		int minCost = Integer.MAX_VALUE;
-		List<Integer> selectedCombination = new ArrayList<Integer>();
+		List<ButtonCombination> selectedCombination = new ArrayList<ButtonCombination>();
 		//Loop through all possible button press
-		for(int i=0; i<buttonCombination.length; i++){
+		for(ButtonCombination btn : ButtonCombination.values()){
 			//Calculate cost for the combination and pick the least one
-			boolean[] btn = buttonCombination[i];
 			int combinationCost = 0;
 			int futureFrame;
 			DummyPlayer dummy = new DummyPlayer(info.level, 1);
@@ -102,11 +126,11 @@ public class GameAI {
 			//			Cost increased by 1 for each collision
 			//- Cost increased if "next future frame" (the next N frame (N > 1) that AI could change button press) is NOT SAFE.
 			//			Cost increased by C; C = min(All possible future frame cost)
-			futureFrame = reactionTime-1;
-			Rectangle nextPlayerFrame = dummy.simulatePosition(btn[0], btn[1], false, false, btn[2], 
-					reactionTime, delta)[futureFrame];
+			futureFrame = AIConstant.reactionTime-1;
+			Rectangle nextPlayerFrame = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
+					btn.jumpPressed(), AIConstant.reactionTime, delta)[futureFrame];
 			for(Rectangle[] frame : predictedFrames){
-				for(int j=futureFrame-safeMargin; j<=futureFrame+safeMargin; j++){
+				for(int j=futureFrame-AIConstant.safeMargin; j<=futureFrame+AIConstant.safeMargin; j++){
 					if(j < 0 || j >= frame.length) continue;
 					if(frame[j].overlaps(nextPlayerFrame)){
 						combinationCost++;
@@ -114,20 +138,20 @@ public class GameAI {
 				}
 			}
 			 combinationCost += searchMinFutureCost(info, delta, predictedFrames, dummy, 1);
-			 System.out.println(i+" : "+combinationCost);
+			 //System.out.println(btn+" : "+combinationCost);
 			 
 			 if(combinationCost < minCost){
 				 minCost = combinationCost;
 				 selectedCombination.clear();
-				 selectedCombination.add(i);
+				 selectedCombination.add(btn);
 			 }else if(combinationCost == minCost){
-				 selectedCombination.add(i);
+				 selectedCombination.add(btn);
 			 }
 		}
 		
 		//There is combination with equal cost, try to retain moving direction
 		if(selectedCombination.size() > 1){
-			List<Integer> retained = new ArrayList<Integer>();
+			List<ButtonCombination> retained = new ArrayList<ButtonCombination>();
 			//Prioritize non-jumping action + same direction > Else. Combination criteria are as following:
 			//- Check if jump button provide no benefit (during fall down, jump button do nothing)
 			//-- True:
@@ -135,17 +159,11 @@ public class GameAI {
 			//-- False:
 			//----- If combination is the same as previous one: Copy it
 			//----- Otherwise, retain direction
-			for(int comb : selectedCombination){
+			for(ButtonCombination comb : selectedCombination){
 				if(startFallingDown){
 					//Exclude jumping choice during fall down but direction must be retained
-					if((buttonCombination[comb][0] && buttonCombination[currentCombination][0]) || 
-							(buttonCombination[comb][1] && buttonCombination[currentCombination][1])){
-						if(buttonCombination[comb][2]){
-							//Has jumping, save non-jumping version combination instead
-							retained.add(comb-3);
-						}else{
-							retained.add(comb);
-						}
+					if(comb.sameMovingDirectionAs(currentCombination)){
+						retained.add(comb.nonJumpVersion());
 					}
 				}else{
 					//Prioritize previous combination
@@ -153,8 +171,7 @@ public class GameAI {
 						return;
 					}
 					//Check if the combination can retain moving direction (left-right only)
-					if((buttonCombination[comb][0] && buttonCombination[currentCombination][0]) || 
-							(buttonCombination[comb][1] && buttonCombination[currentCombination][1])){
+					if(comb.sameMovingDirectionAs(currentCombination)){
 						retained.add(comb);
 					}
 				}
@@ -172,16 +189,15 @@ public class GameAI {
 	private int searchMinFutureCost(LevelSnapshot info, float delta, Rectangle[][] predictedFrames, 
 			DummyPlayer player, int depth){
 		int minCost = Integer.MAX_VALUE;
-		for(int i=0; i<buttonCombination[i].length; i++){
-			boolean[] btn = buttonCombination[i];
+		for(ButtonCombination btn : ButtonCombination.values()){
 			int combinationCost = 0;
 			DummyPlayer dummy = new DummyPlayer(info.level, 1);
 			dummy.mimicPlayer(player);
-			int nextfutureFrame = (depth+1)*reactionTime-1;
-			Rectangle nextPlayerFrame = dummy.simulatePosition(btn[0], btn[1], false, false, btn[2], 
-					reactionTime, delta)[reactionTime-1];
+			int nextfutureFrame = (depth+1)*AIConstant.reactionTime-1;
+			Rectangle nextPlayerFrame = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
+					btn.jumpPressed(), AIConstant.reactionTime, delta)[AIConstant.reactionTime-1];
 			for(Rectangle[] frame : predictedFrames){
-				for(int j=nextfutureFrame-safeMargin; j<=nextfutureFrame+safeMargin; j++){
+				for(int j=nextfutureFrame-AIConstant.safeMargin; j<=nextfutureFrame+AIConstant.safeMargin; j++){
 					if(j < 0 || j >= frame.length) continue;
 					if(frame[j].overlaps(nextPlayerFrame)){
 						combinationCost++;
@@ -192,7 +208,7 @@ public class GameAI {
 				continue;
 			}
 			
-			if(depth < simulationDepth-1)
+			if(depth < AIConstant.simulationDepth-1)
 				combinationCost += searchMinFutureCost(info, delta, predictedFrames, player, depth+1);
 			
 			if(combinationCost < minCost)
@@ -202,18 +218,18 @@ public class GameAI {
 	}
 	
 	private void pressButton(Controller controller, LevelSnapshot info, float delta){
-		System.out.println("Selected "+currentCombination);
+		//System.out.println("Selected "+currentCombination);
 		
-		controller.left = buttonCombination[currentCombination][0];
-		controller.right = buttonCombination[currentCombination][1];
+		controller.left = currentCombination.leftPressed();
+		controller.right = currentCombination.rightPressed();
 		//Require jumping, check if jumping should be delayed by 1 frame or not (release jumping button before pressing again)
-		if(buttonCombination[currentCombination][2]){
+		if(currentCombination.jumpPressed()){
 			controller.jump = !startFallingDown;
 		}
 		DummyPlayer dummy = new DummyPlayer(info.level, 1);
 		dummy.mimicPlayer(info.player);
 		Rectangle[] rect = dummy.simulatePosition(controller.left, controller.right, controller.up, controller.down, controller.jump,
-						reactionTime, delta);
+				AIConstant.reactionTime, delta);
 		simulatedPlayerPos = rect;
 	}
 }

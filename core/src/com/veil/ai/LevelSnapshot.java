@@ -32,7 +32,8 @@ public class LevelSnapshot {
 		}
 		tempRect = new HashMap<DynamicEntity,Rectangle>();
 		for(DynamicEntity dyn : temp){
-			tempRect.put(dyn, new Rectangle(dyn.getWorldCollider()));
+			if(dyn.group != DynamicEntity.Group.ALLY)
+				tempRect.put(dyn, new Rectangle(dyn.getWorldCollider()));
 		}
 	}
 }

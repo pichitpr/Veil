@@ -1,19 +1,25 @@
 package com.veil.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.veil.adl.AgentDatabase;
+import com.veil.ai.BattleProfile;
 import com.veil.ai.Controller;
 import com.veil.ai.GameAI;
 import com.veil.ai.LevelSnapshot;
+import com.veil.ai.RangeProfile;
 import com.veil.game.collider.CollisionResolver;
 import com.veil.game.element.DynamicEntity;
 import com.veil.game.element.Player;
@@ -35,12 +41,54 @@ public class BattleScene implements Screen, LevelContainer{
 	private List<DynamicEntity> pendingSpawnList;
 	private List<DynamicEntity> temporaryDynList;
 	
+	private List<String> enemyRushList;
+	private boolean shouldSpawnNextEnemy;
+	private int nextEnemyDelayCounter;
+	
 	public BattleScene(TheGame game){
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, GameConstant.screenW, GameConstant.screenH);
 		
 		map = new TiledMap();
+		
+		if(!GameConstant.profilingMode){
+			setupSceneManually();
+		}else{
+			enemyRushList = new LinkedList<String>();
+			if(GameConstant.rangeProfiling){
+				FileHandle fh = GameConstant.agentDatabaseDir.child("RangeRush");
+				setupRushList(fh);
+				int enemyCount = enemyRushList.size();
+				for(int i=1; i<=GameConstant.repeat; i++){
+					for(int j=0; j<enemyCount; j++){
+						enemyRushList.add(enemyRushList.get(j));
+					}
+				}
+				Collections.shuffle(enemyRushList);
+			}else{
+				FileHandle fh = GameConstant.agentDatabaseDir.child("Rush");
+				setupRushList(fh);
+			}
+			shouldSpawnNextEnemy = true;
+		}
+	}
+	
+	private void setupRushList(FileHandle fh){
+		for(FileHandle f : fh.list()){
+			if(!f.isDirectory()){
+				if(AgentDatabase.getAgentModelFor(f.nameWithoutExtension()) != null){
+					enemyRushList.add(f.nameWithoutExtension());
+				}else{
+					System.out.println("Agent "+f.nameWithoutExtension()+" not found");
+				}
+			}else{
+				setupRushList(f);
+			}
+		}
+	}
+	
+	private void setupSceneManually(){
 		player = new Player(this, 1);
 		player.setBaseHP(1000);
 		player.maxhp = 1000;
@@ -180,8 +228,49 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy = permanentDynList.get(0);
 	}
 	
+	private void setupScene(String enemyName, boolean setupBecauseUnbeatable){
+		if(!GameConstant.profilingMode) return;
+		player = new Player(this, 1);
+		player.setBaseHP(10000000);
+		player.maxhp = 10000000;
+		permanentDynList = new ArrayList<DynamicEntity>();
+		pendingSpawnList = new ArrayList<DynamicEntity>();
+		temporaryDynList = new ArrayList<DynamicEntity>();
+		permanentDynList.add(new ScriptedEntity(this, enemyName));
+		enemy = permanentDynList.get(0);
+		BattleProfile.instance.reset(enemy.identifier,setupBecauseUnbeatable,GameConstant.profileDir);
+	}
+	
+	private void endCurrentSession(boolean endBecauseUnbeatable){
+		if(!GameConstant.profilingMode) return;
+		if(GameConstant.rangeProfiling){
+			RangeProfile.instance.onSessionEnd();
+		}
+		if(enemyRushList.size() == 0){
+			if(GameConstant.rangeProfiling){
+				RangeProfile.instance.reset(GameConstant.profileDir);
+			}
+			Gdx.app.exit();
+			return;
+		}
+		setupScene(enemyRushList.remove(0), false);
+	}
+	
 	@Override
 	public void render(float delta) {
+		if(GameConstant.profilingMode){
+			if(shouldSpawnNextEnemy){
+				endCurrentSession(false);
+				shouldSpawnNextEnemy = false;
+				nextEnemyDelayCounter = -1;
+			}else if(nextEnemyDelayCounter > 0){
+				nextEnemyDelayCounter--;
+				if(nextEnemyDelayCounter == 0){
+					shouldSpawnNextEnemy = true;
+				}
+			}
+		}
+		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		camera.update();
@@ -199,15 +288,35 @@ public class BattleScene implements Screen, LevelContainer{
 		// Pre-Update
 		//=================================================================
 		Controller.instance.preUpdate();
-		if(GameConstant.useAI){
-			GameAI.instance.aiUpdate(Controller.instance, 
-					new LevelSnapshot(this, player, permanentDynList, temporaryDynList), delta);
+		if(GameConstant.useAI || GameConstant.profilingMode){
+			LevelSnapshot snapshot = new LevelSnapshot(this, player, permanentDynList, temporaryDynList);
+			if(GameConstant.useAI)
+				GameAI.instance.aiUpdate(Controller.instance, snapshot, delta);
+			if(GameConstant.profilingMode){
+				BattleProfile.instance.preUpdate(snapshot);
+				if(GameConstant.rangeProfiling){
+					RangeProfile.instance.preUpdate(snapshot);
+				}
+			}
 		}
 		
 		update(delta);
 		renderGame(delta);
 		debugRender(delta);
 		despawnAndPostDespawn(delta);
+		
+		if(GameConstant.profilingMode){
+			BattleProfile.instance.postUpdate();
+			if(nextEnemyDelayCounter == -1){
+				if(enemy.shouldBeRemovedFromWorld()){
+					//If enemy is just dead, end the session in next 100 frames
+					nextEnemyDelayCounter = 100;
+				}else if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+					//If enemy is deemed unbeatable, end the session immediately
+					endCurrentSession(true);
+				}
+			}
+		}
 	}
 
 	private void debugRender(float delta){

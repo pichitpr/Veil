@@ -1,6 +1,7 @@
 package com.veil.game.element;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.veil.ai.BattleProfile;
 import com.veil.ai.Controller;
 import com.veil.game.GameConstant;
 import com.veil.game.level.LevelContainer;
@@ -45,11 +46,7 @@ public class Player extends DynamicEntity{
 			}
 		}else{
 			if(Controller.instance.jump){
-				if(!pressJump && reachFloor){
-					flag.jumping = true;
-					pressJump = true;
-					timeCount = GameConstant.jumpCounter;
-				}
+				startJump();
 				if(timeCount > 0){
 					timeCount--;
 					gravityVy += GameConstant.jumpSpeed*gravityEff*level.getGravity();
@@ -114,6 +111,9 @@ public class Player extends DynamicEntity{
 					
 					dyn.flag.attack = true;
 					flag.attacked = true;
+					
+					//Profiling
+					BattleProfile.instance.hitPlayer(dyn);
 				}
 			}
 		}
@@ -141,4 +141,21 @@ public class Player extends DynamicEntity{
 		}
 	}
 	
+	private boolean jumpOnce = false;
+	private void startJump(){
+		if(!pressJump && reachFloor){
+			//Range profiling mode allow jumping only once per battle
+			if(GameConstant.profilingMode && GameConstant.rangeProfiling){
+				if(jumpOnce){
+					return;
+				}else{
+					//First jump, save distance profile
+				}
+			}
+			flag.jumping = true;
+			pressJump = true;
+			timeCount = GameConstant.jumpCounter;
+			jumpOnce = true;
+		}
+	}
 }
