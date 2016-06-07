@@ -311,7 +311,7 @@ public class BattleScene implements Screen, LevelContainer{
 				if(enemy.shouldBeRemovedFromWorld()){
 					//If enemy is just dead, end the session in next 100 frames
 					nextEnemyDelayCounter = 100;
-				}else if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+				}else if(Controller.instance.pause){
 					//If enemy is deemed unbeatable, end the session immediately
 					endCurrentSession(true);
 				}

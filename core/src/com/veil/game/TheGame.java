@@ -19,6 +19,7 @@ public class TheGame extends Game {
     public BitmapFont font;
     
     public void create() {
+    	Controller.instance.setup();
     	if(!AgentDatabase.setup()){
     		System.exit(0);
     	}
