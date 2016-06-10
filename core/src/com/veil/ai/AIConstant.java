@@ -12,7 +12,7 @@ public class AIConstant {
 	//AI controller constant
 	public static int buttonSpamDelay = 10; //A number of frame delay for pressing shoot button (min 2)
 	public static int reactionTime = 4; //A number of frame required to re-decide button press
-	public static int simulationDepth = 3; //A number of future step required to simulate to find safest button combination
+	public static int simulationDepth = 6; //A number of future step required to simulate to find safest button combination
 	public static int safeMargin = 5;
 	
 	

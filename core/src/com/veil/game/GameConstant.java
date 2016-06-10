@@ -40,7 +40,7 @@ public class GameConstant {
 	/**
 	 * A directory containing all agent scripts to be used.
 	 */
-	public static final FileHandle agentDatabaseDir = PlatformUtility.fileOperator.getStorageRoot().child("ScriptGen");
+	public static final FileHandle agentDatabaseDir = PlatformUtility.fileOperator.getStorageRoot().child("Profiling").child("AgentDB");
 	
 	//==========================================
 	//Task specific variable
@@ -49,21 +49,21 @@ public class GameConstant {
 	 * Turn on/off profiling mode. In profiling mode, player have to rush through all enemies in subdirectory "Rush"
 	 * of agent database directory. The flag must be set before BattleScene creation.
 	 */
-	public static final boolean profilingMode = true;
+	public static final boolean profilingMode = false;
 	/**
 	 * Turn on/off range profiling mode (also requires profiling mode ON). In this mode, player have to avoid enemies' attack
 	 * with a single jump. Each battle session end after the first enemy bullet leaves screen. Enemies are taken from
 	 * subdirectory "RangeRush" of agent database directory. Every enemies' name must end with "_X" where X is a number
 	 * indicating its attack speed. The flag must be set before BattleScene creation.
 	 */
-	public static final boolean rangeProfiling = true;
+	public static final boolean rangeProfiling = false;
 	public static final int repeat = 3;
 	/**
 	 * Profile saving directory. Range profile will also be saved here under filename "range_profile.txt"
 	 */
-	public static final FileHandle profileDir = PlatformUtility.fileOperator.getStorageRoot().child("Profile");
+	public static final FileHandle profileDir = PlatformUtility.fileOperator.getStorageRoot().child("Profiling").child("Profile");
 	
-	public static final boolean useAI = false;
+	public static final boolean useAI = true;
 	public static final boolean timeStepping = false;
 	public static final boolean debugDrawing = true;
 }

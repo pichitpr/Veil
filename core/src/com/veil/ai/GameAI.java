@@ -10,7 +10,7 @@ import com.veil.game.element.DynamicEntity;
 
 public abstract class GameAI {
 	
-	public static GameAI instance = new GameAI_v2();
+	public static GameAI instance = new GameAI_v4();
 	
 	//For debugging purpose
 	public static Rectangle[] simulatedPlayerPos;
