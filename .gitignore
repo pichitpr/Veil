@@ -64,3 +64,6 @@ build/
 .DS_Store
 
 /ScriptGen/
+/desktop/
+/core/
+/android/
