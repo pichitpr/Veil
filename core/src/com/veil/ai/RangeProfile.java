@@ -9,51 +9,70 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
+import com.veil.game.GameConstant;
 
 public class RangeProfile {
-
+	
 	public class DistanceLog implements Serializable {
 		private static final long serialVersionUID = 8048529594171440656L;
 		
 		private int speed;
 		private List<Integer> list;
+		private List<Boolean> miss;
 		
 		public DistanceLog(int speed){
 			this.speed = speed;
-			list = new LinkedList<Integer>();
+			list = new ArrayList<Integer>();
+			miss = new ArrayList<Boolean>();
 		}
 		
-		public void add(int distance){
+		public void add(int distance, boolean playerDamaged){
 			list.add(distance);
+			miss.add(playerDamaged);
 		}
 		
 		public int sum(){
 			int sum = 0;
-			for(int d : list) sum += d;
+			for(int i=0; i<list.size(); i++){
+				if(!miss.get(i))
+					sum += list.get(i);
+			}
 			return sum;
 		}
 		
 		public int sampleSize(){
-			return list.size();
+			int validSize = 0;
+			for(int i=0; i<list.size(); i++){
+				if(!miss.get(i))
+					validSize++;
+			}
+			return validSize;
 		}
 		
 		public float average(){
 			if(list.size() == 0) return 0;
-			return 1f*sum()/sampleSize();
+			int size = sampleSize();
+			if(size == 0) return 0;
+			return 1f*sum()/size;
 		}
 		
 		@Override
 		public String toString(){
 			StringBuilder strb = new StringBuilder();
 			strb.append(speed).append(" :");
-			for(int i : list){
-				strb.append(" ").append(i);
+			for(int i=0; i<list.size(); i++){
+				strb.append(" ");
+				if(miss.get(i)){
+					strb.append("-");
+				}
+				strb.append(list.get(i));
 			}
 			return strb.toString();
 		}
@@ -64,14 +83,23 @@ public class RangeProfile {
 			for(int data : list){
 				out.writeInt(data);
 			}
+			out.writeInt(miss.size());
+			for(boolean data : miss){
+				out.writeBoolean(data);
+			}
 		}
 		
 		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 			speed = in.readInt();
-			list = new LinkedList<Integer>();
 			int listSize = in.readInt();
+			list = new ArrayList<Integer>(listSize);
 			for(int i=0; i<listSize; i++){
 				list.add(in.readInt());
+			}
+			listSize = in.readInt();
+			miss = new ArrayList<Boolean>(listSize);
+			for(int i=0; i<listSize; i++){
+				miss.add(in.readBoolean());
 			}
 		}
 
@@ -82,14 +110,26 @@ public class RangeProfile {
 		}
 	}
 	
-	public static RangeProfile instance = new RangeProfile();
+	public static RangeProfile instance = new RangeProfile(GameConstant.profileDir.child("Screenshot_range"));
 	
 	private HashMap<Integer, DistanceLog> logs = new HashMap<Integer, DistanceLog>();
 	private boolean sessionLogged = false;
 	private int pendingSpeed, pendingDistance;
+	private boolean playerDamaged;
+	
+	private FileHandle ssDir;
+	private int ssFilename;
 	
 	public RangeProfile(){
+		this(null);
+	}
+	
+	public RangeProfile(FileHandle fh){
 		reset(null);
+		ssDir = fh;
+		if(ssDir != null){
+			ssFilename = ssDir.list().length;
+		}
 	}
 	
 	/**
@@ -101,6 +141,7 @@ public class RangeProfile {
 		}
 		pendingSpeed = -1;
 		pendingDistance = -1;
+		playerDamaged = false;
 		sessionLogged = false;
 		logs.clear();
 	}
@@ -116,20 +157,34 @@ public class RangeProfile {
 				snapshot.playerRect.getCenter(playerPos);
 				pendingDistance = (int)firstAttackPos.dst(playerPos);
 			}
+			if(ssDir != null){
+				ScreenshotUtility.takeScreenshot(ssDir, ""+ssFilename);
+				ssFilename++;
+			}
 			sessionLogged = true;
+		}
+		if(snapshot.player.getBaseHP() < snapshot.player.maxhp){
+			playerDamaged = true;
 		}
 	}
 	
-	public void onSessionEnd(){
+	/**
+	 * Call when current range profiling session should end. Return true if the player is damaged during the session
+	 */
+	public boolean onSessionEnd(){
+		boolean isPlayerDamaged = playerDamaged;
 		if(sessionLogged && pendingSpeed > -1){
 			if(!logs.containsKey(pendingSpeed)){
 				logs.put(pendingSpeed, new DistanceLog(pendingSpeed));
 			}
-			logs.get(pendingSpeed).add(pendingDistance);
+			logs.get(pendingSpeed).add(pendingDistance, playerDamaged);
+			//System.out.println(logs.get(pendingSpeed));
 		}
 		pendingSpeed = -1;
 		pendingDistance = -1;
+		playerDamaged = false;
 		sessionLogged = false;
+		return isPlayerDamaged;
 	}
 	
 	public void print(){
@@ -171,6 +226,7 @@ public class RangeProfile {
 			if(!fh.isDirectory()){
 				RangeProfile profile = new RangeProfile();
 				profile.load(fh);
+				profile.print();
 				int totalDistance = 0;
 				int counter = 0;
 				for(DistanceLog log : profile.logs.values()){

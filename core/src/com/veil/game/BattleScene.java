@@ -42,7 +42,7 @@ public class BattleScene implements Screen, LevelContainer{
 	private List<DynamicEntity> temporaryDynList;
 	
 	private List<String> enemyRushList;
-	private boolean shouldSpawnNextEnemy;
+	private boolean shouldSpawnNextEnemy, firstEnemy;
 	private int nextEnemyDelayCounter;
 	
 	public BattleScene(TheGame game){
@@ -70,7 +70,13 @@ public class BattleScene implements Screen, LevelContainer{
 				FileHandle fh = GameConstant.agentDatabaseDir.child("Rush");
 				setupRushList(fh);
 			}
+			if(enemyRushList.size() == 0){
+				System.out.println("No enemy found");
+				Gdx.app.exit();
+				return;
+			}
 			shouldSpawnNextEnemy = true;
+			firstEnemy = true;
 		}
 	}
 	
@@ -243,8 +249,16 @@ public class BattleScene implements Screen, LevelContainer{
 	
 	private void endCurrentSession(boolean endBecauseUnbeatable){
 		if(!GameConstant.profilingMode) return;
+		boolean shouldRemoveCurrentEnemyFromList = true;
 		if(GameConstant.rangeProfiling){
-			RangeProfile.instance.onSessionEnd();
+			if(RangeProfile.instance.onSessionEnd()){
+				shouldRemoveCurrentEnemyFromList = false;
+			}
+		}
+		if(shouldRemoveCurrentEnemyFromList){
+			enemyRushList.remove(0);
+		}else{
+			enemyRushList.add(enemyRushList.remove(0));
 		}
 		if(enemyRushList.size() == 0){
 			if(GameConstant.rangeProfiling){
@@ -253,14 +267,19 @@ public class BattleScene implements Screen, LevelContainer{
 			Gdx.app.exit();
 			return;
 		}
-		setupScene(enemyRushList.remove(0), false);
+		setupScene(enemyRushList.get(0), false);
 	}
 	
 	@Override
 	public void render(float delta) {
 		if(GameConstant.profilingMode){
 			if(shouldSpawnNextEnemy){
-				endCurrentSession(false);
+				if(firstEnemy){
+					setupScene(enemyRushList.get(0), false);
+					firstEnemy = false;
+				}else{
+					endCurrentSession(false);
+				}
 				shouldSpawnNextEnemy = false;
 				nextEnemyDelayCounter = -1;
 			}else if(nextEnemyDelayCounter > 0){
@@ -270,11 +289,6 @@ public class BattleScene implements Screen, LevelContainer{
 				}
 			}
 		}
-		
-		Gdx.gl.glClearColor(0, 0, 0, 0);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
 		
 		if(GameConstant.timeStepping){
 			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
@@ -481,6 +495,11 @@ public class BattleScene implements Screen, LevelContainer{
 	}
 	
 	private void renderGame(float delta){
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		camera.update();
+		game.batch.setProjectionMatrix(camera.combined);
+		
 		//===========================================================
 		// Render
 		//===========================================================

@@ -146,4 +146,14 @@ public class FrameHistoryBuffer {
 		}
 		return result;
 	}
+	
+	public Vector2 getCurrentMovingDirection(){
+		if(buf.size() < 2){
+			return Vector2.Zero;
+		}else{
+			Rectangle mostRecent = buf.get(buf.size()-1);
+			Rectangle secondRecent = buf.get(buf.size()-2);
+			return new Vector2(mostRecent.x - secondRecent.x, mostRecent.y - secondRecent.y);
+		}
+	}
 }
