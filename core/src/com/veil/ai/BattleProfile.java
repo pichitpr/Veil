@@ -310,7 +310,7 @@ public class BattleProfile {
 	 * Load battle profile. Not everything is saved, so it is expected that only methods below are invoked on the loaded version
 	 * of profile  
 	 */
-	private void load(FileHandle fh){
+	public void load(FileHandle fh){
 		byte[] data = fh.readBytes();
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);
 		ObjectInput in = null;

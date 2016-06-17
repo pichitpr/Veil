@@ -242,7 +242,7 @@ public class RangeProfile {
 		return sampleSize;
 	}
 	
-	private void load(FileHandle fh){
+	public void load(FileHandle fh){
 		byte[] data = fh.readBytes();
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);
 		ObjectInput in = null;
