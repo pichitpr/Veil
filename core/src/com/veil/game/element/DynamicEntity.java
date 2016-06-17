@@ -38,6 +38,8 @@ public abstract class DynamicEntity extends Entity{
 	public boolean phasing,invul;//,rigid;
 	public boolean attacker,defender;
 	
+	public int invulFrame = 0;
+	
 	public float vx,vy,gravityVy;
 	protected float gravityEff;
 	protected boolean reachFloor;

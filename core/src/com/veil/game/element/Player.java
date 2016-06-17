@@ -14,21 +14,23 @@ public class Player extends DynamicEntity{
 	
 	protected boolean pressJump = false;
 	protected int timeCount = 0;
-	protected int invulFrame = 0; //TODO: combine invul frame with invuk flag for dyn
+	protected int invulFrameCounter = 0;
 	protected boolean pressShoot = false;
+	private int shootingFrameCounter = 0;
 	
 	public Player(LevelContainer level, int texture) {
 		super(level, new Rectangle(50,500,32,48), texture);
 		group = Group.ALLY;
 		defender = true;
 		gravityEff = 1;
+		invulFrame = 60;
 	}
 
 	@Override
 	public void behaviorUpdate(float delta){
-		if(invulFrame % 6 == 0)
+		if(invulFrameCounter % 6 == 0)
 			visible = true;
-		else if(invulFrame % 6 == 3)
+		else if(invulFrameCounter % 6 == 3)
 			visible = false;
 		
 		if(floorStunDuration > 0){
@@ -65,10 +67,13 @@ public class Player extends DynamicEntity{
 			this.direction.setDirection(1, 0);
 		}
 		
+		if(shootingFrameCounter > 0)
+			shootingFrameCounter--;
 		if(Controller.instance.shoot){
-			if(!pressShoot){
+			if(!pressShoot && shootingFrameCounter <= 0){
 				level.pendingSpawn(new ScriptedEntity(level, "Bullet_Player"));
 				pressShoot = true;
+				shootingFrameCounter = 10;
 			}
 		}else{
 			pressShoot = false;
@@ -83,8 +88,8 @@ public class Player extends DynamicEntity{
 
 	@Override
 	public void handleCollisionEvent() {
-		if(invulFrame > 0)
-			invulFrame--;
+		if(invulFrameCounter > 0)
+			invulFrameCounter--;
 		
 		//Handle as defender
 		DynamicEntity dyn;
@@ -94,12 +99,12 @@ public class Player extends DynamicEntity{
 				dyn = (DynamicEntity)e; 
 				if(dyn.attacker && dyn.group != Group.ALLY){
 					//Inflict damage
-					if(!this.invul && invulFrame <= 0){
+					if(!this.invul && invulFrameCounter <= 0){
 						dyn.flag.damage = true;
 						this.hp -= dyn.atk;
 						if(this.hp < 0)
 							this.hp = 0;
-						invulFrame = 60;
+						invulFrameCounter = invulFrame;
 					}
 					
 					//Projectile attacker

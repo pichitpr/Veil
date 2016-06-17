@@ -10,6 +10,7 @@ import com.veil.game.level.LevelContainer;
 public class ScriptedEntity extends DynamicEntity{
 	
 	private AgentModelInterpreter interpreter;
+	protected int invulFrameCounter = 0;
 	
 	public ScriptedEntity(LevelContainer level, String identifier){
 		super(level, new Rectangle(0,0,1,1), 1);
@@ -34,6 +35,10 @@ public class ScriptedEntity extends DynamicEntity{
 
 	@Override
 	public void behaviorUpdate(float delta) {
+		if(invulFrameCounter % 6 == 0)
+			visible = true;
+		else if(invulFrameCounter % 6 == 3)
+			visible = false;
 		interpreter.update(delta);
 	}
 
@@ -46,6 +51,9 @@ public class ScriptedEntity extends DynamicEntity{
 
 	@Override
 	public void handleCollisionEvent() {
+		if(invulFrameCounter > 0)
+			invulFrameCounter--;
+		
 		//Handle as defender
 		if(this.defender){
 			DynamicEntity dyn;
@@ -60,11 +68,12 @@ public class ScriptedEntity extends DynamicEntity{
 						if(dyn.group == this.group && dyn.group != Group.HOSTILE){
 							continue;
 						}
-						if(!this.invul){
+						if(!this.invul && invulFrameCounter <= 0){
 							dyn.flag.damage = true;
 							this.hp -= dyn.atk;
 							if(this.hp < 0)
 								this.hp = 0;
+							invulFrameCounter = invulFrame;
 						}else{
 							sfxReflect.play(1.f);
 						}

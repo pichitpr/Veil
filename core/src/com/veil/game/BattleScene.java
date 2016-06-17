@@ -232,6 +232,7 @@ public class BattleScene implements Screen, LevelContainer{
 		//permanentDynList.add(new ScriptedEntity(this, "MrHat"));
 		
 		enemy = permanentDynList.get(0);
+		enemy.invulFrame = 30;
 	}
 	
 	private void setupScene(String enemyName, boolean setupBecauseUnbeatable){
@@ -512,7 +513,7 @@ public class BattleScene implements Screen, LevelContainer{
 		for(DynamicEntity dyn : temporaryDynList){
 			dyn.render(game.batch,game.region);
 		}
-		game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
+		//game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
 		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
 		game.batch.end();
 	}
