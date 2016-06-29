@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Rectangle;
 import com.veil.adl.AgentDatabase;
 import com.veil.ai.BattleProfile;
@@ -28,7 +29,9 @@ import com.veil.game.level.GameMap;
 import com.veil.game.level.LevelContainer;
 import com.veil.game.level.TiledMap;
 
-
+/**
+ * Rush battle scene where a player have to rush through enemies
+ */
 public class BattleScene implements Screen, LevelContainer{
 
 	final TheGame game;
@@ -41,9 +44,261 @@ public class BattleScene implements Screen, LevelContainer{
 	private List<DynamicEntity> pendingSpawnList;
 	private List<DynamicEntity> temporaryDynList;
 	
-	private List<String> enemyRushList;
-	private boolean shouldSpawnNextEnemy, firstEnemy;
-	private int nextEnemyDelayCounter;
+	private enum EnemyType{ 
+		Enemy, Elite, Miniboss, Boss 
+	}
+	
+	private static abstract class EnemyRushManager {
+		
+		protected BattleScene battleScene;
+		//private List<EnemyRushInfo> rushList;
+		protected String currentEnemy;
+		protected EnemyType currentType;
+		protected boolean shouldSpawnNextEnemy;
+		protected int nextEnemyDelayCounter;
+		private boolean firstEnemy;
+		
+		public EnemyRushManager(BattleScene battleScene){
+			this.battleScene = battleScene;
+			this.firstEnemy = true;
+		}
+		
+		/**
+		 * Load enemy list. Also set currentEnemy to the first enemy
+		 */
+		public abstract void setupEnemyList();
+		/**
+		 * End current battle session, then setup next enemy.
+		 */
+		protected abstract void endCurrentSessionAndSetupNextEnemy(boolean unbeatable);
+		
+		public void setup(){
+			setupEnemyList();
+			shouldSpawnNextEnemy = true;
+		}
+		
+		public void preUpdate(){
+			if(shouldSpawnNextEnemy){
+				if(firstEnemy){
+					firstEnemy = false;
+				}else{
+					endCurrentSessionAndSetupNextEnemy(false);
+				}
+				battleScene.setupScene(currentEnemy);
+				if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
+					battleScene.enemy.invulFrame = 30;
+				}
+				shouldSpawnNextEnemy = false;
+				nextEnemyDelayCounter = -1;
+			}else if(nextEnemyDelayCounter > 0){
+				nextEnemyDelayCounter--;
+				if(nextEnemyDelayCounter == 0){
+					shouldSpawnNextEnemy = true;
+				}
+			}
+		}
+		
+		public void postUpdate(){
+			if(nextEnemyDelayCounter == -1){
+				if(battleScene.enemy.shouldBeRemovedFromWorld()){
+					//If enemy is just dead, end the session in next 100 frames
+					nextEnemyDelayCounter = 100;
+				}else if(Controller.instance.pause){
+					//If enemy is deemed unbeatable, end the session immediately
+					endCurrentSessionAndSetupNextEnemy(true);
+					battleScene.setupScene(currentEnemy);
+					if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
+						battleScene.enemy.invulFrame = 30;
+					}
+				}
+			}
+		}
+	}
+	
+	private static class RangeProfilingRushManager extends EnemyRushManager {
+
+		private List<String> rushList;
+		
+		public RangeProfilingRushManager(BattleScene battleScene) {
+			super(battleScene);
+		}
+
+		@Override
+		public void setupEnemyList() {
+			rushList = new ArrayList<String>();
+			FileHandle fh = GameConstant.agentDatabaseDir.child("RangeRush");
+			for(FileHandle f : fh.list()){
+				if(!f.isDirectory()){
+					if(AgentDatabase.getAgentModelFor(f.nameWithoutExtension()) != null){
+						rushList.add(f.nameWithoutExtension());
+					}else{
+						System.err.println("Agent "+f.nameWithoutExtension()+" not found");
+					}
+				}
+			}
+			int enemyCount = rushList.size();
+			if(enemyCount == 0){
+				System.err.println("No enemy found");
+				Gdx.app.exit();
+				return;
+			}
+			for(int i=1; i<=GameConstant.repeat; i++){
+				for(int j=0; j<enemyCount; j++){
+					rushList.add(rushList.get(j));
+				}
+			}
+			Collections.shuffle(rushList);
+			currentType = EnemyType.Enemy;
+			currentEnemy = rushList.remove(0);
+		}
+
+		@Override
+		protected void endCurrentSessionAndSetupNextEnemy(boolean unbeatable) {
+			boolean reappend = false;
+			if(RangeProfile.instance.onSessionEnd()){
+				reappend = true;
+			}
+			if(reappend){
+				rushList.add(currentEnemy);
+			}
+			if(rushList.size() == 0){
+				RangeProfile.instance.reset(GameConstant.profileDir);
+				Gdx.app.exit();
+				return;
+			}
+			currentEnemy = rushList.remove(0);
+		}
+	}
+	
+	
+	private static class BattleProfilingRushManager extends EnemyRushManager {
+		
+		private class RushList {
+			private EnemyType type;
+			private int requiredEnemyCount;
+			private FileHandle profileDir;
+			private List<String> list;
+			private int rushCount;
+			
+			private RushList(EnemyType type, int requiredEnemyCount){
+				this.type = type;
+				this.requiredEnemyCount = requiredEnemyCount;
+				list = new LinkedList<String>();
+				rushCount = 0;
+			}
+			
+			private void setupRushList(FileHandle fh){
+				for(FileHandle f : fh.list()){
+					if(!f.isDirectory()){
+						if(AgentDatabase.getAgentModelFor(f.nameWithoutExtension()) != null){
+							list.add(f.nameWithoutExtension());
+						}else{
+							System.err.println("Agent "+f.nameWithoutExtension()+" not found");
+						}
+					}else{
+						setupRushList(f);
+					}
+				}
+				Collections.shuffle(list);
+			}
+			
+			private String getCurrentEnemy(){
+				return list.get(0);
+			}
+			
+			private EnemyType getCurrentType(){
+				return type;
+			}
+			
+			private void finishCurrentEnemy(boolean reappend){
+				String currentEnemy = list.remove(0);
+				if(reappend){
+					list.add(currentEnemy);
+				}else{
+					rushCount++;
+				}
+			}
+			
+			private boolean isValid(){
+				return requiredEnemyCount < 0 ? true : list.size() >= requiredEnemyCount;
+			}
+			
+			private boolean isRushEnd(){
+				return requiredEnemyCount < 0 ? rushCount >= list.size() : rushCount >= requiredEnemyCount;
+			}
+		}
+		
+		private static RandomXS128 random = new RandomXS128();
+		private List<RushList> rushList;
+		private int currentRushListIndex;
+		
+		public BattleProfilingRushManager(BattleScene battleScene) {
+			super(battleScene);
+		}
+
+		@Override
+		public void setupEnemyList() {
+			RushList enemyList = new RushList(EnemyType.Enemy, GameConstant.enemyRushCount);
+			RushList eliteList = new RushList(EnemyType.Elite, GameConstant.eliteRushCount);
+			RushList minibossList = new RushList(EnemyType.Miniboss, GameConstant.minibossRushCount);
+			RushList bossList = new RushList(EnemyType.Boss, GameConstant.bossRushCount);
+			
+			FileHandle fh = GameConstant.agentDatabaseDir.child("Rush");
+			for(FileHandle f : fh.list()){
+				if(f.isDirectory()){
+					String folderName = f.name();
+					if(folderName.equalsIgnoreCase("Elite")){
+						eliteList.setupRushList(f);
+						eliteList.profileDir = GameConstant.profileDir.child("Elite");
+					}else if(folderName.equalsIgnoreCase("Miniboss")){
+						minibossList.setupRushList(f);
+						minibossList.profileDir = GameConstant.profileDir.child("Miniboss");
+					}else if(folderName.equalsIgnoreCase("Boss")){
+						bossList.setupRushList(f);
+						bossList.profileDir = GameConstant.profileDir.child("Boss");
+					}else {
+						enemyList.setupRushList(f);
+						enemyList.profileDir = GameConstant.profileDir.child("Enemy");
+					}
+				}
+			}
+			if(!enemyList.isValid() || !eliteList.isValid() || !minibossList.isValid() || !bossList.isValid()){
+				System.err.println("Not enough enemy");
+				Gdx.app.exit();
+				return;
+			}
+			rushList = new ArrayList<RushList>();
+			if(!enemyList.isRushEnd()) rushList.add(enemyList);
+			if(!eliteList.isRushEnd()) rushList.add(eliteList);
+			if(!minibossList.isRushEnd()) rushList.add(minibossList);
+			if(!bossList.isRushEnd()) rushList.add(bossList);
+			
+			currentRushListIndex = random.nextInt(rushList.size());
+			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
+			currentType = rushList.get(currentRushListIndex).getCurrentType();
+			BattleProfile.instance.saveAndReset(currentEnemy, false, null);
+		}
+
+		@Override
+		protected void endCurrentSessionAndSetupNextEnemy(boolean unbeatable) {
+			RushList currentRushList = rushList.get(currentRushListIndex);
+			currentRushList.finishCurrentEnemy(false);
+			if(currentRushList.isRushEnd()){
+				rushList.remove(currentRushListIndex);
+			}
+			if(rushList.size() == 0){
+				BattleProfile.instance.saveAndReset(null, unbeatable, currentRushList.profileDir);
+				Gdx.app.exit();
+				return;
+			}
+			currentRushListIndex = random.nextInt(rushList.size());
+			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
+			currentType = rushList.get(currentRushListIndex).getCurrentType();
+			BattleProfile.instance.saveAndReset(currentEnemy, unbeatable, currentRushList == null ? null : currentRushList.profileDir);
+		}
+	}
+	
+	private EnemyRushManager rushManager = null;
 	
 	public BattleScene(TheGame game){
 		this.game = game;
@@ -55,42 +310,12 @@ public class BattleScene implements Screen, LevelContainer{
 		if(!GameConstant.profilingMode){
 			setupSceneManually();
 		}else{
-			enemyRushList = new LinkedList<String>();
 			if(GameConstant.rangeProfiling){
-				FileHandle fh = GameConstant.agentDatabaseDir.child("RangeRush");
-				setupRushList(fh);
-				int enemyCount = enemyRushList.size();
-				for(int i=1; i<=GameConstant.repeat; i++){
-					for(int j=0; j<enemyCount; j++){
-						enemyRushList.add(enemyRushList.get(j));
-					}
-				}
-				Collections.shuffle(enemyRushList);
+				rushManager = new RangeProfilingRushManager(this);
 			}else{
-				FileHandle fh = GameConstant.agentDatabaseDir.child("Rush");
-				setupRushList(fh);
+				rushManager = new BattleProfilingRushManager(this);
 			}
-			if(enemyRushList.size() == 0){
-				System.out.println("No enemy found");
-				Gdx.app.exit();
-				return;
-			}
-			shouldSpawnNextEnemy = true;
-			firstEnemy = true;
-		}
-	}
-	
-	private void setupRushList(FileHandle fh){
-		for(FileHandle f : fh.list()){
-			if(!f.isDirectory()){
-				if(AgentDatabase.getAgentModelFor(f.nameWithoutExtension()) != null){
-					enemyRushList.add(f.nameWithoutExtension());
-				}else{
-					System.out.println("Agent "+f.nameWithoutExtension()+" not found");
-				}
-			}else{
-				setupRushList(f);
-			}
+			rushManager.setup();
 		}
 	}
 	
@@ -235,7 +460,7 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy.invulFrame = 30;
 	}
 	
-	private void setupScene(String enemyName, boolean setupBecauseUnbeatable){
+	private void setupScene(String enemyName){
 		if(!GameConstant.profilingMode) return;
 		player = new Player(this, 1);
 		player.setBaseHP(10000000);
@@ -245,50 +470,12 @@ public class BattleScene implements Screen, LevelContainer{
 		temporaryDynList = new ArrayList<DynamicEntity>();
 		permanentDynList.add(new ScriptedEntity(this, enemyName));
 		enemy = permanentDynList.get(0);
-		BattleProfile.instance.reset(enemy.identifier,setupBecauseUnbeatable,GameConstant.profileDir);
-	}
-	
-	private void endCurrentSession(boolean endBecauseUnbeatable){
-		if(!GameConstant.profilingMode) return;
-		boolean shouldRemoveCurrentEnemyFromList = true;
-		if(GameConstant.rangeProfiling){
-			if(RangeProfile.instance.onSessionEnd()){
-				shouldRemoveCurrentEnemyFromList = false;
-			}
-		}
-		if(shouldRemoveCurrentEnemyFromList){
-			enemyRushList.remove(0);
-		}else{
-			enemyRushList.add(enemyRushList.remove(0));
-		}
-		if(enemyRushList.size() == 0){
-			if(GameConstant.rangeProfiling){
-				RangeProfile.instance.reset(GameConstant.profileDir);
-			}
-			Gdx.app.exit();
-			return;
-		}
-		setupScene(enemyRushList.get(0), false);
 	}
 	
 	@Override
 	public void render(float delta) {
 		if(GameConstant.profilingMode){
-			if(shouldSpawnNextEnemy){
-				if(firstEnemy){
-					setupScene(enemyRushList.get(0), false);
-					firstEnemy = false;
-				}else{
-					endCurrentSession(false);
-				}
-				shouldSpawnNextEnemy = false;
-				nextEnemyDelayCounter = -1;
-			}else if(nextEnemyDelayCounter > 0){
-				nextEnemyDelayCounter--;
-				if(nextEnemyDelayCounter == 0){
-					shouldSpawnNextEnemy = true;
-				}
-			}
+			rushManager.preUpdate();
 		}
 		
 		if(GameConstant.timeStepping){
@@ -322,15 +509,7 @@ public class BattleScene implements Screen, LevelContainer{
 		
 		if(GameConstant.profilingMode){
 			BattleProfile.instance.postUpdate();
-			if(nextEnemyDelayCounter == -1){
-				if(enemy.shouldBeRemovedFromWorld()){
-					//If enemy is just dead, end the session in next 100 frames
-					nextEnemyDelayCounter = 100;
-				}else if(Controller.instance.pause){
-					//If enemy is deemed unbeatable, end the session immediately
-					endCurrentSession(true);
-				}
-			}
+			rushManager.postUpdate();
 		}
 	}
 
@@ -514,7 +693,7 @@ public class BattleScene implements Screen, LevelContainer{
 			dyn.render(game.batch,game.region);
 		}
 		//game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
-		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
+		game.font.draw(game.batch, "HP:"+enemy.getBaseHP()+"  "+enemy.identifier, GameConstant.screenW/2, GameConstant.screenH-20);
 		game.batch.end();
 	}
 	

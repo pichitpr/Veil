@@ -171,13 +171,13 @@ public class BattleProfile {
 	private int frameCounter = 0;
 	
 	public BattleProfile(){
-		reset(null,false,null);
+		saveAndReset(null,false,null);
 	}
 	
 	/**
 	 * Save previous profile (if available) to target directory and reset with new profile name ready to be updated
 	 */
-	public void reset(String newProfileName, boolean resetFromUnbeatable, FileHandle dir){
+	public void saveAndReset(String newProfileName, boolean resetFromUnbeatable, FileHandle dir){
 		if(name != null && dir != null){
 			unbeatable = resetFromUnbeatable;
 			//Should save profile before resetting

@@ -5,34 +5,46 @@ import java.util.List;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.veil.game.element.DynamicEntity;
 
 public class GameAI_v4 extends GameAI {
 
-	//Delay for player to react, in this case, AI will not be able to "change" button decision immediately
-	private final int reactionTime = 4;
+	//Average frame time = 0.07 sec
+	
+	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
+	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
 	
-	private int reactionTimeCounter = 0;
+	private int buttonChangeDelayCounter = 0;
+	private boolean shootLastFrame;
+	private boolean playerOnFloorLastFrame;
+	private ButtonCombination lastValidCombination;
+	private boolean facing;
 	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
 			float delta) {
-		if(reactionTimeCounter == 0){
+		if(buttonChangeDelayCounter == 0){
 			searchButtonCombination(info, delta);
 		}else{
-			reactionTimeCounter--;
+			buttonChangeDelayCounter--;
 		}
 		pressButtonByCombination(controller, info, delta);
+		controller.shoot = !shootLastFrame;
+		shootLastFrame = !shootLastFrame;
+		playerOnFloorLastFrame = info.playerOnFloor;
 	}
 
 	private ButtonCombination currentCombination = ButtonCombination.None;
 	
 	private void searchButtonCombination(LevelSnapshot info, float delta){
 		Rectangle[][] predictedFrames = new Rectangle[entityTracker.size()][];
+		Vector2[] currentDirection = new Vector2[entityTracker.size()];
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(simulationFrame);
+			currentDirection[index] = entityTracker.get(dyn).getCurrentMovingDirection();
 			index++;
 		}
 		predictedEnemyPos = predictedFrames;
@@ -57,7 +69,7 @@ public class GameAI_v4 extends GameAI {
 					}
 				}
 				if(collideEnemy){
-					combinationCost = (simulationFrame-frameRef)/reactionTime;
+					combinationCost = (simulationFrame-frameRef)/buttonChangeDelay;
 					break;
 				}
 			}
@@ -72,46 +84,99 @@ public class GameAI_v4 extends GameAI {
 		}
 
 		ButtonCombination newCombination = currentCombination;
-		//There is combination with equal cost, try to retain moving direction
+		//There are combinations with equal cost
 		if(selectedCombination.size() > 1){
-			List<ButtonCombination> retained = new ArrayList<ButtonCombination>();
-			//Prioritize non-jumping action + same direction > Else. Combination criteria are as following:
-			//- Check if jump button provide no benefit (during fall down, jump button do nothing)
-			//-- True:
-			//----- If combination direction is the same as previous one, select that combination WITHOUT jumping
-			//-- False:
-			//----- If combination is the same as previous one: Copy it
-			//----- Otherwise, retain direction
-			for(ButtonCombination comb : selectedCombination){
-				if(startFallingDown){
-					//Exclude jumping choice during fall down but direction must be retained
-					if(comb.sameMovingDirectionAs(currentCombination)){
-						retained.add(comb.nonJumpVersion());
+			ButtonCombination previousCombination = currentCombination;
+			boolean combinationChosen = false;
+			//Prioritize turning to enemy and stand still (if safe) when the player is on the floor
+			if(info.playerOnFloor){
+				boolean playerFaceRight = info.player.direction.getX() > 0;
+				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
+				boolean safeToStand = isSafeToStand(info);
+				if(safeToStand){
+					//Stand still if choice available and already facing enemy
+					if((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)){
+						if(selectedCombination.contains(ButtonCombination.None)){
+							newCombination = ButtonCombination.None;
+							combinationChosen = true;
+						}
+					}
+					//Above criteria not satisfied, try to turn towards enemy. If cannot decide, use retain direction strategy
+					if(!combinationChosen){
+						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, !enemyOnRight, false);
+						if(comb != null){
+							newCombination = comb;
+							combinationChosen = true; 
+						}
 					}
 				}else{
-					//Prioritize previous combination
-					if(comb == currentCombination){
-						return;
-					}
-					//Check if the combination can retain moving direction (left-right only)
-					if(comb.sameMovingDirectionAs(currentCombination)){
-						retained.add(comb);
+					//It's no safe, avoid enemy now! by either runaway or jump toward
+					boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
+					ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, 
+							(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), false);
+					if(comb != null){
+						newCombination = comb;
+						combinationChosen = true; 
 					}
 				}
 			}
-			if(retained.size() > 0){
-				newCombination = retained.get( MathUtils.random(0,retained.size()-1) );
-			}else{
-				newCombination = selectedCombination.get( MathUtils.random(0,selectedCombination.size()-1) );
+			//Retain previous direction strategy
+			if(!combinationChosen){
+				//Try to retain moving direction when jumping
+				List<ButtonCombination> retained = new ArrayList<ButtonCombination>();
+				for(ButtonCombination comb : selectedCombination){
+					if(startFallingDown){
+						//Exclude jumping choice during fall down but direction must be retained
+						if(comb.sameMovingDirectionAs(previousCombination)){
+							retained.add(comb.nonJumpVersion());
+						}
+					}else{
+						//Prioritize previous combination
+						if(comb == previousCombination){
+							return;
+						}
+						//Check if the combination can retain moving direction (left-right only)
+						if(comb.sameMovingDirectionAs(previousCombination)){
+							retained.add(comb);
+						}
+					}
+				}
+				if(retained.size() > 0){
+					newCombination = retained.get( MathUtils.random(0,retained.size()-1) );
+				}else{
+					newCombination = selectedCombination.get( MathUtils.random(0,selectedCombination.size()-1) );
+				}
 			}
 		}else{
 			newCombination = selectedCombination.get(0);
 		}
+		
 		//Decision change, must retain combination for reactionTime
 		if(newCombination != currentCombination){
-			reactionTimeCounter = reactionTime;
+			buttonChangeDelayCounter = buttonChangeDelay;
 		}
 		currentCombination = newCombination;
+	}
+	
+	private boolean isSafeToStand(LevelSnapshot info){
+		return Math.abs(info.playerRect.x - info.enemyRect.x) > ((info.playerRect.width+info.enemyRect.width)/2 + 300);
+	}
+	
+	private boolean shouldRunFromEnemy(LevelSnapshot info){
+		return Math.abs(info.playerRect.x - info.enemyRect.x) > ((info.playerRect.width+info.enemyRect.width)/2 + 64);
+	}
+	
+	private ButtonCombination getCombinationRunTowardEnemy(List<ButtonCombination> combs, boolean left, 
+			boolean prioritizeJump){
+		ButtonCombination result = null;
+		for(ButtonCombination comb : combs){
+			if((comb.leftPressed() && left) || (comb.rightPressed() && !left)){
+				if(result == null || (comb.jumpPressed() && prioritizeJump) || (!comb.jumpPressed() && !prioritizeJump) ){
+					result = comb;
+				}
+			}
+		}
+		return result;
 	}
 	
 	private void pressButtonByCombination(Controller controller, LevelSnapshot info, float delta){
@@ -124,7 +189,7 @@ public class GameAI_v4 extends GameAI {
 		DummyPlayer dummy = new DummyPlayer(info.level, 1);
 		dummy.mimicPlayer(info.player);
 		Rectangle[] rect = dummy.simulatePosition(controller.left, controller.right, controller.up, controller.down, controller.jump,
-				AIConstant.reactionTime, delta);
+				buttonChangeDelay, delta);
 		simulatedPlayerPos = rect;
 	}
 }

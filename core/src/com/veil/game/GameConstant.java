@@ -46,18 +46,22 @@ public class GameConstant {
 	//Task specific variable
 	//==========================================
 	/**
-	 * Turn on/off profiling mode. In profiling mode, player have to rush through all enemies in subdirectory "Rush"
-	 * of agent database directory. The flag must be set before BattleScene creation.
+	 * Turn on/off profiling mode. In profiling mode, player have to rush through randomly selected enemies in subdirectory "Rush"
+	 * of agent database directory. The flag must be set before BattleScene creation. 
 	 */
-	public static final boolean profilingMode = false;
+	public static boolean profilingMode = false;
+	public static int enemyRushCount = -1;
+	public static int eliteRushCount = -1;
+	public static int minibossRushCount = -1;
+	public static int bossRushCount = -1;
 	/**
 	 * Turn on/off range profiling mode (also requires profiling mode ON). In this mode, player have to avoid enemies' attack
 	 * with a single jump. Each battle session end after the first enemy bullet leaves screen. Enemies are taken from
 	 * subdirectory "RangeRush" of agent database directory. Every enemies' name must end with "_X" where X is a number
 	 * indicating its attack speed. The flag must be set before BattleScene creation.
 	 */
-	public static final boolean rangeProfiling = false;
-	public static final int repeat = 3;
+	public static boolean rangeProfiling = false;
+	public static final int repeat = 1; //Repeat x times AFTER face the enemy once
 	/**
 	 * Profile saving directory. Range profile will also be saved here under filename "range_profile.txt"
 	 */
@@ -66,4 +70,6 @@ public class GameConstant {
 	public static final boolean useAI = true;
 	public static final boolean timeStepping = false;
 	public static final boolean debugDrawing = true;
+	
+	//0.0165 sec per frame --> 16.5 ms per frame
 }
