@@ -44,6 +44,8 @@ public class BattleScene implements Screen, LevelContainer{
 	private List<DynamicEntity> pendingSpawnList;
 	private List<DynamicEntity> temporaryDynList;
 	
+	private List<LevelSnapshot> snapshotQueue;
+	
 	private enum EnemyType{ 
 		Enemy, Elite, Miniboss, Boss 
 	}
@@ -491,7 +493,17 @@ public class BattleScene implements Screen, LevelContainer{
 		//=================================================================
 		Controller.instance.preUpdate();
 		if(GameConstant.useAI || GameConstant.profilingMode){
-			LevelSnapshot snapshot = new LevelSnapshot(this, player, permanentDynList, temporaryDynList);
+			if(snapshotQueue == null){
+				snapshotQueue = new LinkedList<LevelSnapshot>();
+			}
+			snapshotQueue.add(new LevelSnapshot(this, player, permanentDynList, temporaryDynList));
+			LevelSnapshot snapshot = null;
+			if(snapshotQueue.size() > 0){
+				snapshot = snapshotQueue.remove(0);
+			}else {
+				snapshot = snapshotQueue.get(0);
+			}
+			
 			if(GameConstant.useAI)
 				GameAI.instance.aiUpdate(Controller.instance, snapshot, delta);
 			if(GameConstant.profilingMode){
