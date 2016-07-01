@@ -16,10 +16,13 @@ public class GameAI_v4 extends GameAI {
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
 	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
+	private final float yDiffShootingMargin = 20;
+	private final int retainDurationAfterRunTowardEnemy = 20;
 	
 	private int buttonChangeDelayCounter = 0;
 	private boolean shootLastFrame;
-	//private boolean playerOnFloorLastFrame;
+	private boolean runningTowardEnemyState;
+	private int runningTowardEnemyStateCounter;
 	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
@@ -30,9 +33,21 @@ public class GameAI_v4 extends GameAI {
 			buttonChangeDelayCounter--;
 		}
 		pressButtonByCombination(controller, info, delta);
-		controller.shoot = !shootLastFrame;
+		
+		//Shooting enemy
+		if(!shootLastFrame){
+			boolean playerFaceRight = info.player.direction.getX() > 0;
+			boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
+			Vector2 playerCenter = Vector2.Zero, enemyCenter = Vector2.Zero;
+			info.playerRect.getCenter(playerCenter);
+			info.enemyRect.getCenter(enemyCenter);
+			boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
+					(info.enemyRect.height+yDiffShootingMargin)/2f;
+			if( ((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)) && enemyInShootingRange){
+				controller.shoot = true;
+			}
+		}
 		shootLastFrame = !shootLastFrame;
-		//playerOnFloorLastFrame = info.playerOnFloor;
 	}
 
 	private ButtonCombination currentCombination = ButtonCombination.None;
@@ -92,7 +107,7 @@ public class GameAI_v4 extends GameAI {
 			ButtonCombination previousCombination = currentCombination;
 			boolean combinationChosen = false;
 			//Prioritize turning to enemy and stand still (if safe) when the player is on the floor
-			if(info.playerOnFloor){
+			if(info.playerOnFloor && !runningTowardEnemyState){
 				boolean playerFaceRight = info.player.direction.getX() > 0;
 				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
 				boolean safeToStand = isSafeToStand(info);
@@ -119,8 +134,18 @@ public class GameAI_v4 extends GameAI {
 							(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), false);
 					if(comb != null){
 						newCombination = comb;
-						combinationChosen = true; 
+						combinationChosen = true;
+						if(!shouldRunFromEnemy){
+							runningTowardEnemyState = true;
+							runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
+						}
 					}
+				}
+			}
+			if(runningTowardEnemyState){
+				runningTowardEnemyStateCounter--;
+				if(runningTowardEnemyStateCounter == 0){
+					runningTowardEnemyState = false;
 				}
 			}
 			//Retain previous direction strategy
