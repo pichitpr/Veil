@@ -6,6 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.veil.ai.DummyPlayer.PlayerFutureState;
 import com.veil.game.element.DynamicEntity;
 
 public class GameAI_v4 extends GameAI {
@@ -18,9 +19,7 @@ public class GameAI_v4 extends GameAI {
 	
 	private int buttonChangeDelayCounter = 0;
 	private boolean shootLastFrame;
-	private boolean playerOnFloorLastFrame;
-	private ButtonCombination lastValidCombination;
-	private boolean facing;
+	//private boolean playerOnFloorLastFrame;
 	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
@@ -33,7 +32,7 @@ public class GameAI_v4 extends GameAI {
 		pressButtonByCombination(controller, info, delta);
 		controller.shoot = !shootLastFrame;
 		shootLastFrame = !shootLastFrame;
-		playerOnFloorLastFrame = info.playerOnFloor;
+		//playerOnFloorLastFrame = info.playerOnFloor;
 	}
 
 	private ButtonCombination currentCombination = ButtonCombination.None;
@@ -58,17 +57,21 @@ public class GameAI_v4 extends GameAI {
 			DummyPlayer dummy = new DummyPlayer(info.level, 1);
 			dummy.mimicPlayer(info.player);
 			
-			Rectangle[] playerFutures = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
+			PlayerFutureState[] playerFutures = dummy.simulatePosition2(btn.leftPressed(), btn.rightPressed(), false, false, 
 					btn.jumpPressed(), simulationFrame, delta);
 			for(int frameRef = 0; frameRef<playerFutures.length; frameRef++){
+				boolean collideWall = false;
+				if(playerFutures[frameRef].hitWall){
+					collideWall = true;
+				}
 				boolean collideEnemy = false;
 				for(Rectangle[] frame : predictedFrames){
-					if(frame[frameRef].overlaps(playerFutures[frameRef])){
+					if(frame[frameRef].overlaps(playerFutures[frameRef].rect)){
 						collideEnemy = true;
 						break;
 					}
 				}
-				if(collideEnemy){
+				if(collideEnemy || collideWall){
 					combinationCost = (simulationFrame-frameRef)/buttonChangeDelay;
 					break;
 				}
@@ -159,11 +162,11 @@ public class GameAI_v4 extends GameAI {
 	}
 	
 	private boolean isSafeToStand(LevelSnapshot info){
-		return Math.abs(info.playerRect.x - info.enemyRect.x) > ((info.playerRect.width+info.enemyRect.width)/2 + 300);
+		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 240;
 	}
 	
 	private boolean shouldRunFromEnemy(LevelSnapshot info){
-		return Math.abs(info.playerRect.x - info.enemyRect.x) > ((info.playerRect.width+info.enemyRect.width)/2 + 64);
+		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 180;
 	}
 	
 	private ButtonCombination getCombinationRunTowardEnemy(List<ButtonCombination> combs, boolean left, 

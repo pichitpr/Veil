@@ -96,4 +96,35 @@ public class DummyPlayer extends Player{
 		}
 		return result;
 	}
+	
+	public static class PlayerFutureState {
+		public Rectangle rect;
+		public boolean hitWall;
+	}
+	
+	public PlayerFutureState[] simulatePosition2(boolean left, boolean right, boolean up, boolean down, boolean jump, 
+			int futureFrame, float simulationDelta){
+		controller.left = left;
+		controller.right = right;
+		controller.up = up;
+		controller.down = down;
+		controller.jump = jump;
+		PlayerFutureState[] result = new PlayerFutureState[futureFrame];
+		Rectangle prevPosition = null, currentPosition;
+		for(int i=1; i<=futureFrame; i++){
+			this.update(simulationDelta);
+			this.flag.clear();
+			this.level.getStaticMap().resolveEnvironmentCollisionFor(this, this.getLastPos());
+			currentPosition = new Rectangle(this.getWorldCollider());
+			result[i-1] = new PlayerFutureState();
+			result[i-1].rect = currentPosition;
+			if(prevPosition != null){
+				if(Math.abs(currentPosition.x-prevPosition.x) <= 0.05f && Math.abs(currentPosition.y-prevPosition.y) <= 0.05f){
+					result[i-1].hitWall = true;
+				}
+			}
+			prevPosition = currentPosition;
+		}
+		return result;
+	}
 }
