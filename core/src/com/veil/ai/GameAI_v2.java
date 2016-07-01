@@ -9,6 +9,10 @@ import com.veil.game.element.DynamicEntity;
 
 public class GameAI_v2 extends GameAI {
 
+	private final int reactionTime = 4;
+	private final int simulationDepth = 6;
+	private final int safeMargin = 5;
+	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
 			float delta) {
@@ -23,7 +27,7 @@ public class GameAI_v2 extends GameAI {
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(
-					AIConstant.reactionTime*AIConstant.simulationDepth + AIConstant.safeMargin
+					reactionTime*simulationDepth + safeMargin
 					);
 			index++;
 		}
@@ -46,11 +50,11 @@ public class GameAI_v2 extends GameAI {
 			//			Cost increased by 1 for each collision
 			//- Cost increased if "next future frame" (the next N frame (N > 1) that AI could change button press) is NOT SAFE.
 			//			Cost increased by C; C = min(All possible future frame cost)
-			futureFrame = AIConstant.reactionTime-1;
+			futureFrame = reactionTime-1;
 			Rectangle nextPlayerFrame = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
-					btn.jumpPressed(), AIConstant.reactionTime, delta)[futureFrame];
+					btn.jumpPressed(), reactionTime, delta)[futureFrame];
 			for(Rectangle[] frame : predictedFrames){
-				for(int j=futureFrame-AIConstant.safeMargin; j<=futureFrame+AIConstant.safeMargin; j++){
+				for(int j=futureFrame-safeMargin; j<=futureFrame+safeMargin; j++){
 					if(j < 0 || j >= frame.length) continue;
 					if(frame[j].overlaps(nextPlayerFrame)){
 						combinationCost++;
@@ -113,11 +117,11 @@ public class GameAI_v2 extends GameAI {
 			int combinationCost = 0;
 			DummyPlayer dummy = new DummyPlayer(info.level, 1);
 			dummy.mimicPlayer(player);
-			int nextfutureFrame = (depth+1)*AIConstant.reactionTime-1;
+			int nextfutureFrame = (depth+1)*reactionTime-1;
 			Rectangle nextPlayerFrame = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
-					btn.jumpPressed(), AIConstant.reactionTime, delta)[AIConstant.reactionTime-1];
+					btn.jumpPressed(), reactionTime, delta)[reactionTime-1];
 			for(Rectangle[] frame : predictedFrames){
-				for(int j=nextfutureFrame-AIConstant.safeMargin; j<=nextfutureFrame+AIConstant.safeMargin; j++){
+				for(int j=nextfutureFrame-safeMargin; j<=nextfutureFrame+safeMargin; j++){
 					if(j < 0 || j >= frame.length) continue;
 					if(frame[j].overlaps(nextPlayerFrame)){
 						combinationCost++;
@@ -128,7 +132,7 @@ public class GameAI_v2 extends GameAI {
 				continue;
 			}
 			
-			if(depth < AIConstant.simulationDepth-1)
+			if(depth < simulationDepth-1)
 				combinationCost += searchMinFutureCost(info, delta, predictedFrames, player, depth+1);
 			
 			if(combinationCost < minCost)
@@ -149,7 +153,7 @@ public class GameAI_v2 extends GameAI {
 		DummyPlayer dummy = new DummyPlayer(info.level, 1);
 		dummy.mimicPlayer(info.player);
 		Rectangle[] rect = dummy.simulatePosition(controller.left, controller.right, controller.up, controller.down, controller.jump,
-				AIConstant.reactionTime, delta);
+				reactionTime, delta);
 		simulatedPlayerPos = rect;
 	}
 	

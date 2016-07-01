@@ -9,6 +9,10 @@ import com.veil.game.element.DynamicEntity;
 
 public class GameAI_v3 extends GameAI {
 
+	private final int reactionTime = 4;
+	private final int simulationDepth = 6;
+	private final int safeMargin = 5;
+	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
 			float delta) {
@@ -23,7 +27,7 @@ public class GameAI_v3 extends GameAI {
 		int index=0;
 		for(DynamicEntity dyn : entityTracker.keySet()){
 			predictedFrames[index] = entityTracker.get(dyn).predictNextFrame(
-					AIConstant.reactionTime*AIConstant.simulationDepth + AIConstant.safeMargin
+					reactionTime*simulationDepth + safeMargin
 					);
 			index++;
 		}
@@ -38,13 +42,13 @@ public class GameAI_v3 extends GameAI {
 			DummyPlayer dummy = new DummyPlayer(info.level, 1);
 			dummy.mimicPlayer(info.player);
 			Rectangle[] playerFutures = dummy.simulatePosition(btn.leftPressed(), btn.rightPressed(), false, false, 
-					btn.jumpPressed(), AIConstant.reactionTime*AIConstant.simulationDepth, delta);
+					btn.jumpPressed(), reactionTime*simulationDepth, delta);
 			for(int frameRef = 0; frameRef<playerFutures.length; frameRef++){
-				int currentDepth = frameRef/AIConstant.simulationDepth;
-				int frameCost = (int)Math.pow(2, AIConstant.simulationDepth-1-currentDepth);
+				int currentDepth = frameRef/simulationDepth;
+				int frameCost = (int)Math.pow(2, simulationDepth-1-currentDepth);
 				for(Rectangle[] frame : predictedFrames){
 					boolean collideWithEnemy = false;
-					for(int j=frameRef-AIConstant.safeMargin; j<=frameRef+AIConstant.safeMargin; j++){
+					for(int j=frameRef-safeMargin; j<=frameRef+safeMargin; j++){
 						if(j < 0 || j >= frame.length) continue;
 						if(frame[j].overlaps(playerFutures[frameRef])){
 							collideWithEnemy = true;
@@ -115,7 +119,7 @@ public class GameAI_v3 extends GameAI {
 		DummyPlayer dummy = new DummyPlayer(info.level, 1);
 		dummy.mimicPlayer(info.player);
 		Rectangle[] rect = dummy.simulatePosition(controller.left, controller.right, controller.up, controller.down, controller.jump,
-				AIConstant.reactionTime, delta);
+				reactionTime, delta);
 		simulatedPlayerPos = rect;
 	}
 }

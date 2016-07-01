@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.veil.game.GameConstant;
 
 public class FrameHistoryBuffer {
 	
@@ -17,7 +18,7 @@ public class FrameHistoryBuffer {
 	
 	public FrameHistoryBuffer(){
 		buf = new LinkedList<Rectangle>();
-		bufSize = AIConstant.historyBufferSize;
+		bufSize = GameConstant.historyBufferSize;
 	}
 	
 	public List<Rectangle> getBuffer(){
@@ -79,8 +80,8 @@ public class FrameHistoryBuffer {
 			if(frame > 0){
 				currentDisplacement = new Vector2(rect.x - prevFrame.x, rect.y - prevFrame.y);
 				if(frame > 1){
-					if(Math.abs(currentDisplacement.len() - prevDisplacement.len()) > AIConstant.distanceChangeThreshold || 
-							Math.abs(prevDisplacement.angle(currentDisplacement)) > AIConstant.directionChangeThreshold){
+					if(Math.abs(currentDisplacement.len() - prevDisplacement.len()) > GameConstant.distanceChangeThreshold || 
+							Math.abs(prevDisplacement.angle(currentDisplacement)) > GameConstant.directionChangeThreshold){
 						firstValidFrame = frame-1;
 					}
 				}

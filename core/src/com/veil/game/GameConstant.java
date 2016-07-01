@@ -45,6 +45,20 @@ public class GameConstant {
 	//==========================================
 	//Task specific variable
 	//==========================================
+	
+	/**
+	 * History buffer size
+	 */
+	public static int historyBufferSize = 5;
+	/**
+	 * Change threshold that will cause frame[x-2] obsolete when calculating change at frame[x]
+	 */
+	public static float distanceChangeThreshold = 15; //unit in pixel
+	/**
+	 * See distanceChangeThreshold
+	 */
+	public static float directionChangeThreshold = 20; //unit in degree
+	
 	/**
 	 * Turn on/off profiling mode. In profiling mode, player have to rush through randomly selected enemies in subdirectory "Rush"
 	 * of agent database directory. The flag must be set before BattleScene creation. 
