@@ -40,9 +40,9 @@ public class TheGame extends Game {
         batch = new SpriteBatch();
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
-        font.setScale(2);
         
-        this.setScreen(new BattleScene(this));
+        
+        this.setScreen(new InfoScene(this,0));
     }
 
     public void render() {
@@ -50,7 +50,37 @@ public class TheGame extends Game {
     }
 
     public void dispose() {
+    	shapeBatch.dispose();
         batch.dispose();
         font.dispose();
+    }
+    
+    private int sequence = 0;
+    
+    public void nextScene(){
+    	switch(sequence){
+    	case 0: case 2: case 4:
+    		this.setScreen(new InfoScene(this,sequence));
+    		break;
+    	case 1: 
+    		GameConstant.profilingMode = false;
+    		GameConstant.rangeProfiling = false;
+    		this.setScreen(new BattleScene(this));
+    		break;
+    	case 3:
+    		GameConstant.profilingMode = true;
+    		GameConstant.rangeProfiling = true;
+    		this.setScreen(new BattleScene(this));
+    		break;
+    	case 6:
+    		GameConstant.profilingMode = true;
+    		GameConstant.rangeProfiling = false;
+    		this.setScreen(new BattleScene(this));
+    		break;
+    	case 7:
+    		Gdx.app.exit();
+    		return;
+    	}
+    	sequence++;
     }
 }

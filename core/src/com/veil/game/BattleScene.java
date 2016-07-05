@@ -165,7 +165,8 @@ public class BattleScene implements Screen, LevelContainer{
 			}
 			if(rushList.size() == 0){
 				RangeProfile.instance.reset(GameConstant.profileDir);
-				Gdx.app.exit();
+				//Gdx.app.exit();
+				battleScene.game.nextScene();
 				return;
 			}
 			currentEnemy = rushList.remove(0);
@@ -290,7 +291,8 @@ public class BattleScene implements Screen, LevelContainer{
 			}
 			if(rushList.size() == 0){
 				BattleProfile.instance.saveAndReset(null, unbeatable, currentRushList.profileDir);
-				Gdx.app.exit();
+				//Gdx.app.exit();
+				battleScene.game.nextScene();
 				return;
 			}
 			currentRushListIndex = random.nextInt(rushList.size());
@@ -522,6 +524,10 @@ public class BattleScene implements Screen, LevelContainer{
 		if(GameConstant.profilingMode){
 			BattleProfile.instance.postUpdate();
 			rushManager.postUpdate();
+		}else{
+			if(enemy == null || enemy.shouldBeRemovedFromWorld()){
+				game.nextScene();
+			}
 		}
 	}
 
@@ -704,8 +710,9 @@ public class BattleScene implements Screen, LevelContainer{
 		for(DynamicEntity dyn : temporaryDynList){
 			dyn.render(game.batch,game.region);
 		}
+		game.font.setScale(2);
 		//game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
-		game.font.draw(game.batch, "HP:"+enemy.getBaseHP()+"  "+enemy.identifier, GameConstant.screenW/2, GameConstant.screenH-20);
+		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
 		game.batch.end();
 	}
 	

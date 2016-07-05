@@ -1,0 +1,131 @@
+package com.veil.game;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.veil.ai.Controller;
+
+public class InfoScene implements Screen{
+
+	final TheGame game;
+	private OrthographicCamera camera;
+	private Texture tx = null;
+	
+	private int sceneSequence;
+	
+	public InfoScene(TheGame game, int sequence){
+		this.game = game;
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, GameConstant.screenW, GameConstant.screenH);
+		sceneSequence = sequence;
+		if(sequence == 0 && Controller.instance.isUsingController()){
+			tx = new Texture(Gdx.files.internal("controller.png"));
+		}
+	}
+	
+	@Override
+	public void render(float delta) {
+		Controller.instance.preUpdate();
+		if(Controller.instance.pause){
+			game.nextScene();
+			return;
+		}
+		
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		camera.update();
+		game.batch.setProjectionMatrix(camera.combined);
+		
+		game.batch.begin();
+		game.font.setScale(1);
+		
+		switch(sceneSequence){
+		case 0:
+			game.font.draw(game.batch, 
+					"This experiment collects player's action overtime to be used in game AI evaluation", 
+					20, GameConstant.screenH-20);
+			game.font.draw(game.batch, 
+					"In the first session, you'll have to defeat an enemy. An enemy can be beaten by bullet", 
+					20, GameConstant.screenH-50);
+			game.font.draw(game.batch, 
+					"Controlling scheme is shown below.", 
+					20, GameConstant.screenH-80);
+			if(Controller.instance.isUsingController()){
+				game.batch.draw(tx, (GameConstant.screenW-tx.getWidth())/2, (GameConstant.screenH-tx.getHeight())/2, 
+						tx.getWidth(), tx.getHeight());
+			}else{
+				game.font.draw(game.batch, "[Left][Right] Move player", 100, GameConstant.screenH/2+60);
+				game.font.draw(game.batch, "[Z] Jump", 100, GameConstant.screenH/2+20);
+				game.font.draw(game.batch, "[X] Shoot", 100, GameConstant.screenH/2-20);
+				game.font.draw(game.batch, "[Esc] Skip battle", 100, GameConstant.screenH/2-60);
+			}
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			break;
+		case 2:
+			game.font.draw(game.batch, 
+					"In the next session, you'll have to dodge enemy's attack by jumping.", 
+					20, GameConstant.screenH-20);
+			game.font.draw(game.batch, 
+					"You can jump only ONCE for each battle. After you either successfully dodge", 
+					20, GameConstant.screenH-50);
+			game.font.draw(game.batch, 
+					"or fail, skip the current battle.", 
+					20, GameConstant.screenH-80);
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			break;
+		case 4:
+			game.font.draw(game.batch, 
+					"In the final session, you'll have to fight against random enemies. Do your best!", 
+					20, GameConstant.screenH-20);
+			game.font.draw(game.batch, 
+					"However, if the enemy is unbeatable, you can just skip the battle", 
+					20, GameConstant.screenH-50);
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			break;
+		}
+		
+		game.batch.end();
+	}
+	
+	//=======================================
+	
+	@Override
+	public void show() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		if(tx != null){
+			tx.dispose();
+		}
+	}
+
+}

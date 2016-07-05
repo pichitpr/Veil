@@ -78,6 +78,9 @@ public class Controller {
 		7: R2
 		8: Select
 		9: Start
+		
+		PovDirection controllerPOV = controller.getPov(0);
+		if(PovDirection == PovDirection.north)
 		*/
 		float x = extController.getAxis(3);
 		float y = extController.getAxis(2);
@@ -100,5 +103,9 @@ public class Controller {
 		if(extController.getButton(9)){
 			pause = true;
 		}
+	}
+	
+	public boolean isUsingController(){
+		return extController != null;
 	}
 }
