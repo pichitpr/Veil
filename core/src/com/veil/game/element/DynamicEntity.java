@@ -53,6 +53,8 @@ public abstract class DynamicEntity extends Entity{
 	public EventFlag flag;
 	private int outScreenTimeCount = 0;
 	
+	public boolean noAutoDespawn = false;
+	
 	public DynamicEntity(LevelContainer level, Rectangle collider, int texture) {
 		super(collider, texture);
 		this.identifier = "^";
@@ -212,8 +214,10 @@ public abstract class DynamicEntity extends Entity{
 		}else{
 			outScreenTimeCount = 0;
 		}
-		if(outScreenTimeCount > GameConstant.autoDespawnTime){
-			despawn();
+		if(!noAutoDespawn){
+			if(outScreenTimeCount > GameConstant.autoDespawnTime){
+				despawn();
+			}
 		}
 	}
 	

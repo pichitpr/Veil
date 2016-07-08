@@ -285,7 +285,7 @@ public class BattleScene implements Screen, LevelContainer{
 		@Override
 		protected void endCurrentSessionAndSetupNextEnemy(boolean unbeatable) {
 			RushList currentRushList = rushList.get(currentRushListIndex);
-			currentRushList.finishCurrentEnemy(false);
+			currentRushList.finishCurrentEnemy(unbeatable);
 			if(currentRushList.isRushEnd()){
 				rushList.remove(currentRushListIndex);
 			}
@@ -327,6 +327,7 @@ public class BattleScene implements Screen, LevelContainer{
 		player = new Player(this, 1);
 		player.setBaseHP(1000);
 		player.maxhp = 1000;
+		player.noAutoDespawn = true;
 		permanentDynList = new ArrayList<DynamicEntity>();
 		pendingSpawnList = new ArrayList<DynamicEntity>();
 		//permanentDynList.add(new ScriptedEntity(this, new Rectangle(400,70,32,32), 2));
@@ -469,11 +470,13 @@ public class BattleScene implements Screen, LevelContainer{
 		player = new Player(this, 1);
 		player.setBaseHP(10000000);
 		player.maxhp = 10000000;
+		player.noAutoDespawn = true;
 		permanentDynList = new ArrayList<DynamicEntity>();
 		pendingSpawnList = new ArrayList<DynamicEntity>();
 		temporaryDynList = new ArrayList<DynamicEntity>();
 		permanentDynList.add(new ScriptedEntity(this, enemyName));
 		enemy = permanentDynList.get(0);
+		enemy.noAutoDespawn = true;
 	}
 	
 	@Override

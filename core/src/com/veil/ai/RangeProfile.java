@@ -17,6 +17,7 @@ import java.util.List;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.veil.game.GameConstant;
+import com.veil.game.element.DynamicEntity;
 
 public class RangeProfile {
 	
@@ -115,7 +116,7 @@ public class RangeProfile {
 	private HashMap<Integer, DistanceLog> logs = new HashMap<Integer, DistanceLog>();
 	private boolean sessionLogged = false;
 	private int pendingSpeed, pendingDistance;
-	private boolean playerDamaged;
+	private boolean playerDamaged, bulletPassPlayer;
 	
 	private FileHandle ssDir;
 	private int ssFilename;
@@ -142,6 +143,7 @@ public class RangeProfile {
 		pendingSpeed = -1;
 		pendingDistance = -1;
 		playerDamaged = false;
+		bulletPassPlayer = false;
 		sessionLogged = false;
 		logs.clear();
 	}
@@ -166,25 +168,34 @@ public class RangeProfile {
 		if(snapshot.player.getBaseHP() < snapshot.player.maxhp){
 			playerDamaged = true;
 		}
+		for(DynamicEntity dyn : snapshot.tempRect.keySet()){
+			if(dyn.getWorldCollider().x < snapshot.player.getWorldCollider().x){
+				bulletPassPlayer = true;
+			}
+		}
 	}
 	
 	/**
 	 * Call when current range profiling session should end. Return true if the player is damaged during the session
+	 * OR the session ends prematurely (end before enemy's first shoot)
 	 */
 	public boolean onSessionEnd(){
 		boolean isPlayerDamaged = playerDamaged;
-		if(sessionLogged && pendingSpeed > -1){
+		boolean isBulletPassPlayer = bulletPassPlayer;
+		//Check condition, prevent logging when session ends prematurely
+		if(sessionLogged && pendingSpeed > -1 && (isPlayerDamaged || isBulletPassPlayer)){
 			if(!logs.containsKey(pendingSpeed)){
 				logs.put(pendingSpeed, new DistanceLog(pendingSpeed));
 			}
-			logs.get(pendingSpeed).add(pendingDistance, playerDamaged);
+			logs.get(pendingSpeed).add(pendingDistance, isPlayerDamaged);
 			//System.out.println(logs.get(pendingSpeed));
 		}
 		pendingSpeed = -1;
 		pendingDistance = -1;
 		playerDamaged = false;
+		bulletPassPlayer = false;
 		sessionLogged = false;
-		return isPlayerDamaged;
+		return isPlayerDamaged || !isBulletPassPlayer;
 	}
 	
 	public void print(){
