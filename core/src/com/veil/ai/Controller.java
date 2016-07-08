@@ -3,6 +3,7 @@ package com.veil.ai;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.controllers.PovDirection;
 import com.veil.game.GameConstant;
 
 public class Controller {
@@ -11,6 +12,7 @@ public class Controller {
 	
 	public boolean up,down,left,right,jump,shoot,pause;
 	private com.badlogic.gdx.controllers.Controller extController = null;
+	private boolean extControllerPauseLastFrame = false;
 	
 	public void setup(){
 		extController = null;
@@ -94,6 +96,20 @@ public class Controller {
 		}else if(y > 0.7f){
 			down = true;
 		}
+		/*
+		PovDirection controllerPOV = extController.getPov(0);
+		switch(controllerPOV){
+		case north: up = true; break;
+		case east: right = true; break;
+		case south: down = true; break;
+		case west: left = true; break;
+		case northEast: right = true; up = true; break;
+		case northWest: left = true; up = true; break;
+		case southEast: right = true; down = true; break;
+		case southWest: left = true; down = true; break;
+		default:
+		}
+		*/
 		if(extController.getButton(1)){
 			jump = true;
 		}
@@ -101,7 +117,12 @@ public class Controller {
 			shoot = true;
 		}
 		if(extController.getButton(9)){
-			pause = true;
+			if(!extControllerPauseLastFrame){
+				extControllerPauseLastFrame = true;
+				pause = true;
+			}
+		}else{
+			extControllerPauseLastFrame = false;
 		}
 	}
 	
