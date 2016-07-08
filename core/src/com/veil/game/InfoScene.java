@@ -46,7 +46,6 @@ public class InfoScene implements Screen{
 		switch(sceneSequence){
 		case 0:
 			drawMultiline(new String[]{
-					"This experiment collects player's action overtime to be used in game AI evaluation",
 					"In the first session, you'll have to defeat an enemy. An enemy can be beaten by bullet",
 					"Controlling scheme is shown below."
 			}, 20, GameConstant.screenH-20, 30, game.batch, game.font);
@@ -106,7 +105,7 @@ public class InfoScene implements Screen{
 		case 4:
 			drawMultiline(new String[]{
 					"In the final session, you'll have to fight against random enemies. Do your best!", 
-					"However, if the enemy is unbeatable, you can just skip the battle"
+					"However, if the enemy is unbeatable for any reason, you can just skip the battle"
 			}, 20, GameConstant.screenH-20, 30, game.batch, game.font);
 			/*
 			game.font.draw(game.batch, 
