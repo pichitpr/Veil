@@ -77,6 +77,7 @@ public class InfoScene implements Screen{
 				game.font.draw(game.batch, "[Esc] Skip battle", 100, GameConstant.screenH/2-60);
 				*/
 			}
+			game.font.draw(game.batch, "You can shoot AFTER a battle has been going on for 2 seconds.", 20, 120);
 			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
 			break;
 		case 2:

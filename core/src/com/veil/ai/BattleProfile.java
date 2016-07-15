@@ -166,26 +166,31 @@ public class BattleProfile {
 	
 	private boolean startProfile;
 	private String name;
-	private boolean unbeatable;
+	private boolean unbeatable, playerDead;
 	private HashMap<Integer,EnemyLog> logs = new HashMap<Integer,EnemyLog>();
 	private int frameCounter = 0;
 	
 	public BattleProfile(){
-		saveAndReset(null,false,null);
+		saveAndReset(null,BattleSessionEndReason.InitialSession,null);
 	}
 	
 	/**
 	 * Save previous profile (if available) to target directory and reset with new profile name ready to be updated
 	 */
-	public void saveAndReset(String newProfileName, boolean resetFromUnbeatable, FileHandle dir){
+	public void saveAndReset(String newProfileName, BattleSessionEndReason endReason, FileHandle dir){
 		if(name != null && dir != null){
-			unbeatable = resetFromUnbeatable;
+			unbeatable = endReason == BattleSessionEndReason.Unbeatable;
+			playerDead = endReason == BattleSessionEndReason.PlayerDead;
 			//Should save profile before resetting
-			save(dir.child((resetFromUnbeatable ? "_" : "")+name+".txt"));
+			String filename = name+".txt";
+			if(unbeatable) filename = "_"+filename;
+			if(playerDead) filename = "-"+filename;
+			save(dir.child(filename));
 		}
 		startProfile = false;
 		name = newProfileName;
 		unbeatable = false;
+		playerDead = false;
 		logs.clear();
 		frameCounter = 0;
 	}
@@ -247,6 +252,7 @@ public class BattleProfile {
 		try {
 			out = new ObjectOutputStream(bos);
 			out.writeBoolean(unbeatable);
+			out.writeBoolean(playerDead);
 			out.writeInt(logs.size());
 			for(EnemyLog log : logs.values()){
 				out.writeObject(log);
@@ -318,6 +324,7 @@ public class BattleProfile {
 			name = fh.nameWithoutExtension();
 			in = new ObjectInputStream(bis);
 			unbeatable = in.readBoolean();
+			playerDead = in.readBoolean();
 			int remaining = in.readInt();
 			logs.clear();
 			while(remaining > 0){

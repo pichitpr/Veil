@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Rectangle;
 import com.veil.adl.AgentDatabase;
 import com.veil.ai.BattleProfile;
+import com.veil.ai.BattleSessionEndReason;
 import com.veil.ai.Controller;
 import com.veil.ai.GameAI;
 import com.veil.ai.LevelSnapshot;
@@ -46,6 +47,8 @@ public class BattleScene implements Screen, LevelContainer{
 	
 	private List<LevelSnapshot> snapshotQueue;
 	
+	private float noShootDelay;
+	
 	private enum EnemyType{ 
 		Enemy, Elite, Miniboss, Boss 
 	}
@@ -72,7 +75,7 @@ public class BattleScene implements Screen, LevelContainer{
 		/**
 		 * End current battle session, then setup next enemy.
 		 */
-		protected abstract void endCurrentSessionAndSetupNextEnemy(boolean unbeatable);
+		protected abstract void endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason endReason);
 		
 		public void setup(){
 			setupEnemyList();
@@ -84,7 +87,7 @@ public class BattleScene implements Screen, LevelContainer{
 				if(firstEnemy){
 					firstEnemy = false;
 				}else{
-					endCurrentSessionAndSetupNextEnemy(false);
+					endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.PlayerWin);
 				}
 				battleScene.setupScene(currentEnemy);
 				if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
@@ -105,9 +108,16 @@ public class BattleScene implements Screen, LevelContainer{
 				if(battleScene.enemy.shouldBeRemovedFromWorld()){
 					//If enemy is just dead, end the session in next 100 frames
 					nextEnemyDelayCounter = 100;
-				}else if(Controller.instance.pause){
+				} else if(battleScene.player.shouldBeRemovedFromWorld()){
+					//Player is dead, end the session immediately
+					endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.PlayerDead);
+					battleScene.setupScene(currentEnemy);
+					if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
+						battleScene.enemy.invulFrame = 30;
+					}
+				} else if(Controller.instance.pause){
 					//If enemy is deemed unbeatable, end the session immediately
-					endCurrentSessionAndSetupNextEnemy(true);
+					endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.Unbeatable);
 					battleScene.setupScene(currentEnemy);
 					if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
 						battleScene.enemy.invulFrame = 30;
@@ -155,9 +165,9 @@ public class BattleScene implements Screen, LevelContainer{
 		}
 
 		@Override
-		protected void endCurrentSessionAndSetupNextEnemy(boolean unbeatable) {
+		protected void endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason endReason) {
 			boolean reappend = false;
-			if(RangeProfile.instance.onSessionEnd()){
+			if(RangeProfile.instance.onSessionEnd() || endReason == BattleSessionEndReason.PlayerDead){
 				reappend = true;
 			}
 			if(reappend){
@@ -279,18 +289,18 @@ public class BattleScene implements Screen, LevelContainer{
 			currentRushListIndex = random.nextInt(rushList.size());
 			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
 			currentType = rushList.get(currentRushListIndex).getCurrentType();
-			BattleProfile.instance.saveAndReset(currentEnemy, false, null);
+			BattleProfile.instance.saveAndReset(currentEnemy, BattleSessionEndReason.InitialSession, null);
 		}
 
 		@Override
-		protected void endCurrentSessionAndSetupNextEnemy(boolean unbeatable) {
+		protected void endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason endReason) {
 			RushList currentRushList = rushList.get(currentRushListIndex);
-			currentRushList.finishCurrentEnemy(unbeatable);
+			currentRushList.finishCurrentEnemy(endReason == BattleSessionEndReason.Unbeatable);
 			if(currentRushList.isRushEnd()){
 				rushList.remove(currentRushListIndex);
 			}
 			if(rushList.size() == 0){
-				BattleProfile.instance.saveAndReset(null, unbeatable, currentRushList.profileDir);
+				BattleProfile.instance.saveAndReset(null, endReason, currentRushList.profileDir);
 				//Gdx.app.exit();
 				battleScene.game.nextScene();
 				return;
@@ -298,7 +308,7 @@ public class BattleScene implements Screen, LevelContainer{
 			currentRushListIndex = random.nextInt(rushList.size());
 			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
 			currentType = rushList.get(currentRushListIndex).getCurrentType();
-			BattleProfile.instance.saveAndReset(currentEnemy, unbeatable, currentRushList == null ? null : currentRushList.profileDir);
+			BattleProfile.instance.saveAndReset(currentEnemy, endReason, currentRushList == null ? null : currentRushList.profileDir);
 		}
 	}
 	
@@ -325,9 +335,10 @@ public class BattleScene implements Screen, LevelContainer{
 	
 	private void setupSceneManually(){
 		player = new Player(this, 1);
-		player.setBaseHP(1000);
-		player.maxhp = 1000;
+		player.setBaseHP(20);
+		player.maxhp = 20;
 		player.noAutoDespawn = true;
+		player.superArmor = true;
 		permanentDynList = new ArrayList<DynamicEntity>();
 		pendingSpawnList = new ArrayList<DynamicEntity>();
 		//permanentDynList.add(new ScriptedEntity(this, new Rectangle(400,70,32,32), 2));
@@ -463,20 +474,23 @@ public class BattleScene implements Screen, LevelContainer{
 		
 		enemy = permanentDynList.get(0);
 		enemy.invulFrame = 30;
+		noShootDelay = 2;
 	}
 	
 	private void setupScene(String enemyName){
 		if(!GameConstant.profilingMode) return;
 		player = new Player(this, 1);
-		player.setBaseHP(10000000);
-		player.maxhp = 10000000;
+		player.setBaseHP(20);
+		player.maxhp = 20;
 		player.noAutoDespawn = true;
+		player.superArmor = true;
 		permanentDynList = new ArrayList<DynamicEntity>();
 		pendingSpawnList = new ArrayList<DynamicEntity>();
 		temporaryDynList = new ArrayList<DynamicEntity>();
 		permanentDynList.add(new ScriptedEntity(this, enemyName));
 		enemy = permanentDynList.get(0);
 		enemy.noAutoDespawn = true;
+		noShootDelay = 2;
 	}
 	
 	@Override
@@ -517,6 +531,10 @@ public class BattleScene implements Screen, LevelContainer{
 					RangeProfile.instance.preUpdate(snapshot);
 				}
 			}
+		}
+		if(noShootDelay > 0){
+			noShootDelay -= delta;
+			Controller.instance.shoot = false;
 		}
 		
 		update(delta);
@@ -714,8 +732,10 @@ public class BattleScene implements Screen, LevelContainer{
 			dyn.render(game.batch,game.region);
 		}
 		game.font.setScale(2);
-		//game.font.draw(game.batch, "HP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
+		game.font.draw(game.batch, "MyHP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
 		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
+		if(noShootDelay > 0)
+			game.font.draw(game.batch, "NO SHOOT", GameConstant.screenW/2+100, GameConstant.screenH-20);
 		game.batch.end();
 	}
 	
