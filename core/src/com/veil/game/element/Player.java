@@ -18,6 +18,8 @@ public class Player extends DynamicEntity{
 	protected boolean pressShoot = false;
 	private int shootingFrameCounter = 0;
 	
+	public boolean superArmor = false;
+	
 	public Player(LevelContainer level, int texture) {
 		super(level, new Rectangle(50,500,32,48), texture);
 		group = Group.ALLY;
@@ -101,7 +103,7 @@ public class Player extends DynamicEntity{
 					//Inflict damage
 					if(!this.invul && invulFrameCounter <= 0){
 						dyn.flag.damage = true;
-						this.hp -= dyn.atk;
+						this.hp -= (superArmor ? 1 : dyn.atk);
 						if(this.hp < 0)
 							this.hp = 0;
 						invulFrameCounter = invulFrame;
