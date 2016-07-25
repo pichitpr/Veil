@@ -98,6 +98,7 @@ public class BattleProfile {
 				out.writeInt(data);
 			}
 			if(isMainAgent){
+				out.writeInt(lastHP);
 				out.writeInt(damagedFrame.size());
 				for(int data : damagedFrame){
 					out.writeInt(data);
@@ -121,6 +122,7 @@ public class BattleProfile {
 				hitPlayerFrame.add(in.readInt());
 			}
 			if(isMainAgent){
+				lastHP = in.readInt();
 				damagedFrame = new LinkedList<Integer>();
 				listSize = in.readInt();
 				for(int i=0; i<listSize; i++){
@@ -167,6 +169,7 @@ public class BattleProfile {
 	private boolean startProfile;
 	private String name;
 	private boolean unbeatable, playerDead;
+	private int playerRemainingHP = -1; //This field may be inaccurate (if battle is skipped during the frame the player loses HP)
 	private HashMap<Integer,EnemyLog> logs = new HashMap<Integer,EnemyLog>();
 	private int frameCounter = 0;
 	
@@ -191,6 +194,7 @@ public class BattleProfile {
 		name = newProfileName;
 		unbeatable = false;
 		playerDead = false;
+		playerRemainingHP = -1;
 		logs.clear();
 		frameCounter = 0;
 	}
@@ -223,6 +227,7 @@ public class BattleProfile {
 			}
 			logs.get(dyn.hashCode()).onPreupdate();
 		}
+		playerRemainingHP = snapshot.player.getBaseHP();
 	}
 	
 	public void hitPlayer(DynamicEntity attacker){
@@ -253,6 +258,7 @@ public class BattleProfile {
 			out = new ObjectOutputStream(bos);
 			out.writeBoolean(unbeatable);
 			out.writeBoolean(playerDead);
+			out.writeInt(playerRemainingHP);
 			out.writeInt(logs.size());
 			for(EnemyLog log : logs.values()){
 				out.writeObject(log);
@@ -267,46 +273,65 @@ public class BattleProfile {
 	/**
 	 * Calculate necessary parameters required to evaluate battle profile from existing profiles in specified directory. <br/>
 	 * Return length-3 array <br/>
-	 * [0] = (int) Battle timelimit
-	 * [1] = (float) Good evasion rate (AI must perform at equal or higher rate)
-	 * [2] = (float) Good remaining HP percentage (AI must perform at equal or lower percentage)
+	 * [0] = (int) Battle duration (used to set battle timelimit for AI)
+	 * [1] = (float) Good evasion rate (AI must perform at similar rate)
+	 * [2] = (float) Good remaining HP percentage (AI must perform at similar percentage)
 	 */
 	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange){
 		float[] params = new float[3];
-		int sampleSize = calculateTotalTimelimit(dir, params);
+		int sampleSize = calculateTotalBattleDuration(dir, params);
 		params[0] /= sampleSize;
-		sampleSize = calculateTotalRate(dir, params, relevantRange, (int)params[0]);
+		sampleSize = calculateEvasionRate(dir, params, relevantRange);
 		params[1] /= sampleSize;
+		sampleSize = calculateHPPercent(dir, params, (int)params[0]);
 		params[2] /= sampleSize;
 		return params;
 	}
 	
-	private static int calculateTotalTimelimit(FileHandle dir, float[] out){
+	private static int calculateTotalBattleDuration(FileHandle dir, float[] out){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
-				out[0] += profile.getTimelimit();
-				sampleSize++;
+				if(profile.isValidForBattleDuration()){
+					out[0] += profile.getBattleDuration();
+					sampleSize++;
+				}
 			}else{
-				sampleSize += calculateTotalTimelimit(fh, out);
+				sampleSize += calculateTotalBattleDuration(fh, out);
 			}
 		}
 		return sampleSize;
 	}
 	
-	private static int calculateTotalRate(FileHandle dir, float[] out, int relevantRange, int averageTimelimit){
+	private static int calculateEvasionRate(FileHandle dir, float[] out, int relevantRange){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
 				out[1] += profile.getEvasionRate(relevantRange);
-				out[2] += profile.getRemainingHPPercent(averageTimelimit);
 				sampleSize++;
 			}else{
-				sampleSize += calculateTotalRate(fh, out, relevantRange, averageTimelimit);
+				sampleSize += calculateEvasionRate(fh, out, relevantRange);
+			}
+		}
+		return sampleSize;
+	}
+	
+	private static int calculateHPPercent(FileHandle dir, float[] out, int averageTimelimit){
+		int sampleSize = 0;
+		for(FileHandle fh : dir.list()){
+			if(!fh.isDirectory()){
+				BattleProfile profile = new BattleProfile();
+				profile.load(fh);
+				if(profile.isValidForRemainingHP()){
+					out[2] += profile.getRemainingHPPercent(averageTimelimit);
+					sampleSize++;
+				}
+			}else{
+				sampleSize += calculateHPPercent(fh, out, averageTimelimit);
 			}
 		}
 		return sampleSize;
@@ -325,6 +350,7 @@ public class BattleProfile {
 			in = new ObjectInputStream(bis);
 			unbeatable = in.readBoolean();
 			playerDead = in.readBoolean();
+			playerRemainingHP = in.readInt();
 			int remaining = in.readInt();
 			logs.clear();
 			while(remaining > 0){
@@ -332,33 +358,67 @@ public class BattleProfile {
 				remaining--;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("Error loading battle profile "+fh.nameWithoutExtension());
 		}
 	}
 	
-	private int getTimelimit(){
+	private boolean isValidForBattleDuration(){
+		if(unbeatable) return false;
+		if(playerDead){
+			for(EnemyLog log : logs.values()){
+				if(log.isMainAgent){
+					return log.lastHP < log.maxHP;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private boolean isValidForRemainingHP(){
+		return isValidForBattleDuration();
+	}
+	
+	private int getBattleDuration(){
 		int timelimit = 0;
+		EnemyLog mainAgent = null;
 		for(EnemyLog log : logs.values()){
 			int afterLastFrame = log.startFrame+log.lifetime;
 			if(afterLastFrame > timelimit){
 				timelimit = afterLastFrame;
 			}
+			if(log.isMainAgent){
+				mainAgent = log;
+			}
 		}
+		if(playerDead && mainAgent.lastHP > 0){
+			//Extrapolate timelimit based on main agent's remaining HP in case player is dead
+			int damageDealtToEnemy = mainAgent.maxHP - mainAgent.lastHP;
+			timelimit = (int)(timelimit * mainAgent.maxHP * 1f / damageDealtToEnemy);
+		}
+		//System.out.println("time "+name+" "+timelimit);
 		return timelimit;
 	}
 	
-	private float getEvasionRate(int relevantRange){
+	private float getEvasionRate(final int relevantRange){
 		HashSet<EnemyLog> set = new HashSet<EnemyLog>();
 		set.addAll(logs.values());
 		set.removeIf(log -> !log.everCloseToPlayer(relevantRange));
+		if(set.size() == 0){
+			return 0;
+		}
+		int relevantRangeSq = relevantRange*relevantRange;
 		int hitCount = 0;
 		for(EnemyLog log : set){
+			//Count each enemy once if collides
 			for(int frame : log.hitPlayerFrame){
-				if(log.distSq.get(frame) <= relevantRange){
+				if(log.distSq.get(frame) <= relevantRangeSq){
 					hitCount++;
+					break;
 				}
 			}
 		}
+		//System.out.println("eva "+name+" "+hitCount+" "+set.size());
 		return Math.min(1, hitCount*1f/set.size());
 	}
 	
@@ -375,6 +435,7 @@ public class BattleProfile {
 				if(remainingHp < 0){
 					remainingHp = 0;
 				}
+				//System.out.println("hp "+name+" "+remainingHp+"("+log.lastHP+") /"+log.maxHP);
 				return remainingHp*1f/log.maxHP;
 			}
 		}
