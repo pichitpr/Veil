@@ -78,7 +78,7 @@ public class InfoScene implements Screen{
 				*/
 			}
 			game.font.draw(game.batch, "You can shoot AFTER a battle has been going on for 2 seconds.", 20, 120);
-			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue. (May need to press twice)", 20, 80);
 			break;
 		case 2:
 			drawMultiline(new String[]{
@@ -101,12 +101,13 @@ public class InfoScene implements Screen{
 					"or fail, you have to SKIP the current battle MANUALLY.", 
 					20, GameConstant.screenH-110);
 					*/
-			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue. (May need to press twice)", 20, 80);
 			break;
 		case 4:
 			drawMultiline(new String[]{
 					"In the final session, you'll have to fight against random enemies. Do your best!", 
-					"However, if the enemy is unbeatable for any reason, you can just skip the battle"
+					"However, if the enemy is unbeatable for any reason, you can just skip the battle.",
+					"The game will be automatically closed when this session end"
 			}, 20, GameConstant.screenH-20, 30, game.batch, game.font);
 			/*
 			game.font.draw(game.batch, 
@@ -116,7 +117,7 @@ public class InfoScene implements Screen{
 					"However, if the enemy is unbeatable, you can just skip the battle", 
 					20, GameConstant.screenH-50);
 					*/
-			game.font.draw(game.batch, "Press \"Skip battle\" to continue.", 20, 80);
+			game.font.draw(game.batch, "Press \"Skip battle\" to continue. (May need to press twice)", 20, 80);
 			break;
 		}
 		
