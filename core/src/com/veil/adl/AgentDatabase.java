@@ -163,7 +163,7 @@ public class AgentDatabase {
 				if(!parseScriptInDir(f))
 					return false;
 			}else{
-				if(f.name().startsWith("_")){
+				if(f.name().startsWith("^")){
 					continue;
 				}
 				System.out.println("Parsing & compiling file : "+f.name());
