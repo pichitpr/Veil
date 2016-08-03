@@ -36,15 +36,17 @@ public class GameAI_v4 extends GameAI {
 		
 		//Shooting enemy
 		if(!shootLastFrame){
-			boolean playerFaceRight = info.player.direction.getX() > 0;
-			boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
-			Vector2 playerCenter = Vector2.Zero, enemyCenter = Vector2.Zero;
-			info.playerRect.getCenter(playerCenter);
-			info.enemyRect.getCenter(enemyCenter);
-			boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
-					(info.enemyRect.height+yDiffShootingMargin)/2f;
-			if( ((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)) && enemyInShootingRange){
-				controller.shoot = true;
+			if(info.enemy != null){
+				boolean playerFaceRight = info.player.direction.getX() > 0;
+				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
+				Vector2 playerCenter = Vector2.Zero, enemyCenter = Vector2.Zero;
+				info.playerRect.getCenter(playerCenter);
+				info.enemyRect.getCenter(enemyCenter);
+				boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
+						(info.enemyRect.height+yDiffShootingMargin)/2f;
+				if( ((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)) && enemyInShootingRange){
+					controller.shoot = true;
+				}
 			}
 		}
 		shootLastFrame = !shootLastFrame;
@@ -106,38 +108,40 @@ public class GameAI_v4 extends GameAI {
 		if(selectedCombination.size() > 1){
 			ButtonCombination previousCombination = currentCombination;
 			boolean combinationChosen = false;
-			//Prioritize turning to enemy and stand still (if safe) when the player is on the floor
-			if(info.playerOnFloor && !runningTowardEnemyState){
-				boolean playerFaceRight = info.player.direction.getX() > 0;
-				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
-				boolean safeToStand = isSafeToStand(info);
-				if(safeToStand){
-					//Stand still if choice available and already facing enemy
-					if((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)){
-						if(selectedCombination.contains(ButtonCombination.None)){
-							newCombination = ButtonCombination.None;
-							combinationChosen = true;
+			if(info.enemy != null){
+				//Prioritize turning to enemy and stand still (if safe) when the player is on the floor
+				if(info.playerOnFloor && !runningTowardEnemyState){
+					boolean playerFaceRight = info.player.direction.getX() > 0;
+					boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
+					boolean safeToStand = isSafeToStand(info);
+					if(safeToStand){
+						//Stand still if choice available and already facing enemy
+						if((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)){
+							if(selectedCombination.contains(ButtonCombination.None)){
+								newCombination = ButtonCombination.None;
+								combinationChosen = true;
+							}
 						}
-					}
-					//Above criteria not satisfied, try to turn towards enemy. If cannot decide, use retain direction strategy
-					if(!combinationChosen){
-						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, !enemyOnRight, false);
+						//Above criteria not satisfied, try to turn towards enemy. If cannot decide, use retain direction strategy
+						if(!combinationChosen){
+							ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, !enemyOnRight, false);
+							if(comb != null){
+								newCombination = comb;
+								combinationChosen = true; 
+							}
+						}
+					}else{
+						//It's no safe, avoid enemy now! by either runaway or jump toward
+						boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
+						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, 
+								(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), false);
 						if(comb != null){
 							newCombination = comb;
-							combinationChosen = true; 
-						}
-					}
-				}else{
-					//It's no safe, avoid enemy now! by either runaway or jump toward
-					boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
-					ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, 
-							(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), false);
-					if(comb != null){
-						newCombination = comb;
-						combinationChosen = true;
-						if(!shouldRunFromEnemy){
-							runningTowardEnemyState = true;
-							runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
+							combinationChosen = true;
+							if(!shouldRunFromEnemy){
+								runningTowardEnemyState = true;
+								runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
+							}
 						}
 					}
 				}
