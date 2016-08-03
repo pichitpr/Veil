@@ -48,6 +48,7 @@ public class BattleScene implements Screen, LevelContainer{
 	private List<LevelSnapshot> snapshotQueue;
 	
 	private float noShootDelay;
+	private float timelimit; //Setting this value above 0 will render it to the screen
 	
 	private enum EnemyType{ 
 		Enemy, Elite, Miniboss, Boss 
@@ -66,6 +67,7 @@ public class BattleScene implements Screen, LevelContainer{
 		public EnemyRushManager(BattleScene battleScene){
 			this.battleScene = battleScene;
 			this.firstEnemy = true;
+			battleScene.timelimit = -10000;
 		}
 		
 		/**
@@ -115,12 +117,18 @@ public class BattleScene implements Screen, LevelContainer{
 					if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
 						battleScene.enemy.invulFrame = 30;
 					}
-				} else if(Controller.instance.pause){
-					//If enemy is deemed unbeatable, end the session immediately
-					endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.Unbeatable);
-					battleScene.setupScene(currentEnemy);
-					if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
-						battleScene.enemy.invulFrame = 30;
+				} else if(battleScene.timelimit > 0){
+					//Use timelimit (pre-marked unbeatable session) -- countdown
+					battleScene.timelimit -= 1;
+				} else {
+					//Unbeatable session end (2 cases: player deems unbeatable for normal session, time out for pre-marked unbeatable)
+					boolean shouldEndBattle = (battleScene.timelimit < -100 && Controller.instance.pause) || battleScene.timelimit > -1;
+					if(shouldEndBattle){
+						endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.Unbeatable);
+						battleScene.setupScene(currentEnemy);
+						if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
+							battleScene.enemy.invulFrame = 30;
+						}
 					}
 				}
 			}
@@ -290,6 +298,11 @@ public class BattleScene implements Screen, LevelContainer{
 			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
 			currentType = rushList.get(currentRushListIndex).getCurrentType();
 			BattleProfile.instance.saveAndReset(currentEnemy, BattleSessionEndReason.InitialSession, null);
+			if(currentEnemy.startsWith("_")){
+				battleScene.timelimit = GameConstant.unbeatableBattleTime;
+			}else{
+				battleScene.timelimit = -10000;
+			}
 		}
 
 		@Override
@@ -309,6 +322,11 @@ public class BattleScene implements Screen, LevelContainer{
 			currentEnemy = rushList.get(currentRushListIndex).getCurrentEnemy();
 			currentType = rushList.get(currentRushListIndex).getCurrentType();
 			BattleProfile.instance.saveAndReset(currentEnemy, endReason, currentRushList == null ? null : currentRushList.profileDir);
+			if(currentEnemy.startsWith("_")){
+				battleScene.timelimit = GameConstant.unbeatableBattleTime;
+			}else{
+				battleScene.timelimit = -10000;
+			}
 		}
 	}
 	
@@ -334,6 +352,7 @@ public class BattleScene implements Screen, LevelContainer{
 	}
 	
 	private void setupSceneManually(){
+		timelimit = 0;
 		player = new Player(this, 1);
 		player.setBaseHP(20);
 		player.maxhp = 20;
@@ -734,8 +753,11 @@ public class BattleScene implements Screen, LevelContainer{
 		game.font.setScale(2);
 		game.font.draw(game.batch, "MyHP:"+player.getBaseHP()+"/"+player.maxhp, 10, GameConstant.screenH-20);
 		game.font.draw(game.batch, "HP:"+enemy.getBaseHP(), GameConstant.screenW/2, GameConstant.screenH-20);
-		if(noShootDelay > 0)
+		if(noShootDelay > 0){
 			game.font.draw(game.batch, "NO SHOOT", GameConstant.screenW/2+100, GameConstant.screenH-20);
+		}else if(timelimit > 0){
+			game.font.draw(game.batch, "Time "+(int)timelimit, GameConstant.screenW/2+100, GameConstant.screenH-20);
+		}
 		game.batch.end();
 	}
 	
