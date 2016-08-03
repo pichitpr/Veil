@@ -40,11 +40,21 @@ public class TheGame extends Game {
         batch = new SpriteBatch();
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
-        
-        
-        this.setScreen(new InfoScene(this,0));
+        /*
+        FileHandle fh = new FileHandle("C:\\Users\\angelix\\Documents\\CU DOC\\Profile-2016-07-29\\timing_all\\Boss");
+        FileHandle fh2 = new FileHandle("C:\\Users\\angelix\\Documents\\CU DOC\\Profile-2016-07-29\\timing_all\\Range");
+        ProfileEvaluator eva = new ProfileEvaluator();
+        eva.addBattleProfilePath(fh);
+        eva.addRangeProfilePath(fh2);
+        eva.begin();
+        eva.evaluate(null);
+        eva.end();
+        */
+        //this.setScreen(new InfoScene(this,0));
+        sequence = 0;
+        nextScene();
     }
-
+	
     public void render() {
         super.render(); //important!
     }
@@ -55,7 +65,7 @@ public class TheGame extends Game {
         font.dispose();
     }
     
-    private int sequence = 0;
+    private int sequence;
     
     public void nextScene(){
     	switch(sequence){
