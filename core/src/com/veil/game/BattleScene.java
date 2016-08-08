@@ -121,13 +121,19 @@ public class BattleScene implements Screen, LevelContainer{
 					//Use timelimit (pre-marked unbeatable session) -- countdown
 					battleScene.timelimit -= 1;
 				} else {
-					//Unbeatable session end (2 cases: player deems unbeatable for normal session, time out for pre-marked unbeatable)
-					boolean shouldEndBattle = (battleScene.timelimit < -100 && Controller.instance.pause) || battleScene.timelimit > -1;
-					if(shouldEndBattle){
-						endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.Unbeatable);
-						battleScene.setupScene(currentEnemy);
-						if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
-							battleScene.enemy.invulFrame = 30;
+					if(this instanceof RangeProfilingRushManager){
+						if( ((RangeProfilingRushManager)this).checkForSessionEnd() ){
+							battleScene.setupScene(currentEnemy);
+						}
+					}else{
+						//Unbeatable session end (2 cases: player deems unbeatable for normal session, time out for pre-marked unbeatable)
+						boolean shouldEndBattle = (battleScene.timelimit < -100 && Controller.instance.pause) || battleScene.timelimit > -1;
+						if(shouldEndBattle){
+							endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.Unbeatable);
+							battleScene.setupScene(currentEnemy);
+							if(currentType == EnemyType.Miniboss || currentType == EnemyType.Boss){
+								battleScene.enemy.invulFrame = 30;
+							}
 						}
 					}
 				}
@@ -188,6 +194,14 @@ public class BattleScene implements Screen, LevelContainer{
 				return;
 			}
 			currentEnemy = rushList.remove(0);
+		}
+		
+		public boolean checkForSessionEnd(){
+			if(RangeProfile.instance.shouldEndSession()){
+				endCurrentSessionAndSetupNextEnemy(BattleSessionEndReason.AutoSkip);
+				return true;
+			}
+			return false;
 		}
 	}
 	

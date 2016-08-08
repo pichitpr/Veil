@@ -85,7 +85,7 @@ public class InfoScene implements Screen{
 					"In the next session, you'll have to dodge enemy's attack by jumping.",
 					"Every enemy will shoot a bullet at a random speed in a random interval",
 					"You can jump only ONCE for each battle. After you either successfully dodge",
-					"or fail, you have to SKIP the current battle MANUALLY."
+					"or fail, the battle is end immediately."
 			}, 20, GameConstant.screenH-20, 30, game.batch, game.font);
 			/*
 			game.font.draw(game.batch, 
