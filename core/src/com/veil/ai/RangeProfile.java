@@ -169,10 +169,14 @@ public class RangeProfile {
 			playerDamaged = true;
 		}
 		for(DynamicEntity dyn : snapshot.tempRect.keySet()){
-			if(dyn.getWorldCollider().x < snapshot.player.getWorldCollider().x){
+			if(snapshot.player.getWorldCollider().x - dyn.getWorldCollider().x >= 64){
 				bulletPassPlayer = true;
 			}
 		}
+	}
+	
+	public boolean shouldEndSession(){
+		return playerDamaged || bulletPassPlayer;
 	}
 	
 	/**
