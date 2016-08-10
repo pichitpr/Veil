@@ -9,12 +9,14 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 import com.veil.game.element.DynamicEntity;
 import com.veil.game.element.Player;
 
@@ -274,14 +276,14 @@ public class BattleProfile {
 	 * Calculate necessary parameters required to evaluate battle profile from existing profiles in specified directory. <br/>
 	 * Return length-3 array <br/>
 	 * [0] = (int) Battle duration (used to set battle timelimit for AI)
-	 * [1] = (float) Good evasion rate (AI must perform at similar rate)
+	 * [1] = (float) Good miss rate (AI must perform at similar rate)
 	 * [2] = (float) Good remaining HP percentage (AI must perform at similar percentage)
 	 */
 	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange){
 		float[] params = new float[3];
 		int sampleSize = calculateTotalBattleDuration(dir, params);
 		params[0] /= sampleSize;
-		sampleSize = calculateEvasionRate(dir, params, relevantRange);
+		sampleSize = calculateMissRate(dir, params, relevantRange);
 		params[1] /= sampleSize;
 		sampleSize = calculateHPPercent(dir, params, (int)params[0]);
 		params[2] /= sampleSize;
@@ -305,16 +307,16 @@ public class BattleProfile {
 		return sampleSize;
 	}
 	
-	private static int calculateEvasionRate(FileHandle dir, float[] out, int relevantRange){
+	private static int calculateMissRate(FileHandle dir, float[] out, int relevantRange){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
-				out[1] += profile.getEvasionRate(relevantRange);
+				out[1] += profile.getMissRate(relevantRange);
 				sampleSize++;
 			}else{
-				sampleSize += calculateEvasionRate(fh, out, relevantRange);
+				sampleSize += calculateMissRate(fh, out, relevantRange);
 			}
 		}
 		return sampleSize;
@@ -400,26 +402,33 @@ public class BattleProfile {
 		return timelimit;
 	}
 	
-	private float getEvasionRate(final int relevantRange){
+	private float getMissRate(final int relevantRange){
+		//Filter only entities that ever gets close to player
 		HashSet<EnemyLog> set = new HashSet<EnemyLog>();
 		set.addAll(logs.values());
 		set.removeIf(log -> !log.everCloseToPlayer(relevantRange));
 		if(set.size() == 0){
-			return 0;
+			return 0; //Would this causes bias??
 		}
-		int relevantRangeSq = relevantRange*relevantRange;
-		int hitCount = 0;
+		
+		float sumMissRate = 0;
 		for(EnemyLog log : set){
-			//Count each enemy once if collides
+			//Calculate miss rate against individual entity
+			int maxHitCount = MathUtils.ceil(log.lifetime / 60f); // ceil(EntityLifetime/InvulFrame)
+			int hitCount = 0;
+			int lastHitFrame = -1;
+			Collections.sort(log.hitPlayerFrame);
 			for(int frame : log.hitPlayerFrame){
-				if(log.distSq.get(frame) <= relevantRangeSq){
+				if(lastHitFrame < 0 || frame - lastHitFrame >= 60){
 					hitCount++;
-					break;
+					lastHitFrame = frame;
 				}
 			}
+			sumMissRate += hitCount*1f/maxHitCount;
 		}
-		//System.out.println("eva "+name+" "+hitCount+" "+set.size());
-		return Math.min(1, hitCount*1f/set.size());
+		
+		//System.out.println("miss "+name+" "+hitCount+" "+set.size());
+		return Math.min(1, sumMissRate/set.size());
 	}
 	
 	private float getRemainingHPPercent(int timeLimit){
