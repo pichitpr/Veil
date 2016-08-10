@@ -12,6 +12,7 @@ import com.veil.game.level.LevelContainer;
 public class LevelSnapshot {
 	
 	public LevelContainer level;
+	public float levelTimelimit;
 	public Player player;
 	public Rectangle playerRect;
 	public EventFlag playerState;
@@ -20,8 +21,10 @@ public class LevelSnapshot {
 	public Rectangle enemyRect;
 	public HashMap<DynamicEntity,Rectangle> tempRect;
 	
-	public LevelSnapshot(LevelContainer level, Player player, List<DynamicEntity> permanent, List<DynamicEntity> temp){
+	public LevelSnapshot(LevelContainer level, float levelTimelimit, Player player, 
+			List<DynamicEntity> permanent, List<DynamicEntity> temp){
 		this.level = level;
+		this.levelTimelimit = levelTimelimit;
 		this.player = player;
 		playerRect = new Rectangle(player.getWorldCollider());
 		playerState = player.flag.cloneImportantFlag();

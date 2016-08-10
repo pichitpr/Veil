@@ -21,6 +21,12 @@ public abstract class GameAI {
 	protected HashMap<DynamicEntity, FrameHistoryBuffer> entityTracker = new HashMap<DynamicEntity, FrameHistoryBuffer>();
 	protected boolean startFallingDown = false;
 	
+	public void aiReset(){
+		entityTracker.clear();
+		startFallingDown = false;
+		onReset();
+	}
+	
 	public void aiUpdate(Controller controller, LevelSnapshot info, float delta){
 		setupFrameDataAndFlag(info);
 		if(GameConstant.profilingMode && !BattleProfile.instance.isStart())
@@ -92,6 +98,7 @@ public abstract class GameAI {
 		}
 	}
 	
+	protected abstract void onReset();
 	protected abstract void pressButton(Controller controller, LevelSnapshot info, float delta);
 	
 }

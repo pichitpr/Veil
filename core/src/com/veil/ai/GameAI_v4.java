@@ -16,17 +16,42 @@ public class GameAI_v4 extends GameAI {
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
 	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
-	private final float yDiffShootingMargin = 20;
+	private final float yDiffShootingMargin = 0;
 	private final int retainDurationAfterRunTowardEnemy = 20;
+	
+	//If enemy does not take damage within [threshold] frames, try to skip 
+	private final int noDamageFrameThreshold = 60*60;
 	
 	private int buttonChangeDelayCounter = 0;
 	private boolean shootLastFrame;
 	private boolean runningTowardEnemyState;
 	private int runningTowardEnemyStateCounter;
 	
+	private int lastEnemyHP = -1;
+	private int landHitOnEnemyFrame = -1;
+	private int accumulatedFrame = 0;
+	
+	@Override
+	protected void onReset() {
+		buttonChangeDelayCounter = 0;
+		shootLastFrame = false;
+		runningTowardEnemyState = false;
+		runningTowardEnemyStateCounter = 0;
+		
+		lastEnemyHP = -1;
+		landHitOnEnemyFrame = -1;
+		accumulatedFrame = 0;
+	}
+	
 	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
 			float delta) {
+		if(lastEnemyHP > 0 && info.enemy != null && info.enemy.getBaseHP() < lastEnemyHP){
+			//Enemy hp changed
+			lastEnemyHP = info.enemy.getBaseHP();
+			landHitOnEnemyFrame = accumulatedFrame;
+		}
+		
 		if(buttonChangeDelayCounter == 0){
 			searchButtonCombination(info, delta);
 		}else{
@@ -39,7 +64,7 @@ public class GameAI_v4 extends GameAI {
 			if(info.enemy != null){
 				boolean playerFaceRight = info.player.direction.getX() > 0;
 				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
-				Vector2 playerCenter = Vector2.Zero, enemyCenter = Vector2.Zero;
+				Vector2 playerCenter = new Vector2(Vector2.Zero), enemyCenter = new Vector2(Vector2.Zero);
 				info.playerRect.getCenter(playerCenter);
 				info.enemyRect.getCenter(enemyCenter);
 				boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
@@ -50,6 +75,22 @@ public class GameAI_v4 extends GameAI {
 			}
 		}
 		shootLastFrame = !shootLastFrame;
+		
+		//Check for skipping if the level is skippable
+		if(info.levelTimelimit < 0){
+			if(landHitOnEnemyFrame < 0){
+				if(accumulatedFrame > noDamageFrameThreshold){
+					controller.pause = true;
+				}
+			}else{
+				if(accumulatedFrame - landHitOnEnemyFrame > noDamageFrameThreshold){
+					controller.pause = true;
+				}
+			}
+			
+		}
+		
+		accumulatedFrame ++;
 	}
 
 	private ButtonCombination currentCombination = ButtonCombination.None;

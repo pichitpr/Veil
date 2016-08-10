@@ -150,7 +150,7 @@ public class FrameHistoryBuffer {
 	
 	public Vector2 getCurrentMovingDirection(){
 		if(buf.size() < 2){
-			return Vector2.Zero;
+			return new Vector2(Vector2.Zero);
 		}else{
 			Rectangle mostRecent = buf.get(buf.size()-1);
 			Rectangle secondRecent = buf.get(buf.size()-2);

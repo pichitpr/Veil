@@ -508,6 +508,7 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy = permanentDynList.get(0);
 		enemy.invulFrame = 30;
 		noShootDelay = 2;
+		GameAI.instance.aiReset();
 	}
 	
 	private void setupScene(String enemyName){
@@ -524,6 +525,7 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy = permanentDynList.get(0);
 		enemy.noAutoDespawn = true;
 		noShootDelay = 2;
+		GameAI.instance.aiReset();
 	}
 	
 	@Override
@@ -548,7 +550,7 @@ public class BattleScene implements Screen, LevelContainer{
 			if(snapshotQueue == null){
 				snapshotQueue = new LinkedList<LevelSnapshot>();
 			}
-			snapshotQueue.add(new LevelSnapshot(this, player, permanentDynList, temporaryDynList));
+			snapshotQueue.add(new LevelSnapshot(this, timelimit, player, permanentDynList, temporaryDynList));
 			LevelSnapshot snapshot = null;
 			if(snapshotQueue.size() > 0){
 				snapshot = snapshotQueue.remove(0);

@@ -14,6 +14,11 @@ public class GameAI_v2 extends GameAI {
 	private final int safeMargin = 5;
 	
 	@Override
+	protected void onReset() {
+		
+	}
+	
+	@Override
 	protected void pressButton(Controller controller, LevelSnapshot info,
 			float delta) {
 		searchButtonCombination(info, delta);
@@ -156,5 +161,4 @@ public class GameAI_v2 extends GameAI {
 				reactionTime, delta);
 		simulatedPlayerPos = rect;
 	}
-	
 }
