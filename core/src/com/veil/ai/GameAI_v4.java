@@ -16,7 +16,7 @@ public class GameAI_v4 extends GameAI {
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
 	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
-	private final float yDiffShootingMargin = 0;
+	private final float yDiffShootingMargin = 20;
 	private final int retainDurationAfterRunTowardEnemy = 20;
 	
 	//If enemy does not take damage within [threshold] frames, try to skip 
@@ -108,7 +108,7 @@ public class GameAI_v4 extends GameAI {
 		
 		int minCost = Integer.MAX_VALUE;
 		List<ButtonCombination> selectedCombination = new ArrayList<ButtonCombination>();
-		//Loop through all possible button press
+		//Loop through all possible button presses and pick the safest route (prioritize safety)
 		for(ButtonCombination btn : ButtonCombination.values()){
 			//Calculate cost for the combination and pick the least one
 			int combinationCost = 0;
@@ -145,8 +145,18 @@ public class GameAI_v4 extends GameAI {
 		}
 
 		ButtonCombination newCombination = currentCombination;
-		//There are combinations with equal cost
-		if(selectedCombination.size() > 1){
+		if(selectedCombination.size() == 1){
+			newCombination = selectedCombination.get(0);
+		}else{
+			/*
+			 * There are button combinations with equal cost (all combinations are considered safest route by AI)
+			 * If enemy exists, prioritize: 
+			 * 		1) No horizontal movement + facing enemy + keep same Y as enemy (Attacking phase)
+			 * 		2) Facing enemy + allow horizontal movement to keep same Y as enemy
+			 * 		3) Avoid + keep same Y as enemy
+			 * 		4) Avoid
+			 * If cannot decide, try to retain moving direction
+			 */
 			ButtonCombination previousCombination = currentCombination;
 			boolean combinationChosen = false;
 			if(info.enemy != null){
@@ -156,11 +166,32 @@ public class GameAI_v4 extends GameAI {
 					boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
 					boolean safeToStand = isSafeToStand(info);
 					if(safeToStand){
-						//Stand still if choice available and already facing enemy
+						//Already facing enemy
 						if((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)){
-							if(selectedCombination.contains(ButtonCombination.None)){
-								newCombination = ButtonCombination.None;
-								combinationChosen = true;
+							if(isEnemyAbove(info)){
+								//Try to keep the same Y as enemy by jumping if possible -- moving is allow if needed
+								if(selectedCombination.contains(ButtonCombination.Jump)){
+									newCombination = ButtonCombination.Jump;
+									combinationChosen = true;
+								}else{
+									if(playerFaceRight){
+										if(selectedCombination.contains(ButtonCombination.RightJump)){
+											newCombination = ButtonCombination.RightJump;
+											combinationChosen = true;
+										}
+									}else{
+										if(selectedCombination.contains(ButtonCombination.LeftJump)){
+											newCombination = ButtonCombination.LeftJump;
+											combinationChosen = true;
+										}
+									}
+								}
+							}else{
+								//Stand still if choice is available
+								if(selectedCombination.contains(ButtonCombination.None)){
+									newCombination = ButtonCombination.None;
+									combinationChosen = true;
+								}
 							}
 						}
 						//Above criteria not satisfied, try to turn towards enemy. If cannot decide, use retain direction strategy
@@ -172,10 +203,11 @@ public class GameAI_v4 extends GameAI {
 							}
 						}
 					}else{
-						//It's no safe, avoid enemy now! by either runaway or jump toward
+						//It's not safe, avoid enemy now! by either runaway or jump toward
 						boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
 						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, 
-								(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), false);
+								(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), 
+								isEnemyAbove(info));
 						if(comb != null){
 							newCombination = comb;
 							combinationChosen = true;
@@ -220,8 +252,6 @@ public class GameAI_v4 extends GameAI {
 					newCombination = selectedCombination.get( MathUtils.random(0,selectedCombination.size()-1) );
 				}
 			}
-		}else{
-			newCombination = selectedCombination.get(0);
 		}
 		
 		//Decision change, must retain combination for reactionTime
@@ -231,14 +261,24 @@ public class GameAI_v4 extends GameAI {
 		currentCombination = newCombination;
 	}
 	
+	/**
+	 * Return true (considered safe) if enemy is more than 240 pixels away
+	 */
 	private boolean isSafeToStand(LevelSnapshot info){
 		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 240;
 	}
 	
+	/**
+	 * In avoiding phase, player should runaway if it is more than 180 pixels away from enemy
+	 */
 	private boolean shouldRunFromEnemy(LevelSnapshot info){
 		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 180;
 	}
 	
+	/**
+	 * Return combination that causes player to run towards specified direction (run left if left == true)
+	 * If prioritizeJump is true, this method pick combination with jump button pressed
+	 */
 	private ButtonCombination getCombinationRunTowardEnemy(List<ButtonCombination> combs, boolean left, 
 			boolean prioritizeJump){
 		ButtonCombination result = null;
@@ -250,6 +290,10 @@ public class GameAI_v4 extends GameAI {
 			}
 		}
 		return result;
+	}
+	
+	private boolean isEnemyAbove(LevelSnapshot info){
+		return info.enemyRect.y - info.playerRect.y > info.enemyRect.height/2 ;
 	}
 	
 	private void pressButtonByCombination(Controller controller, LevelSnapshot info, float delta){
