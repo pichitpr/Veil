@@ -69,6 +69,13 @@ public class GameConstant {
 	public static int minibossRushCount = 3;
 	public static int bossRushCount = 3;
 	/**
+	 * A number of frames that the battle is automatically end for an enemy that is pre-marked as unbeatable. The value should
+	 * be gathered from statistic
+	 */
+	public static float unbeatableBattleTime = 900f; //Average time BEFORE player skips the battle with unbeatable enemy
+	//Average from profiling = 1834.7858f, After testing and interview = 900 for better experience
+	
+	/**
 	 * Turn on/off range profiling mode (also requires profiling mode ON). In this mode, player have to avoid enemies' attack
 	 * with a single jump. Each battle session end after the first enemy bullet leaves screen. Enemies are taken from
 	 * subdirectory "RangeRush" of agent database directory. Every enemies' name must end with "_X" where X is a number
@@ -81,7 +88,7 @@ public class GameConstant {
 	 */
 	public static final FileHandle profileDir = PlatformUtility.fileOperator.getStorageRoot().child("Profiling").child("Profile");
 	
-	public static final boolean useAI = false;
+	public static final boolean useAI = true;
 	public static final boolean timeStepping = false;
 	public static final boolean debugDrawing = false;
 	
