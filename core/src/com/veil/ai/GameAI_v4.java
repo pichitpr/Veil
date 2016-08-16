@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.veil.ai.DummyPlayer.PlayerFutureState;
+import com.veil.game.GameConstant;
 import com.veil.game.element.DynamicEntity;
 
 public class GameAI_v4 extends GameAI {
@@ -16,8 +17,8 @@ public class GameAI_v4 extends GameAI {
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
 	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
-	private final float yDiffShootingMargin = 20;
-	private final int retainDurationAfterRunTowardEnemy = 20;
+	private final float yDiffShootingMargin = 8;
+	private final int retainDurationAfterRunTowardEnemy = 40;
 	
 	//If enemy does not take damage within [threshold] frames, try to skip 
 	private final int noDamageFrameThreshold = 60*60;
@@ -59,22 +60,23 @@ public class GameAI_v4 extends GameAI {
 		}
 		pressButtonByCombination(controller, info, delta);
 		
-		//Shooting enemy
+		//Shooting enemy or minion
 		if(!shootLastFrame){
-			if(info.enemy != null){
-				boolean playerFaceRight = info.player.direction.getX() > 0;
-				boolean enemyOnRight = info.playerRect.x < info.enemyRect.x;
-				Vector2 playerCenter = new Vector2(Vector2.Zero), enemyCenter = new Vector2(Vector2.Zero);
-				info.playerRect.getCenter(playerCenter);
-				info.enemyRect.getCenter(enemyCenter);
-				boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
-						(info.enemyRect.height+yDiffShootingMargin)/2f;
-				if( ((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)) && enemyInShootingRange){
-					controller.shoot = true;
+			controller.shoot = shouldShootThisEntity(info, info.enemy, true);
+			if(!controller.shoot){
+				for(DynamicEntity dyn : info.tempRect.keySet()){
+					if(shouldShootThisEntity(info, dyn, false)){
+						controller.shoot = true;
+						break;
+					}
 				}
 			}
+			if(controller.shoot){
+				shootLastFrame = true;
+			}
+		}else{
+			shootLastFrame = false;
 		}
-		shootLastFrame = !shootLastFrame;
 		
 		//Check for skipping if the level is skippable
 		if(info.levelTimelimit < 0){
@@ -204,17 +206,28 @@ public class GameAI_v4 extends GameAI {
 						}
 					}else{
 						//It's not safe, avoid enemy now! by either runaway or jump toward
-						boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
-						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, 
-								(shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight), 
+						boolean prioritizeLeft = false;
+						if(isLargeEnemy(info)){
+							float leftGap = getEnemyGap(info, true);
+							float rightGap = getEnemyGap(info, false);
+							prioritizeLeft = leftGap > rightGap;
+						}else{
+							boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
+							prioritizeLeft = (shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight);
+						}
+						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, prioritizeLeft, 
 								isEnemyAbove(info));
 						if(comb != null){
 							newCombination = comb;
 							combinationChosen = true;
+							runningTowardEnemyState = true;
+							runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
+							/*
 							if(!shouldRunFromEnemy){
 								runningTowardEnemyState = true;
 								runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
 							}
+							*/
 						}
 					}
 				}
@@ -261,18 +274,38 @@ public class GameAI_v4 extends GameAI {
 		currentCombination = newCombination;
 	}
 	
+	private boolean isLargeEnemy(LevelSnapshot info){
+		return info.enemyRect.width >= 128 || info.enemyRect.height >= 128;
+	}
+	
+	private float getEnemyGap(LevelSnapshot info, boolean left){
+		return left ? info.enemyRect.x - GameConstant.tileSizeX*2 : 
+			info.level.getStaticMap().getMapSize()[0] - GameConstant.tileSizeX - info.playerRect.width - 
+			(info.enemyRect.x + info.enemyRect.width);
+	}
+	
 	/**
 	 * Return true (considered safe) if enemy is more than 240 pixels away
 	 */
 	private boolean isSafeToStand(LevelSnapshot info){
-		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 240;
+		float dsp = Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2;
+		float minSafeDsp =  (info.level.getStaticMap().getMapSize()[0] - GameConstant.tileSizeX*2 - info.enemyRect.width)*0.4f;
+		/*
+		float availableSafeDsp = info.playerRect.x < info.enemyRect.x ?  info.enemyRect.x - GameConstant.tileSizeX*2 : 
+			info.level.getStaticMap().getMapSize()[0] - GameConstant.tileSizeX - info.playerRect.width - (info.enemyRect.x + info.enemyRect.width);
+			*/ 
+		if(isLargeEnemy(info)){
+			return dsp >= minSafeDsp;
+		}else{
+			return dsp >= minSafeDsp;
+		}
 	}
 	
 	/**
 	 * In avoiding phase, player should runaway if it is more than 180 pixels away from enemy
 	 */
 	private boolean shouldRunFromEnemy(LevelSnapshot info){
-		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 180;
+		return (Math.abs(info.playerRect.x - info.enemyRect.x) - (info.playerRect.width+info.enemyRect.width)/2) >= 120;//180;
 	}
 	
 	/**
@@ -294,6 +327,25 @@ public class GameAI_v4 extends GameAI {
 	
 	private boolean isEnemyAbove(LevelSnapshot info){
 		return info.enemyRect.y - info.playerRect.y > info.enemyRect.height/2 ;
+	}
+	
+	private boolean shouldShootThisEntity(LevelSnapshot info, DynamicEntity dyn, boolean isEnemy){
+		if(dyn == null) return false;;
+		if(!isEnemy && (dyn.invul || !dyn.defender)) return false;
+		Vector2 playerCenter = new Vector2(Vector2.Zero), enemyCenter = new Vector2(Vector2.Zero);
+		info.playerRect.getCenter(playerCenter);
+		dyn.getWorldCollider().getCenter(enemyCenter);
+		boolean enemyInShootingRange = Math.abs(playerCenter.y-enemyCenter.y) <=
+				(dyn.getWorldCollider().height+yDiffShootingMargin)/2f;
+		if(Math.abs(playerCenter.x-enemyCenter.x) <= dyn.getWorldCollider().width/2f && enemyInShootingRange){
+			return true;
+		}
+		boolean playerFaceRight = info.player.direction.getX() > 0;
+		boolean enemyOnRight = info.playerRect.x < dyn.getWorldCollider().x;
+		if( ((enemyOnRight && playerFaceRight) || (!enemyOnRight && !playerFaceRight)) && enemyInShootingRange){
+			return true;
+		}
+		return false;
 	}
 	
 	private void pressButtonByCombination(Controller controller, LevelSnapshot info, float delta){
