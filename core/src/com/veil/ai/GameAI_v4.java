@@ -1,6 +1,9 @@
 package com.veil.ai;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -15,7 +18,7 @@ public class GameAI_v4 extends GameAI {
 	//Average frame time = 0.07 sec
 	
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
-	private final int buttonChangeDelay = 4;
+	private final int buttonChangeDelay = 10;
 	private final int simulationFrame = 50;
 	private final float yDiffShootingMargin = 8;
 	private final int retainDurationAfterRunTowardEnemy = 40;
@@ -32,6 +35,8 @@ public class GameAI_v4 extends GameAI {
 	private int landHitOnEnemyFrame = -1;
 	private int accumulatedFrame = 0;
 	
+	private long landHitOnEnemyTime = -1;
+	
 	@Override
 	protected void onReset() {
 		buttonChangeDelayCounter = 0;
@@ -42,6 +47,8 @@ public class GameAI_v4 extends GameAI {
 		lastEnemyHP = -1;
 		landHitOnEnemyFrame = -1;
 		accumulatedFrame = 0;
+		
+		landHitOnEnemyTime = System.currentTimeMillis();
 	}
 	
 	@Override
@@ -51,6 +58,7 @@ public class GameAI_v4 extends GameAI {
 			//Enemy hp changed
 			lastEnemyHP = info.enemy.getBaseHP();
 			landHitOnEnemyFrame = accumulatedFrame;
+			landHitOnEnemyTime = System.currentTimeMillis();
 		}
 		
 		if(buttonChangeDelayCounter == 0){
@@ -79,20 +87,29 @@ public class GameAI_v4 extends GameAI {
 		}
 		
 		//Check for skipping if the level is skippable
-		if(info.levelTimelimit < 0){
+		if(info.levelTimelimit < -10){
 			if(landHitOnEnemyFrame < 0){
 				if(accumulatedFrame > noDamageFrameThreshold){
 					controller.pause = true;
+					printDateTime(System.currentTimeMillis() - landHitOnEnemyTime);
 				}
 			}else{
 				if(accumulatedFrame - landHitOnEnemyFrame > noDamageFrameThreshold){
 					controller.pause = true;
+					printDateTime(System.currentTimeMillis() - landHitOnEnemyTime);
 				}
 			}
 			
 		}
 		
 		accumulatedFrame ++;
+	}
+	
+	private void printDateTime(long ms){
+		long min = ms/60000;
+		long sec = (ms % 60000) / 1000;
+		ms = (ms % 60000) % 1000;
+		System.out.println(min+":"+sec+":"+ms);
 	}
 
 	private ButtonCombination currentCombination = ButtonCombination.None;
@@ -207,12 +224,14 @@ public class GameAI_v4 extends GameAI {
 					}else{
 						//It's not safe, avoid enemy now! by either runaway or jump toward
 						boolean prioritizeLeft = false;
+						boolean shouldRunFromEnemy = false;
 						if(isLargeEnemy(info)){
 							float leftGap = getEnemyGap(info, true);
 							float rightGap = getEnemyGap(info, false);
 							prioritizeLeft = leftGap > rightGap;
+							shouldRunFromEnemy = true;
 						}else{
-							boolean shouldRunFromEnemy = shouldRunFromEnemy(info);
+							shouldRunFromEnemy = shouldRunFromEnemy(info);
 							prioritizeLeft = (shouldRunFromEnemy && enemyOnRight) || (!shouldRunFromEnemy && !enemyOnRight);
 						}
 						ButtonCombination comb = getCombinationRunTowardEnemy(selectedCombination, prioritizeLeft, 
@@ -220,14 +239,15 @@ public class GameAI_v4 extends GameAI {
 						if(comb != null){
 							newCombination = comb;
 							combinationChosen = true;
+							/*
 							runningTowardEnemyState = true;
 							runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
-							/*
+							*/
 							if(!shouldRunFromEnemy){
 								runningTowardEnemyState = true;
 								runningTowardEnemyStateCounter = retainDurationAfterRunTowardEnemy;
 							}
-							*/
+							
 						}
 					}
 				}
@@ -295,9 +315,9 @@ public class GameAI_v4 extends GameAI {
 			info.level.getStaticMap().getMapSize()[0] - GameConstant.tileSizeX - info.playerRect.width - (info.enemyRect.x + info.enemyRect.width);
 			*/ 
 		if(isLargeEnemy(info)){
-			return dsp >= minSafeDsp;
+			return dsp >= 240;
 		}else{
-			return dsp >= minSafeDsp;
+			return dsp >= 240;
 		}
 	}
 	
