@@ -275,17 +275,21 @@ public class BattleProfile {
 	/**
 	 * Calculate necessary parameters required to evaluate battle profile from existing profiles in specified directory. <br/>
 	 * Return length-3 array <br/>
-	 * [0] = (int) Battle duration (used to set battle timelimit for AI)
-	 * [1] = (float) Good miss rate (AI must perform at similar rate)
-	 * [2] = (float) Good remaining HP percentage (AI must perform at similar percentage)
+	 * [0] = (int) Battle duration (used to set battle timelimit for AI) <br/>
+	 * [1] = (float) Good miss rate (AI must perform at similar rate) <br/>
+	 * [2] = (float) Good remaining HP percentage (AI must perform at similar percentage) <br/> 
+	 * if battleDuration is higher than 0, the value is used when calculating remaining HP instead of average battle duration in [0].
 	 */
-	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange){
+	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange, int battleDuration){
 		float[] params = new float[3];
+		//System.out.println("=================== Duration ==================");
 		int sampleSize = calculateTotalBattleDuration(dir, params);
 		params[0] /= sampleSize;
+		//System.out.println("=================== Miss ==================");
 		sampleSize = calculateMissRate(dir, params, relevantRange);
 		params[1] /= sampleSize;
-		sampleSize = calculateHPPercent(dir, params, (int)params[0]);
+		//System.out.println("=================== HP Percent ==================");
+		sampleSize = calculateHPPercent(dir, params, battleDuration > 0 ? battleDuration : (int)params[0]);
 		params[2] /= sampleSize;
 		return params;
 	}
@@ -294,11 +298,16 @@ public class BattleProfile {
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
 				if(profile.isValidForBattleDuration()){
 					out[0] += profile.getBattleDuration();
 					sampleSize++;
+					EvaluationApp.durationTable.setCell(fh, ""+profile.getBattleDuration());
+				}else{
+					//System.out.println("time invalid");
+					EvaluationApp.durationTable.setCell(fh, "invalid");
 				}
 			}else{
 				sampleSize += calculateTotalBattleDuration(fh, out);
@@ -311,9 +320,11 @@ public class BattleProfile {
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				EvaluationApp.fhTemp = fh;
+				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
-				out[1] += profile.getMissRate(relevantRange);
+				out[1] += profile.getMissRate(relevantRange, -1);
 				sampleSize++;
 			}else{
 				sampleSize += calculateMissRate(fh, out, relevantRange);
@@ -326,6 +337,7 @@ public class BattleProfile {
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
 				if(profile.isValidForRemainingHP()){
@@ -398,16 +410,19 @@ public class BattleProfile {
 			int damageDealtToEnemy = mainAgent.maxHP - mainAgent.lastHP;
 			timelimit = (int)(timelimit * mainAgent.maxHP * 1f / damageDealtToEnemy);
 		}
+		
 		//System.out.println("time "+name+" "+timelimit);
 		return timelimit;
 	}
 	
-	private float getMissRate(final int relevantRange){
+	private float getMissRate(int relevantRange, int battleDurationCap){
 		//Filter only entities that ever gets close to player
 		HashSet<EnemyLog> set = new HashSet<EnemyLog>();
 		set.addAll(logs.values());
 		set.removeIf(log -> !log.everCloseToPlayer(relevantRange));
 		if(set.size() == 0){
+			//System.out.println("\thit 0 of 0 (Never close up)");
+			EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, "NoCloseUp");
 			return 0; //Would this causes bias??
 		}
 		
@@ -419,15 +434,18 @@ public class BattleProfile {
 			int lastHitFrame = -1;
 			Collections.sort(log.hitPlayerFrame);
 			for(int frame : log.hitPlayerFrame){
+				if(battleDurationCap > 0 && frame > battleDurationCap)
+					break;
 				if(lastHitFrame < 0 || frame - lastHitFrame >= 60){
 					hitCount++;
 					lastHitFrame = frame;
 				}
 			}
+			//System.out.println("\thit "+hitCount+" of "+maxHitCount);
 			sumMissRate += hitCount*1f/maxHitCount;
 		}
-		
-		//System.out.println("miss "+name+" "+hitCount+" "+set.size());
+		EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, ""+sumMissRate/set.size());
+		//System.out.println("miss "+name+" "+set.size());
 		return Math.min(1, sumMissRate/set.size());
 	}
 	
