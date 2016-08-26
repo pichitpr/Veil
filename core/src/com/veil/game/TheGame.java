@@ -40,18 +40,19 @@ public class TheGame extends Game {
         batch = new SpriteBatch();
         //Use LibGDX's default Arial font.
         font = new BitmapFont();
-        /*
-        FileHandle fh = new FileHandle("C:\\Users\\angelix\\Documents\\CU DOC\\Profile-2016-07-29\\timing_all\\Boss");
-        FileHandle fh2 = new FileHandle("C:\\Users\\angelix\\Documents\\CU DOC\\Profile-2016-07-29\\timing_all\\Range");
-        ProfileEvaluator eva = new ProfileEvaluator();
-        eva.addBattleProfilePath(fh);
-        eva.addRangeProfilePath(fh2);
-        eva.begin();
-        eva.evaluate(null);
-        eva.end();
-        */
+        
         //this.setScreen(new InfoScene(this,0));
-        sequence = 0;
+        /*
+        try{
+        	FileHandle fh = PlatformUtility.fileOperator.getStorageRoot().child("frametime.txt");
+        	float frameTime = Float.parseFloat(fh.readString().trim());
+        	GameConstant.unbeatableBattleTime = frameTime;
+        }catch(Exception ex){}
+        */
+        if(!GameConstant.useAI)
+        	sequence = 0;
+        else
+        	sequence = 6;
         nextScene();
     }
 	
