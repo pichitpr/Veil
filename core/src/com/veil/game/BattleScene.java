@@ -238,6 +238,7 @@ public class BattleScene implements Screen, LevelContainer{
 			}
 			
 			private String getCurrentEnemy(){
+				System.out.println(list.get(0));
 				return list.get(0);
 			}
 			
@@ -255,6 +256,7 @@ public class BattleScene implements Screen, LevelContainer{
 			}
 			
 			private boolean isValid(){
+				if(list.size() <= 0) return false;
 				return requiredEnemyCount < 0 ? true : list.size() >= requiredEnemyCount;
 			}
 			
@@ -508,7 +510,7 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy = permanentDynList.get(0);
 		enemy.invulFrame = 30;
 		noShootDelay = 2;
-		GameAI.instance.aiReset();
+		GameAI.instance.aiReset(enemy);
 	}
 	
 	private void setupScene(String enemyName){
@@ -525,7 +527,7 @@ public class BattleScene implements Screen, LevelContainer{
 		enemy = permanentDynList.get(0);
 		enemy.noAutoDespawn = true;
 		noShootDelay = 2;
-		GameAI.instance.aiReset();
+		GameAI.instance.aiReset(enemy);
 	}
 	
 	@Override

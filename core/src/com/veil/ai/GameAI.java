@@ -21,10 +21,10 @@ public abstract class GameAI {
 	protected HashMap<DynamicEntity, FrameHistoryBuffer> entityTracker = new HashMap<DynamicEntity, FrameHistoryBuffer>();
 	protected boolean startFallingDown = false;
 	
-	public void aiReset(){
+	public void aiReset(DynamicEntity initialStateEnemy){
 		entityTracker.clear();
 		startFallingDown = false;
-		onReset();
+		onReset(initialStateEnemy);
 	}
 	
 	public void aiUpdate(Controller controller, LevelSnapshot info, float delta){
@@ -98,7 +98,7 @@ public abstract class GameAI {
 		}
 	}
 	
-	protected abstract void onReset();
+	protected abstract void onReset(DynamicEntity initialStateEnemy);
 	protected abstract void pressButton(Controller controller, LevelSnapshot info, float delta);
 	
 }

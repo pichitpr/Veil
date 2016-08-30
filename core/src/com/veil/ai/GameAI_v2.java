@@ -14,7 +14,7 @@ public class GameAI_v2 extends GameAI {
 	private final int safeMargin = 5;
 	
 	@Override
-	protected void onReset() {
+	protected void onReset(DynamicEntity initialStateEnemy) {
 		
 	}
 	

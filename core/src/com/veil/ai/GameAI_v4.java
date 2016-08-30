@@ -18,7 +18,7 @@ public class GameAI_v4 extends GameAI {
 	//Average frame time = 0.07 sec
 	
 	//Delay for player to re-decide button press, in this case, AI will not be able to "change" button decision immediately
-	private final int buttonChangeDelay = 10;
+	private final int buttonChangeDelay = 4;
 	private final int simulationFrame = 50;
 	private final float yDiffShootingMargin = 8;
 	private final int retainDurationAfterRunTowardEnemy = 40;
@@ -38,13 +38,13 @@ public class GameAI_v4 extends GameAI {
 	private long landHitOnEnemyTime = -1;
 	
 	@Override
-	protected void onReset() {
+	protected void onReset(DynamicEntity initialStateEnemy) {
 		buttonChangeDelayCounter = 0;
 		shootLastFrame = false;
 		runningTowardEnemyState = false;
 		runningTowardEnemyStateCounter = 0;
 		
-		lastEnemyHP = -1;
+		lastEnemyHP = initialStateEnemy.getBaseHP();
 		landHitOnEnemyFrame = -1;
 		accumulatedFrame = 0;
 		
