@@ -213,12 +213,14 @@ public class BattleScene implements Screen, LevelContainer{
 			private int requiredEnemyCount;
 			private FileHandle profileDir;
 			private List<String> list;
+			private int totalEnemyCount;
 			private int rushCount;
 			
 			private RushList(EnemyType type, int requiredEnemyCount){
 				this.type = type;
 				this.requiredEnemyCount = requiredEnemyCount;
 				list = new LinkedList<String>();
+				totalEnemyCount = 0;
 				rushCount = 0;
 			}
 			
@@ -235,10 +237,11 @@ public class BattleScene implements Screen, LevelContainer{
 					}
 				}
 				Collections.shuffle(list);
+				totalEnemyCount = list.size();
 			}
 			
 			private String getCurrentEnemy(){
-				System.out.println(list.get(0));
+				System.out.println(type+" "+list.get(0));
 				return list.get(0);
 			}
 			
@@ -248,7 +251,7 @@ public class BattleScene implements Screen, LevelContainer{
 			
 			private void finishCurrentEnemy(boolean reappend){
 				String currentEnemy = list.remove(0);
-				if(reappend){
+				if(reappend && !GameConstant.useAI){
 					list.add(currentEnemy);
 				}else{
 					rushCount++;
@@ -257,11 +260,11 @@ public class BattleScene implements Screen, LevelContainer{
 			
 			private boolean isValid(){
 				if(list.size() <= 0) return false;
-				return requiredEnemyCount < 0 ? true : list.size() >= requiredEnemyCount;
+				return requiredEnemyCount < 0 ? true : totalEnemyCount >= requiredEnemyCount;
 			}
 			
 			private boolean isRushEnd(){
-				return requiredEnemyCount < 0 ? rushCount >= list.size() : rushCount >= requiredEnemyCount;
+				return requiredEnemyCount < 0 ? rushCount >= totalEnemyCount : rushCount >= requiredEnemyCount;
 			}
 		}
 		
@@ -326,6 +329,7 @@ public class BattleScene implements Screen, LevelContainer{
 			RushList currentRushList = rushList.get(currentRushListIndex);
 			currentRushList.finishCurrentEnemy(endReason == BattleSessionEndReason.Unbeatable);
 			if(currentRushList.isRushEnd()){
+				System.out.println("Rush End " + currentRushList.type);
 				rushList.remove(currentRushListIndex);
 			}
 			if(rushList.size() == 0){
