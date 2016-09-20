@@ -9,6 +9,7 @@ public class EvaluationApp extends Game {
 
 	public static ProfileTable durationTable;
 	public static ProfileTable missCountTable;
+	public static ProfileTable hpPercentTable;
 	public static FileHandle fhTemp;
 	
 	private String[] typeDir = {"Enemy","Elite","Miniboss","Boss"};
@@ -21,6 +22,7 @@ public class EvaluationApp extends Game {
 			System.out.println("######$$$######  "+type+"  ######$$$######");
 			durationTable = new ProfileTable();
 			missCountTable = new ProfileTable();
+			hpPercentTable = new ProfileTable();
 			FileHandle baseline = new FileHandle("C:\\Users\\angelix\\Documents\\CU DOC\\Profile\\timing_all\\Battle\\"+type);
 			FileHandle target = GameConstant.profileDir.child(type);
 			ProfileEvaluator eva = new ProfileEvaluator();
@@ -29,8 +31,9 @@ public class EvaluationApp extends Game {
 	        eva.begin();
 	        eva.evaluate(target);
 	        eva.end();
-	        //durationTable.saveToFile(PlatformUtility.fileOperator.getStorageRoot().child("battle_duration_"+type+".csv"));
-	        missCountTable.saveToFile(PlatformUtility.fileOperator.getStorageRoot().child("miss_count_"+type+".csv"));
+	        durationTable.saveToFile(PlatformUtility.fileOperator.getStorageRoot().child("eval_battle_duration_"+type+".csv"));
+	        missCountTable.saveToFile(PlatformUtility.fileOperator.getStorageRoot().child("eval_miss_count_"+type+".csv"));
+	        hpPercentTable.saveToFile(PlatformUtility.fileOperator.getStorageRoot().child("eval_hp_capped"+type+".csv"));
 		}
 	}
 
