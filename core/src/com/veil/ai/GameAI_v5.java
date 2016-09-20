@@ -279,7 +279,8 @@ public class GameAI_v5 extends GameAI {
 		dummy.mimicPlayer(info.player);
 		PlayerFutureState[] playerFutures = dummy.simulatePosition2(inspecting.leftPressed(), inspecting.rightPressed(), false, false, 
 				inspecting.jumpPressed(), simulationFrame, delta);
-		boolean firstCollisionCostCalculated = false;
+		boolean firstCollideWallCalculated = false;
+		boolean firstCollisionCalculated = false;
 		int shootableFrame = 0;
 		for(int frameRef = 0; frameRef<playerFutures.length; frameRef++){
 			boolean collideWall = false;
@@ -298,14 +299,22 @@ public class GameAI_v5 extends GameAI {
 					break;
 				}
 			}
-			if(!firstCollisionCostCalculated && (collideWall || collideEnemyCount > 0)){
-				//Cost increased based on wall collision and enemy collision, the sooner the higher cost.
-				cost += simulationFrame-frameRef;
-				firstCollisionCostCalculated = true;
+			
+			if(!firstCollideWallCalculated && collideWall){
+				//Avoid wall if it is in the near future
+				if(frameRef < 10)
+					cost += 100;
+				firstCollideWallCalculated = true;
 			}
-			//Collision starts in far future, just ignore it
-			if(cost < 30){
-				cost = 0;
+			if(!firstCollisionCalculated && collideEnemyCount > 0){
+				//Cost increased based on frame number, the sooner the higher cost.
+				int collisionCost = simulationFrame-frameRef;
+				if(frameRef >= 30){
+					//Do not care if enemy collision happen in far future (frame 30 onward)
+					collisionCost = 0;
+				}
+				cost += collisionCost;
+				firstCollisionCalculated = true;
 			}
 			
 			//If player has high enough HP, AI will consider shooting
