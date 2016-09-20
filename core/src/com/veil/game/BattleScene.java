@@ -259,7 +259,7 @@ public class BattleScene implements Screen, LevelContainer{
 			}
 			
 			private boolean isValid(){
-				if(list.size() <= 0) return false;
+				if(list.size() <= 0) return true;
 				return requiredEnemyCount < 0 ? true : totalEnemyCount >= requiredEnemyCount;
 			}
 			
