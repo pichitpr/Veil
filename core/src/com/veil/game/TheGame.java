@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.veil.adl.AgentDatabase;
 import com.veil.ai.Controller;
+import com.veil.ai.PropertiesLoader;
+import com.veil.platforminterface.PlatformUtility;
 
 public class TheGame extends Game {
 	public ShapeRenderer shapeBatch;
@@ -24,6 +26,14 @@ public class TheGame extends Game {
     		System.exit(0);
     	}
     	System.out.println("Data loaded successful!!");
+    	
+    	try {
+			PropertiesLoader.loadProperties(PlatformUtility.fileOperator.getStorageRoot().child("Profiling").child("ai5.properties"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+    	System.out.println("Properties loaded successful");
     	
     	MathUtils.random = new RandomXS128(1000);
     	
