@@ -100,6 +100,7 @@ public class DummyPlayer extends Player{
 	public static class PlayerFutureState {
 		public Rectangle rect;
 		public boolean hitWall;
+		public boolean facingRight;
 	}
 	
 	public PlayerFutureState[] simulatePosition2(boolean left, boolean right, boolean up, boolean down, boolean jump, 
@@ -123,6 +124,7 @@ public class DummyPlayer extends Player{
 					result[i-1].hitWall = true;
 				}
 			}
+			result[i-1].facingRight = this.direction.getX() > 0;
 			prevPosition = currentPosition;
 		}
 		return result;
