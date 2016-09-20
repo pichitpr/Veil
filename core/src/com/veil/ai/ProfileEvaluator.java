@@ -1,5 +1,6 @@
 package com.veil.ai;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class ProfileEvaluator {
 	
 	private List<FileHandle> rangeProfiles = new LinkedList<FileHandle>();
 	private List<FileHandle> battleProfiles = new LinkedList<FileHandle>();
+	
+	public float errorMargin = 0.1f;
 	
 	public void addRangeProfilePath(FileHandle dir){
 		rangeProfiles.add(dir);
@@ -43,7 +46,10 @@ public class ProfileEvaluator {
 	
 	public void evaluate(FileHandle targetBattleProfile){
 		int relevantRange = RangeProfile.calculateRelevantRange(rangeProfileTmp);
-		float[] evaluationParameter = BattleProfile.calculateEvaluationParameter(battleProfileTmp, relevantRange, -1);
+		HashSet<String> exclusionList = createDurationExclusionSet(targetBattleProfile);
+		
+		float[] evaluationParameter = BattleProfile.calculateEvaluationParameter(battleProfileTmp, relevantRange, -1, 
+				exclusionList, null, exclusionList);
 		System.out.println("========== Baseline parameters ==========");
 		System.out.println("range "+relevantRange+" px");
 		System.out.println("time "+evaluationParameter[0]+" frames");
@@ -52,17 +58,19 @@ public class ProfileEvaluator {
 		
 		if(targetBattleProfile == null) return;
 		
-		float[] targetParameter = BattleProfile.calculateEvaluationParameter(targetBattleProfile, relevantRange, (int)evaluationParameter[0]);
+		float[] targetParameter = BattleProfile.calculateEvaluationParameter(targetBattleProfile, relevantRange, 
+				(int)evaluationParameter[0], exclusionList, null, exclusionList);
 		System.out.println("========== Evaluating parameters ==========");
 		System.out.println("time "+targetParameter[0]+" frames");
 		System.out.println("miss rate "+targetParameter[1]);
 		System.out.println("hp percentage "+targetParameter[2]);
 		
 		System.out.println("===================================");
-		boolean durationPass = Math.abs(evaluationParameter[0] - targetParameter[0])/evaluationParameter[0] <= 0.1f;
-		boolean missRatePass = Math.abs(evaluationParameter[1] - targetParameter[1])/evaluationParameter[1] <= 0.1f;
-		boolean hpPass = Math.abs(evaluationParameter[2] - targetParameter[2])/evaluationParameter[2] <= 0.1f;
-		System.out.println("Duration:"+durationPass+"  Miss rate:"+missRatePass+"  HP:"+hpPass);
+		//boolean durationPass = Math.abs(evaluationParameter[0] - targetParameter[0])/evaluationParameter[0] <= 0.1f;
+		boolean missRatePass = Math.abs(evaluationParameter[1] - targetParameter[1])/evaluationParameter[1] <= errorMargin;
+		boolean hpPass = targetParameter[2] <= errorMargin;
+		//System.out.println("Duration:"+durationPass+"  Miss rate:"+missRatePass+"  HP:"+hpPass);
+		System.out.println("Miss rate:"+missRatePass+"  HP:"+hpPass);
 	}
 	
 	public void end(){
@@ -71,6 +79,66 @@ public class ProfileEvaluator {
 		}
 		if(battleProfileTmp.exists()){
 			battleProfileTmp.deleteDirectory();
+		}
+	}
+	
+	private HashSet<String> createDurationExclusionSet(FileHandle aiDirectory){
+		//Find all AI player name 
+		ProfileTable aiEncounterTable = new ProfileTable();
+		markEncounterTable(aiDirectory, aiEncounterTable);
+		HashSet<String> aiPlayerName = new HashSet<String>();
+		for(String playerName : aiEncounterTable.getColHeaderIterable()){
+			aiPlayerName.add(playerName);
+		}
+		
+		ProfileTable encounterTable = new ProfileTable();
+		markEncounterTable(battleProfileTmp, encounterTable);
+		markEncounterTable(aiDirectory, encounterTable);
+		
+		HashSet<String> set = new HashSet<String>();
+		for(String enemyName : encounterTable.getRowHeaderIterable()){
+			//Enemy is valid only if:
+			//- No invalid data exists in any encounter
+			//- All AI encounter the enemy
+			//- At least 1 player encounter the enemy
+			boolean invalidEnemy = false;
+			boolean humanPlayerEncounterThisEnemy = false;
+			for(String playerName : encounterTable.getColHeaderIterable()){
+				String value = encounterTable.getCell(enemyName, playerName);
+				if(aiPlayerName.contains(playerName)){
+					//AI player's record
+					if(value == null || value.equals("i")){
+						invalidEnemy = true;
+						break;
+					}
+				}else{
+					//Human player's record
+					if(value != null){
+						humanPlayerEncounterThisEnemy = true;
+						if(value.equals("i")){
+							invalidEnemy = true;
+							break;
+						}
+					}
+				}
+			}
+			if(invalidEnemy || !humanPlayerEncounterThisEnemy){
+				set.add(enemyName);
+			}
+		}
+		return set;
+	}
+	
+	private void markEncounterTable(FileHandle fh, ProfileTable encounterTable){
+		//row=enemyFileName col=playerName val={null: no encounter, ""=fought, "i"=invalidForBattleDuration }
+		if(!fh.isDirectory()){
+			BattleProfile battleProfile = new BattleProfile();
+			battleProfile.load(fh);
+			encounterTable.setCell(fh, battleProfile.isValidForBattleDuration() ? "" : "i");
+		}else{
+			for(FileHandle f : fh.list()){
+				markEncounterTable(f, encounterTable);
+			}
 		}
 	}
 }

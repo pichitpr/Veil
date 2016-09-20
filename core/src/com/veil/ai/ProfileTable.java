@@ -20,6 +20,18 @@ public class ProfileTable {
 		colHeader = new HashMap<String, Integer>();
 	}
 	
+	public Iterable<String> getRowHeaderIterable(){
+		return rowHeader.keySet();
+	}
+	
+	public Iterable<String> getColHeaderIterable(){
+		return colHeader.keySet();
+	}
+	
+	public String getCell(String rowHeader, String colHeader){
+		return table.get(this.rowHeader.get(rowHeader)).get(this.colHeader.get(colHeader));
+	}
+	
 	public void setCell(FileHandle fh, String value){
 		String[] split = fh.pathWithoutExtension().split("/");
 		setCell(split[split.length-2], split[split.length-1], value);

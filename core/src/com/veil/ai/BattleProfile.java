@@ -280,24 +280,28 @@ public class BattleProfile {
 	 * [2] = (float) Good remaining HP percentage (AI must perform at similar percentage) <br/> 
 	 * if battleDuration is higher than 0, the value is used when calculating remaining HP instead of average battle duration in [0].
 	 */
-	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange, int battleDuration){
+	public static float[] calculateEvaluationParameter(FileHandle dir, int relevantRange, int battleDurationCap,
+			HashSet<String> durationExlusion, HashSet<String> missRateExclusion, HashSet<String> hpExclusion){
 		float[] params = new float[3];
 		//System.out.println("=================== Duration ==================");
-		int sampleSize = calculateTotalBattleDuration(dir, params);
+		int sampleSize = calculateTotalBattleDuration(dir, params, durationExlusion);
 		params[0] /= sampleSize;
 		//System.out.println("=================== Miss ==================");
-		sampleSize = calculateMissRate(dir, params, relevantRange);
+		sampleSize = calculateMissRate(dir, params, relevantRange, missRateExclusion);
 		params[1] /= sampleSize;
 		//System.out.println("=================== HP Percent ==================");
-		sampleSize = calculateHPPercent(dir, params, battleDuration > 0 ? battleDuration : (int)params[0]);
+		sampleSize = calculateHPPercent(dir, params, battleDurationCap > 0 ? battleDurationCap : (int)params[0], hpExclusion);
 		params[2] /= sampleSize;
 		return params;
 	}
 	
-	private static int calculateTotalBattleDuration(FileHandle dir, float[] out){
+	private static int calculateTotalBattleDuration(FileHandle dir, float[] out, HashSet<String> exclusionList){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				if(exclusionList != null && exclusionList.contains(fh.nameWithoutExtension())){
+					continue;
+				}
 				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
@@ -310,16 +314,19 @@ public class BattleProfile {
 					EvaluationApp.durationTable.setCell(fh, "invalid");
 				}
 			}else{
-				sampleSize += calculateTotalBattleDuration(fh, out);
+				sampleSize += calculateTotalBattleDuration(fh, out, exclusionList);
 			}
 		}
 		return sampleSize;
 	}
 	
-	private static int calculateMissRate(FileHandle dir, float[] out, int relevantRange){
+	private static int calculateMissRate(FileHandle dir, float[] out, int relevantRange, HashSet<String> exclusionList){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				if(exclusionList != null && exclusionList.contains(fh.nameWithoutExtension())){
+					continue;
+				}
 				EvaluationApp.fhTemp = fh;
 				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
@@ -327,25 +334,31 @@ public class BattleProfile {
 				out[1] += profile.getMissRate(relevantRange, -1);
 				sampleSize++;
 			}else{
-				sampleSize += calculateMissRate(fh, out, relevantRange);
+				sampleSize += calculateMissRate(fh, out, relevantRange, exclusionList);
 			}
 		}
 		return sampleSize;
 	}
 	
-	private static int calculateHPPercent(FileHandle dir, float[] out, int averageTimelimit){
+	private static int calculateHPPercent(FileHandle dir, float[] out, int averageTimelimit, HashSet<String> exclusionList){
 		int sampleSize = 0;
 		for(FileHandle fh : dir.list()){
 			if(!fh.isDirectory()){
+				if(exclusionList != null && exclusionList.contains(fh.nameWithoutExtension())){
+					continue;
+				}
 				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
 				if(profile.isValidForRemainingHP()){
 					out[2] += profile.getRemainingHPPercent(averageTimelimit);
 					sampleSize++;
+					EvaluationApp.hpPercentTable.setCell(fh, ""+profile.getRemainingHPPercent(averageTimelimit));
+				}else{
+					EvaluationApp.hpPercentTable.setCell(fh, "invalid");
 				}
 			}else{
-				sampleSize += calculateHPPercent(fh, out, averageTimelimit);
+				sampleSize += calculateHPPercent(fh, out, averageTimelimit, exclusionList);
 			}
 		}
 		return sampleSize;
@@ -377,7 +390,7 @@ public class BattleProfile {
 		}
 	}
 	
-	private boolean isValidForBattleDuration(){
+	public boolean isValidForBattleDuration(){
 		if(unbeatable) return false;
 		if(playerDead){
 			for(EnemyLog log : logs.values()){
@@ -466,6 +479,7 @@ public class BattleProfile {
 				return remainingHp*1f/log.maxHP;
 			}
 		}
-		return 1; //Impossible case
+		//The only case here is player takes too long to land first strike on enemy
+		return 1;
 	}
 }
