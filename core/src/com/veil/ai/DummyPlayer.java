@@ -120,7 +120,8 @@ public class DummyPlayer extends Player{
 			result[i-1] = new PlayerFutureState();
 			result[i-1].rect = currentPosition;
 			if(prevPosition != null){
-				if(Math.abs(currentPosition.x-prevPosition.x) <= 0.05f && Math.abs(currentPosition.y-prevPosition.y) <= 0.05f){
+				//if(Math.abs(currentPosition.x-prevPosition.x) <= 0.05f && Math.abs(currentPosition.y-prevPosition.y) <= 0.05f){
+				if(Math.abs(currentPosition.x-prevPosition.x) <= 0.05f && (left || right)){
 					result[i-1].hitWall = true;
 				}
 			}
