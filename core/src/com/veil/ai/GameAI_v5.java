@@ -22,18 +22,22 @@ public class GameAI_v5 extends GameAI {
 	private final int noDamageFrameThreshold = 60*60;
 	
 	//If enemy is in "undamagable" state for [threshold] frames, try to wander
-	private final int invulFrameThreshold = 60*4;
+	private final int invulFrameThreshold = 60*3;
 	
 	//If enemy is out of reach for [threshold] frames, try to wonder
-	private final int outOfReachThreshold = 60*4;
+	private final int outOfReachThreshold = 60*3;
 	
 	//If enemy does not take damage within [threshold] frames, AI may consider wandering
-	private final int noDamageFrameThresholdForTransition = 60*10;
+	private final int noDamageFrameThresholdForTransition = 60*4;
+	
+	//If any attack come closer than [threshold], stop wandering
+	private final float threatProximityThreshold = 180;
 	
 	//A number of frame to ignore enemy collision when searching future (prevent biased cost when player already collides with enemy)
 	private final int ignoreEnemyFrameCount = 10;
 	
 	private int buttonChangeDelayCounter = 0;
+	private int stateChangeDelayCounter = 0;
 	private boolean isFightingState;
 	
 	//Wandering state variable
@@ -90,6 +94,9 @@ public class GameAI_v5 extends GameAI {
 			}else{
 				outOfReachCounter++;
 			}
+		}else{
+			invulCounter = 0;
+			outOfReachCounter = 0;
 		}
 		
 		//Handle button press decision for fighting
@@ -114,10 +121,13 @@ public class GameAI_v5 extends GameAI {
 
 	private void aiPressButton(Controller controller, LevelSnapshot info, float delta){
 		//Press button
+		stateChangeDelayCounter--;
 		if(buttonChangeDelayCounter == 0){
+			//Delay is to prevent AI to toggle from fighting state to wandering state too fast
+			//However, toggle from wandering to fighting immediately is required to avoid attack
 			if(isFightingState){
 				searchButtonCombination(info, delta);
-				if(shouldEndFight(info, delta)){
+				if(shouldEndFight(info, delta) && stateChangeDelayCounter <= 0){
 					resetFight();
 					isFightingState = false;
 				}
@@ -126,6 +136,7 @@ public class GameAI_v5 extends GameAI {
 				if(shouldEndWander(info, delta)){
 					resetWander();
 					isFightingState = true;
+					stateChangeDelayCounter = 30;
 				}
 			}
 		}else{
@@ -170,9 +181,9 @@ public class GameAI_v5 extends GameAI {
 				return true;
 			}else{
 				boolean xDstInProximity = xCenterDst(info.playerRect, dynRect) <=
-						(info.playerRect.width+dynRect.width)/2f + 120;
+						(info.playerRect.width+dynRect.width)/2f + threatProximityThreshold;
 				boolean yDstInProximity = yCenterDst(info.playerRect, dynRect) <=
-						(info.playerRect.height+dynRect.height)/2f + 120;
+						(info.playerRect.height+dynRect.height)/2f + threatProximityThreshold;
 				if(xDstInProximity && yDstInProximity){
 					return true;
 				}
@@ -181,10 +192,12 @@ public class GameAI_v5 extends GameAI {
 		
 		//Visible enemy and it is either damagable now OR AI might collide with enemy --> end wandering
 		Rectangle screenRect = new Rectangle(0, 0, GameConstant.screenW, GameConstant.screenH);
-		if(screenRect.contains(info.enemyRect)){
+		if(screenRect.overlaps(info.enemyRect)){
+			//Now damagable
 			if(info.levelTimelimit < -10 && invulCounter < invulFrameThreshold && outOfReachCounter < outOfReachThreshold){
 				return true;
 			}
+			//Not damagable but too close
 			if(xCenterDst(info.playerRect, info.enemyRect) < (info.playerRect.width+info.enemyRect.width)/2f+GameConstant.tileSizeX*2 && 
 					yCenterDst(info.playerRect, info.enemyRect) < (info.playerRect.height+info.enemyRect.height)/2f+GameConstant.tileSizeY*2){
 				return true;
@@ -223,7 +236,7 @@ public class GameAI_v5 extends GameAI {
 		
 		//Player cannot damage enemy for sometime
 		Rectangle screenRect = new Rectangle(0, 0, GameConstant.screenW, GameConstant.screenH);
-		if(!screenRect.contains(info.enemyRect)){
+		if(!screenRect.overlaps(info.enemyRect)){
 			//Enemy is not visible, try to wander
 			return true;
 		}else{
@@ -262,6 +275,7 @@ public class GameAI_v5 extends GameAI {
 		//Loop through all possible button presses and pick the best
 		for(ButtonCombination btn : ButtonCombination.values()){
 			int cost = calculateCombinationCost(btn, info.enemy, currentEnemies, predictedMainEnemy, predictedEnemies, info, delta);
+			System.out.print(btn+":"+cost+"  ");
 			if(cost <= minCost){
 				if(cost < minCost){
 					selectedCombination.clear();
@@ -269,7 +283,7 @@ public class GameAI_v5 extends GameAI {
 				}
 				selectedCombination.add(btn);
 			}
-		}
+		} System.out.println("");
 		
 		ButtonCombination newCombination = currentCombination;
 		if(selectedCombination.size() == 1){
@@ -473,6 +487,9 @@ public class GameAI_v5 extends GameAI {
 		return enemyRect.width >= 128 || enemyRect.height >= 128;
 	}
 	
+	/**
+	 * Return empty space on either side of the enemy
+	 */
 	private float getEnemyGap(LevelSnapshot info, boolean left){
 		return left ? info.enemyRect.x - GameConstant.tileSizeX : 
 			info.level.getStaticMap().getMapSize()[0] - GameConstant.tileSizeX - (info.enemyRect.x + info.enemyRect.width);
@@ -491,10 +508,11 @@ public class GameAI_v5 extends GameAI {
 	}
 	
 	/**
-	 * In avoiding phase, player should runaway if it is more than 180 pixels away from enemy
+	 * In avoiding phase, player should runaway if it is more than 120 pixels away from enemy.
+	 * Otherwise, try running toward enemy and jump over instead
 	 */
 	private boolean shouldRunFromEnemy(Rectangle playerRect, Rectangle enemyRect){
-		return (xCenterDst(playerRect, enemyRect) - (playerRect.width + enemyRect.width)/2) >= 120;//180;
+		return (xCenterDst(playerRect, enemyRect) - (playerRect.width + enemyRect.width)/2) >= 120;
 	}
 	
 	/**
