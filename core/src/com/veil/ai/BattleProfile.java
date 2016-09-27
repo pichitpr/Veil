@@ -331,7 +331,9 @@ public class BattleProfile {
 				//System.out.println(fh.nameWithoutExtension()+"  "+fh.pathWithoutExtension());
 				BattleProfile profile = new BattleProfile();
 				profile.load(fh);
-				out[1] += profile.getMissRate(relevantRange, -1);
+				float missRate = profile.getMissRate(relevantRange, -1);
+				//Use 0 if no close up, will this cause bias?
+				out[1] += (missRate < 0 ? 0 : missRate);
 				sampleSize++;
 			}else{
 				sampleSize += calculateMissRate(fh, out, relevantRange, exclusionList);
@@ -402,6 +404,10 @@ public class BattleProfile {
 		return true;
 	}
 	
+	public boolean everCloseUp(int relevantRange, int battleDurationCap){
+		return getMissRate(relevantRange, battleDurationCap) > -1;
+	}
+	
 	private boolean isValidForRemainingHP(){
 		return isValidForBattleDuration();
 	}
@@ -436,7 +442,7 @@ public class BattleProfile {
 		if(set.size() == 0){
 			//System.out.println("\thit 0 of 0 (Never close up)");
 			EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, "NoCloseUp");
-			return 0; //Would this causes bias??
+			return -1;
 		}
 		
 		float sumMissRate = 0;
