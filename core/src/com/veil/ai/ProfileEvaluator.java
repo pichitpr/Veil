@@ -47,9 +47,10 @@ public class ProfileEvaluator {
 	public void evaluate(FileHandle targetBattleProfile){
 		int relevantRange = RangeProfile.calculateRelevantRange(rangeProfileTmp);
 		HashSet<String> exclusionList = createDurationExclusionSet(targetBattleProfile);
+		HashSet<String> missRateExclusionList = createMissRateExclusionList(targetBattleProfile, relevantRange, true);
 		
 		float[] evaluationParameter = BattleProfile.calculateEvaluationParameter(battleProfileTmp, relevantRange, -1, 
-				exclusionList, null, exclusionList);
+				exclusionList, missRateExclusionList, exclusionList);
 		System.out.println("========== Baseline parameters ==========");
 		System.out.println("range "+relevantRange+" px");
 		System.out.println("time "+evaluationParameter[0]+" frames");
@@ -59,7 +60,7 @@ public class ProfileEvaluator {
 		if(targetBattleProfile == null) return;
 		
 		float[] targetParameter = BattleProfile.calculateEvaluationParameter(targetBattleProfile, relevantRange, 
-				(int)evaluationParameter[0], exclusionList, null, exclusionList);
+				(int)evaluationParameter[0], exclusionList, missRateExclusionList, exclusionList);
 		System.out.println("========== Evaluating parameters ==========");
 		System.out.println("time "+targetParameter[0]+" frames");
 		System.out.println("miss rate "+targetParameter[1]);
@@ -135,6 +136,66 @@ public class ProfileEvaluator {
 			BattleProfile battleProfile = new BattleProfile();
 			battleProfile.load(fh);
 			encounterTable.setCell(fh, battleProfile.isValidForBattleDuration() ? "" : "i");
+		}else{
+			for(FileHandle f : fh.list()){
+				markEncounterTable(f, encounterTable);
+			}
+		}
+	}
+	
+	private HashSet<String> createMissRateExclusionList(FileHandle aiDirectory, int relevantRange, boolean alsoExcludeNoCloseUp){
+		//Find all AI player name 
+		ProfileTable aiEncounterTable = new ProfileTable();
+		markEncounterTable(aiDirectory, aiEncounterTable);
+		HashSet<String> aiPlayerName = new HashSet<String>();
+		for(String playerName : aiEncounterTable.getColHeaderIterable()){
+			aiPlayerName.add(playerName);
+		}
+
+		ProfileTable encounterTable = new ProfileTable();
+		markMissrateTable(battleProfileTmp, encounterTable, relevantRange, -1);
+		markMissrateTable(aiDirectory, encounterTable, relevantRange, -1);
+
+		HashSet<String> set = new HashSet<String>();
+		for(String enemyName : encounterTable.getRowHeaderIterable()){
+			//Enemy is valid only if:
+			//- All AI encounter the enemy
+			//- At least 1 player encounter the enemy
+			//- Has close up combat (depends on flag)
+			boolean invalidEnemy = false;
+			boolean humanPlayerEncounterThisEnemy = false;
+			for(String playerName : encounterTable.getColHeaderIterable()){
+				String value = encounterTable.getCell(enemyName, playerName);
+				if(aiPlayerName.contains(playerName)){
+					//AI player's record
+					if(value == null || (alsoExcludeNoCloseUp && value == "n")){
+						invalidEnemy = true;
+						break;
+					}
+				}else{
+					//Human player's record
+					if(value != null){
+						humanPlayerEncounterThisEnemy = true;
+						if(alsoExcludeNoCloseUp && value == "n"){
+							invalidEnemy = true;
+							break;
+						}
+					}
+				}
+			}
+			if(invalidEnemy || !humanPlayerEncounterThisEnemy){
+				set.add(enemyName);
+			}
+		}
+		return set;
+	}
+	
+	private void markMissrateTable(FileHandle fh, ProfileTable encounterTable, int relevantRange, int durationCap){
+		//row=enemyFileName col=playerName val={null: no encounter, ""=fought, "n"=noCloseUp }
+		if(!fh.isDirectory()){
+			BattleProfile battleProfile = new BattleProfile();
+			battleProfile.load(fh);
+			encounterTable.setCell(fh, battleProfile.everCloseUp(relevantRange, durationCap) ? "" : "n");
 		}else{
 			for(FileHandle f : fh.list()){
 				markEncounterTable(f, encounterTable);
