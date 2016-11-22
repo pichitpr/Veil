@@ -245,6 +245,10 @@ public class BattleProfile {
 		frameCounter++;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	public void print(){
 		System.out.println(name);
 		for(EnemyLog log : logs.values()){
@@ -308,10 +312,12 @@ public class BattleProfile {
 				if(profile.isValidForBattleDuration()){
 					out[0] += profile.getBattleDuration();
 					sampleSize++;
-					EvaluationApp.durationTable.setCell(fh, ""+profile.getBattleDuration());
+					if(EvaluationApp.durationTable != null)
+						EvaluationApp.durationTable.setCell(fh, ""+profile.getBattleDuration());
 				}else{
 					//System.out.println("time invalid");
-					EvaluationApp.durationTable.setCell(fh, "invalid");
+					if(EvaluationApp.durationTable != null)
+						EvaluationApp.durationTable.setCell(fh, "invalid");
 				}
 			}else{
 				sampleSize += calculateTotalBattleDuration(fh, out, exclusionList);
@@ -355,9 +361,11 @@ public class BattleProfile {
 				if(profile.isValidForRemainingHP()){
 					out[2] += profile.getRemainingHPPercent(averageTimelimit);
 					sampleSize++;
-					EvaluationApp.hpPercentTable.setCell(fh, ""+profile.getRemainingHPPercent(averageTimelimit));
+					if(EvaluationApp.hpPercentTable != null)
+						EvaluationApp.hpPercentTable.setCell(fh, ""+profile.getRemainingHPPercent(averageTimelimit));
 				}else{
-					EvaluationApp.hpPercentTable.setCell(fh, "invalid");
+					if(EvaluationApp.hpPercentTable != null)
+						EvaluationApp.hpPercentTable.setCell(fh, "invalid");
 				}
 			}else{
 				sampleSize += calculateHPPercent(fh, out, averageTimelimit, exclusionList);
@@ -412,7 +420,7 @@ public class BattleProfile {
 		return isValidForBattleDuration();
 	}
 	
-	private int getBattleDuration(){
+	public int getBattleDuration(){
 		int timelimit = 0;
 		EnemyLog mainAgent = null;
 		for(EnemyLog log : logs.values()){
@@ -434,14 +442,15 @@ public class BattleProfile {
 		return timelimit;
 	}
 	
-	private float getMissRate(int relevantRange, int battleDurationCap){
+	public float getMissRate(int relevantRange, int battleDurationCap){
 		//Filter only entities that ever gets close to player
 		HashSet<EnemyLog> set = new HashSet<EnemyLog>();
 		set.addAll(logs.values());
 		set.removeIf(log -> !log.everCloseToPlayer(relevantRange));
 		if(set.size() == 0){
 			//System.out.println("\thit 0 of 0 (Never close up)");
-			EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, "NoCloseUp");
+			if(EvaluationApp.missCountTable != null)
+				EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, "NoCloseUp");
 			return -1;
 		}
 		
@@ -463,17 +472,18 @@ public class BattleProfile {
 			//System.out.println("\thit "+hitCount+" of "+maxHitCount);
 			sumMissRate += hitCount*1f/maxHitCount;
 		}
-		EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, ""+sumMissRate/set.size());
+		if(EvaluationApp.missCountTable != null)
+			EvaluationApp.missCountTable.setCell(EvaluationApp.fhTemp, ""+sumMissRate/set.size());
 		//System.out.println("miss "+name+" "+set.size());
 		return Math.min(1, sumMissRate/set.size());
 	}
 	
-	private float getRemainingHPPercent(int timeLimit){
+	public float getRemainingHPPercent(int timeLimit){
 		for(EnemyLog log : logs.values()){
 			if(log.isMainAgent){
 				int remainingHp = log.maxHP;
 				for(int damagedFrame : log.damagedFrame){
-					if(damagedFrame >= timeLimit){
+					if(timeLimit > 0 && damagedFrame >= timeLimit){
 						break;
 					}
 					remainingHp--;
@@ -487,5 +497,9 @@ public class BattleProfile {
 		}
 		//The only case here is player takes too long to land first strike on enemy
 		return 1;
+	}
+	
+	public int getBulletCount(){
+		return logs.size()-1;
 	}
 }
