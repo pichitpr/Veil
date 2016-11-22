@@ -59,7 +59,7 @@ public class TheGame extends Game {
         	GameConstant.unbeatableBattleTime = frameTime;
         }catch(Exception ex){}
         */
-        if(!GameConstant.useAI)
+        if(!GameConstant.useAI && GameConstant.profilingMode)
         	sequence = 0;
         else
         	sequence = 6;
