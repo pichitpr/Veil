@@ -36,7 +36,10 @@ public class EvalAgentApp extends Game {
 			float baseMissrate = baselineMissrate[i];
 			float baseHp = baselineHpPercent[i];
 			System.out.println("######$$$######  "+type+"  ######$$$######");
-			FileHandle target = GameConstant.profileDir.child(type);
+			FileHandle target = GameConstant.profileDir.child(type); 
+			if(!target.exists()){
+				target.mkdirs();
+			}
 			ProfileEvaluator eva = new ProfileEvaluator();
 	        eva.addBattleProfilePath(target);
 	        eva.addRangeProfilePath(rangeProfile);
@@ -52,7 +55,7 @@ public class EvalAgentApp extends Game {
 	        FileHandle failLowSubdir = failLowScript.child(type);
 	        failLowSubdir.mkdirs();
 	        FileHandle failHighSubdir = failHighScript.child(type);
-	        failHighScript.mkdirs();
+	        failHighSubdir.mkdirs();
 	        List<String> evaluated = enemiesList[0];
 	        List<String> lowMiss = enemiesList[1];
 	        List<String> highMiss = enemiesList[2];
