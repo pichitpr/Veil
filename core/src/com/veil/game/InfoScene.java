@@ -29,7 +29,7 @@ public class InfoScene implements Screen{
 	
 	@Override
 	public void render(float delta) {
-		Controller.instance.preUpdate();
+		Controller.instance.preUpdateInfoScene();
 		if(Controller.instance.pause){
 			game.nextScene();
 			return;

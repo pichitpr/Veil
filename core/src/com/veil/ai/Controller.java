@@ -41,6 +41,24 @@ public class Controller {
 		}
 	}
 	
+	//Bandaid code for InfoScene
+	public void preUpdateInfoScene(){
+		up = false;
+		down = false;
+		left = false;
+		right = false;
+		jump = false;
+		shoot = false;
+		pause = false;
+		if(!GameConstant.useAI){
+			if(extController == null){
+				controlWithKeyboard();
+			}else{
+				controlWithExtController();
+			}
+		}
+	}
+	
 	private void controlWithKeyboard(){
 		if(Gdx.input.isKeyPressed(Input.Keys.UP)){
 			up = true;
