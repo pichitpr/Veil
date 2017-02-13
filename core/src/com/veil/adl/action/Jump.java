@@ -33,6 +33,10 @@ public class Jump implements IAction{
 			
 			//acc vector g
 			float g = -dyn.getGravityEff()*level.getGravity();
+			if(Float.compare(Math.abs(g), 0) == 0){
+				//Force end if g == 0 to prevent NaN
+				return true;
+			}
 			if(g > 0) maxHeight = -maxHeight;
 			
 			//distance vector dy
