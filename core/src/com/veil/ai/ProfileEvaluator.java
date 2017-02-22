@@ -339,6 +339,11 @@ public class ProfileEvaluator {
 	
 	private void constructProfileTable(FileHandle source, HashMap<String, List<ClusteringProfile>> table, int relevantRange,
 			int capDuration){
+		constructProfileTable(source, table, relevantRange, capDuration, false);
+	}
+	
+	private void constructProfileTable(FileHandle source, HashMap<String, List<ClusteringProfile>> table, int relevantRange,
+			int capDuration, boolean skipInvalidMissrate){
 		if(!source.isDirectory()){
 			BattleProfile battleProfile = new BattleProfile();
 			battleProfile.load(source);
@@ -348,7 +353,11 @@ public class ProfileEvaluator {
 			}
 			List<ClusteringProfile> list = table.get(enemyName);
 			float missrate = battleProfile.getMissRate(relevantRange, -1);
-			if(missrate < 0) missrate = 0;
+			if(missrate < 0){
+				if(skipInvalidMissrate)
+					return;
+				missrate = 0;
+			}
 			String[] split = source.pathWithoutExtension().split("/");
 			String playerName = split[split.length-2];
 			list.add(new ClusteringProfile(
@@ -514,5 +523,33 @@ public class ProfileEvaluator {
 		}
 		resultFile.writeString(csv, false);
 		return new List[]{evaluatedEnemies, lowMissrateEnemies, highMissrateEnemies};
+	}
+	
+	//=================================================
+	
+	public void dumpProfile(float capDuration, FileHandle resultFile){
+		int relevantRange = RangeProfile.calculateRelevantRange(rangeProfileTmp);
+		HashMap<String,List<ClusteringProfile>> profileTable = new HashMap<String, List<ClusteringProfile>>();
+		constructProfileTable(battleProfileTmp, profileTable, relevantRange, (int)capDuration, true);
+		String csv = "x,Dur,MissrateAvg,HpAvg(cap="+capDuration+")\n";
+		for(Entry<String,List<ClusteringProfile>> entry : profileTable.entrySet()){
+			if(entry.getValue().size() == 0){
+				csv += entry.getKey()+",-,-,-\n";
+				continue;
+			}
+			float durationAvg = 0;
+			float missrateAvg = 0;
+			float hpPercentAvg = 0;
+			for(ClusteringProfile profile : entry.getValue()){
+				durationAvg += profile.battleDuration;
+				missrateAvg += profile.missrate;
+				hpPercentAvg += profile.remainingHpPercent;
+			}
+			durationAvg /= entry.getValue().size();
+			missrateAvg /= entry.getValue().size();
+			hpPercentAvg /= entry.getValue().size();
+			csv += entry.getKey()+","+durationAvg+","+missrateAvg+","+hpPercentAvg+"\n";
+		}
+		resultFile.writeString(csv, false);
 	}
 }
