@@ -12,8 +12,8 @@ public class EvalAgentApp extends Game {
 
 	private String[] typeDir = {"Enemy","Elite","Miniboss","Boss"};
 	private float[] avgCapDuration = {152.9167f, 329.8f, 596.333f, 1337.5263f}; //Based on clustering result
-	private float[] baselineMissrate = {0.07246f, 0.0667f, 0.1246f, 0.1874f}; //Based on AI result against dataset
-	private float[] baselineHpPercent = {0.05789f, 0, 0, 0.00132f}; //Based on AI result against dataset
+	private float[] baselineMissrate = {0.0652f, 0.0667f, 0.1246f, 0.1669f}; //Based on AI result against dataset (only collected from valid one)
+	private float[] baselineHpPercent = {0.1667f, 0.04722f, 0, 0.03997f}; //Based on AI result against selected cluster, duration is capped with capDuration
 	
 	@Override
 	public void create() {
