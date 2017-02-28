@@ -362,7 +362,7 @@ public class ProfileEvaluator {
 			String playerName = split[split.length-2];
 			list.add(new ClusteringProfile(
 					playerName, battleProfile.getBattleDuration(), missrate, 
-					battleProfile.getRemainingHPPercent(capDuration <= 0 ? (int)(battleProfile.getBattleDuration()) : capDuration),
+					battleProfile.getRemainingHPPercent(capDuration <= 0 ? (int)(battleProfile.getBattleDuration())+1 : capDuration),
 					battleProfile.getBulletCount()
 					));
 		}else{
