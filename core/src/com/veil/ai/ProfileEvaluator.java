@@ -345,6 +345,7 @@ public class ProfileEvaluator {
 	private void constructProfileTable(FileHandle source, HashMap<String, List<ClusteringProfile>> table, int relevantRange,
 			int capDuration, boolean skipInvalidMissrate){
 		if(!source.isDirectory()){
+			System.out.println(source.path());
 			BattleProfile battleProfile = new BattleProfile();
 			battleProfile.load(source);
 			String enemyName = battleProfile.getName();
@@ -360,9 +361,16 @@ public class ProfileEvaluator {
 			}
 			String[] split = source.pathWithoutExtension().split("/");
 			String playerName = split[split.length-2];
+			/*
 			list.add(new ClusteringProfile(
 					playerName, battleProfile.getBattleDuration(), missrate, 
 					battleProfile.getRemainingHPPercent(capDuration <= 0 ? (int)(battleProfile.getBattleDuration())+1 : capDuration),
+					battleProfile.getBulletCount()
+					));
+					*/
+			list.add(new ClusteringProfile(
+					playerName, Integer.MAX_VALUE, missrate, 
+					battleProfile.getRemainingHPPercent(capDuration <= 0 ? Integer.MAX_VALUE : capDuration),
 					battleProfile.getBulletCount()
 					));
 		}else{
@@ -499,7 +507,7 @@ public class ProfileEvaluator {
 				missrateResult = Math.abs(missrateAvg - missrateBaseline) <= errorMargin;
 			}
 			if(hpPercentBaseline >= 0){
-				hpResult = Math.abs(hpPercentAvg - hpPercentBaseline) <= errorMargin;
+				hpResult = Math.abs(hpPercentAvg - hpPercentBaseline) <= 0.00001f; //The float is epsilon
 			}
 			csv += entry.getKey()+","+missrateAvg+","+hpPercentAvg+","+missrateResult+","+hpResult+","+
 					(missrateResult && hpResult)+"\n";
@@ -531,12 +539,14 @@ public class ProfileEvaluator {
 		int relevantRange = RangeProfile.calculateRelevantRange(rangeProfileTmp);
 		HashMap<String,List<ClusteringProfile>> profileTable = new HashMap<String, List<ClusteringProfile>>();
 		constructProfileTable(battleProfileTmp, profileTable, relevantRange, (int)capDuration, true);
-		String csv = "x,Dur,MissrateAvg,HpAvg(cap="+capDuration+")\n";
+		//String csv = "x,Dur,MissrateAvg,HpAvg(cap="+capDuration+")\n";
+		String csv = "";
 		for(Entry<String,List<ClusteringProfile>> entry : profileTable.entrySet()){
 			if(entry.getValue().size() == 0){
-				csv += entry.getKey()+",-,-,-\n";
+				csv += entry.getKey()+",---------\n";
 				continue;
 			}
+			csv += entry.getKey()+"";
 			float durationAvg = 0;
 			float missrateAvg = 0;
 			float hpPercentAvg = 0;
@@ -544,7 +554,9 @@ public class ProfileEvaluator {
 				durationAvg += profile.battleDuration;
 				missrateAvg += profile.missrate;
 				hpPercentAvg += profile.remainingHpPercent;
+				//csv += ","+profile.remainingHpPercent;
 			}
+			//csv += "\n";
 			durationAvg /= entry.getValue().size();
 			missrateAvg /= entry.getValue().size();
 			hpPercentAvg /= entry.getValue().size();

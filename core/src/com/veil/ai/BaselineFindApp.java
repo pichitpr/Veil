@@ -24,7 +24,7 @@ public class BaselineFindApp extends Game{
 	        eva.addBattleProfilePath(target);
 	        eva.addRangeProfilePath(rangeProfile);
 	        eva.begin();
-	        eva.dumpProfile(-1, battleProfile.child(type+".csv"));
+	        eva.dumpProfile(capDuration, battleProfile.child(type+".csv"));
 	        eva.end();
 		}
 	}

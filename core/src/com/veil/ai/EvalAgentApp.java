@@ -32,9 +32,7 @@ public class EvalAgentApp extends Game {
 		
 		for(int i=0; i<4; i++){
 			String type = typeDir[i];
-			float capDuration = avgCapDuration[i];
 			float baseMissrate = baselineMissrate[i];
-			float baseHp = baselineHpPercent[i];
 			System.out.println("######$$$######  "+type+"  ######$$$######");
 			FileHandle target = GameConstant.profileDir.child(type); 
 			if(!target.exists()){
@@ -44,7 +42,7 @@ public class EvalAgentApp extends Game {
 	        eva.addBattleProfilePath(target);
 	        eva.addRangeProfilePath(rangeProfile);
 	        eva.begin();
-	        List<String>[] enemiesList = eva.evaluateIndividually(capDuration, baseMissrate, baseHp, 
+	        List<String>[] enemiesList = eva.evaluateIndividually(-1, baseMissrate, 0, 
 	        		PlatformUtility.fileOperator.getStorageRoot().child("gen_eval_"+type+".csv")
 	        		);
 	        eva.end();
