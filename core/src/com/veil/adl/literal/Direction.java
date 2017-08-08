@@ -29,7 +29,11 @@ public class Direction {
 	}
 	
 	public void setDirection(float x,float y){
-		data = new Vector2(x,y);
+		if(Float.compare(x, 0) == 0 && Float.compare(y, 0) == 0){
+			data = new Vector2(1,0);
+		}else{
+			data = new Vector2(x,y);
+		}
 	}
 	
 	public void setDirectionDegree(float degree){
@@ -116,7 +120,7 @@ public class Direction {
 	
 	public static Direction getNearestFromSet(List<Direction> dSet, Direction dir){
 		Direction pickedDir = null;
-		float minDeg = 400;
+		float minDeg = Float.MAX_VALUE;
 		for(int i=0; i<dSet.size(); i++){
 			if(Math.abs(dir.deltaDegree(dSet.get(i))) < minDeg){
 				minDeg = Math.abs(dir.deltaDegree(dSet.get(i)));

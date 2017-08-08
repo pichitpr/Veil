@@ -15,6 +15,7 @@ public class Jump implements IAction{
 		ItpData itpData = (ItpData)itp.getAdditionalData();
 		Position pos = Position.parse(param[0]);
 		float maxHeight = ((Number)param[1]).floatValue(); //Must be positive
+		maxHeight = Math.abs(maxHeight);
 		//float spd = ((Number)parameter[2].value).floatValue();
 		DynamicEntity dyn = itpData.thisAgent;
 		LevelContainer level = itpData.level;

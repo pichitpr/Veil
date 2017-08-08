@@ -10,6 +10,11 @@ public class RangeCap implements IFunction{
 		float num = ((Number)param[0]).floatValue();
 		float min = ((Number)param[1]).floatValue();
 		float max = ((Number)param[2]).floatValue();
+		if(max < min){
+			float tmp = max;
+			max = min;
+			min = tmp;
+		}
 		if(num < min) num = min;
 		if(num > max) num = max;
 		return num;

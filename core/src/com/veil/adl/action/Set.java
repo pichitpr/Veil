@@ -3,6 +3,7 @@ package com.veil.adl.action;
 import adl_2daa.IAction;
 import adl_2daa.SequenceInterpreter;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.veil.adl.literal.Direction;
 import com.veil.adl.literal.Position;
 import com.veil.game.element.DynamicEntity;
@@ -43,7 +44,12 @@ public class Set implements IAction {
 		}else if(stat.equalsIgnoreCase("phasing")){
 			dyn.phasing = (Boolean)val;
 		}else if(stat.equalsIgnoreCase("texture")){
-			dyn.setTexture(((Number)val).intValue());
+			int tx = ((Number)val).intValue();
+			//Random texture for out-of-range data
+			if(tx < 1 || tx > 6){
+				tx = MathUtils.random(1, 6);
+			}
+			dyn.setTexture(tx);
 		}else{ //HP
 			dyn.setBaseHP(((Number)val).intValue());
 		}
