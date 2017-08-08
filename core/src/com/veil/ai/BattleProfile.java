@@ -269,6 +269,8 @@ public class BattleProfile {
 			for(EnemyLog log : logs.values()){
 				out.writeObject(log);
 			}
+			out.close();
+			bos.close();
 			byte[] bytes = bos.toByteArray();
 			fh.writeBytes(bytes, false);
 		} catch (IOException e) {
@@ -395,8 +397,9 @@ public class BattleProfile {
 				remaining--;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Error loading battle profile "+fh.nameWithoutExtension());
+			//e.printStackTrace();
+			//System.err.println("Error loading battle profile "+fh.nameWithoutExtension());
+			System.err.println(fh.nameWithoutExtension());
 		}
 	}
 	
