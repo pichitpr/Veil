@@ -164,6 +164,12 @@ public class GameAI_v5 extends GameAI {
 		}else{
 			shootDelayCounter--;
 		}
+		
+		DummyPlayer dummy = new DummyPlayer(info.level, 1);
+		dummy.mimicPlayer(info.player);
+		Rectangle[] rect = dummy.simulatePosition(controller.left, controller.right, controller.up, controller.down, controller.jump,
+				buttonChangeDelay, delta);
+		simulatedPlayerPos = rect;
 	}
 	
 	private void resetWander(){
@@ -267,7 +273,15 @@ public class GameAI_v5 extends GameAI {
 				index++;
 			}
 		}
-		predictedEnemyPos = predictedEnemies;
+		
+		Rectangle[][] predicted = new Rectangle[predictedEnemies.length+(info.enemy == null ? 0 : 1)][];
+		for(int i=0; i<predictedEnemies.length;i++){
+			predicted[i] = predictedEnemies[i];
+		}
+		if(info.enemy != null){
+			predicted[predicted.length-1] = predictedMainEnemy;
+		}
+		predictedEnemyPos = predicted;
 		
 		//Search for best combination		
 		int minCost = Integer.MAX_VALUE;
@@ -275,7 +289,7 @@ public class GameAI_v5 extends GameAI {
 		//Loop through all possible button presses and pick the best
 		for(ButtonCombination btn : ButtonCombination.values()){
 			int cost = calculateCombinationCost(btn, info.enemy, currentEnemies, predictedMainEnemy, predictedEnemies, info, delta);
-			System.out.print(btn+":"+cost+"  ");
+			//System.out.print(btn+":"+cost+"  ");
 			if(cost <= minCost){
 				if(cost < minCost){
 					selectedCombination.clear();
@@ -283,7 +297,8 @@ public class GameAI_v5 extends GameAI {
 				}
 				selectedCombination.add(btn);
 			}
-		} System.out.println("");
+		}
+		//System.out.println("");
 		
 		ButtonCombination newCombination = currentCombination;
 		if(selectedCombination.size() == 1){
