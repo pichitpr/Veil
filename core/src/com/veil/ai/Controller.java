@@ -3,7 +3,6 @@ package com.veil.ai;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.controllers.PovDirection;
 import com.veil.game.GameConstant;
 
 public class Controller {

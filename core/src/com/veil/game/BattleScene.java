@@ -541,7 +541,7 @@ public class BattleScene implements Screen, LevelContainer{
 		}
 		
 		if(GameConstant.timeStepping){
-			if(!Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+			if(!Gdx.input.isKeyPressed(Input.Keys.SPACE)){
 				renderGame(delta);
 				debugRender(delta);
 				return;

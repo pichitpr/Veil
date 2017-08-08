@@ -241,7 +241,7 @@ public class RangeProfile {
 			if(!fh.isDirectory()){
 				RangeProfile profile = new RangeProfile();
 				profile.load(fh);
-				profile.print();
+				//profile.print();
 				int totalDistance = 0;
 				int counter = 0;
 				for(DistanceLog log : profile.logs.values()){

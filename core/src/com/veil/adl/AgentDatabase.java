@@ -1,6 +1,10 @@
 package com.veil.adl;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+
+import org.apache.commons.io.FileUtils;
 
 import adl_2daa.AgentModel;
 import adl_2daa.Registry;
@@ -8,6 +12,7 @@ import adl_2daa.ast.structure.Agent;
 import adl_2daa.ast.structure.Root;
 import adl_2daa.tool.ADLCompiler;
 import adl_2daa.tool.Parser;
+import adl_2daa.tool.Tokenizer;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.veil.adl.action.AddExtraVelocityToPlayer;
@@ -169,6 +174,8 @@ public class AgentDatabase {
 				System.out.println("Parsing & compiling file : "+f.name());
 				try {
 					script = f.readString();
+					/*Tokenizer tok = new Tokenizer(script);
+					FileUtils.writeStringToFile(new File("tokenizer.txt"), tok.dumpTokenizedString(), StandardCharsets.US_ASCII, false);*/
 					parser = new Parser();
 					astRoot = parser.parse(script);
 					for(Agent astAgent : astRoot.getRelatedAgents()){

@@ -17,6 +17,9 @@ public class ScriptedEntity extends DynamicEntity{
 		this.identifier = identifier;
 		this.interpreter = new VeilAgentInterpreter(AgentDatabase.getAgentModelFor(identifier),
 				this, level);
+		//this.interpreter.stateVerbose = true;
+		//this.interpreter.sequenceVerbose = true;
+		//this.interpreter.detailVerbose = true;
 		this.interpreter.onSpawn();
 	}
 	
@@ -75,7 +78,7 @@ public class ScriptedEntity extends DynamicEntity{
 								this.hp = 0;
 							invulFrameCounter = invulFrame;
 						}else{
-							sfxReflect.play(1.f);
+							//sfxReflect.play(1.f);
 						}
 						
 						if(dyn.projectile && !dyn.invul){
