@@ -12,6 +12,10 @@ public class DesktopLauncher {
 		config.width = 640;
 		config.height = 64*9;
 		new LwjglApplication(new TheGame(), config);
+		//new LwjglApplication(new EvaluationApp(), config);
+		//new LwjglApplication(new ClusteringApp(), config);
+		//new LwjglApplication(new EvalAgentApp(), config);
+		//new LwjglApplication(new BaselineFindApp(), config);
 		PlatformUtility.fileOperator = new DesktopFileOperator();
 	}
 }
